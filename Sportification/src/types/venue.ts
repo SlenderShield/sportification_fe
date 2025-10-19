@@ -1,70 +1,126 @@
 export interface Venue {
-  id: string;
+  _id: string;
   name: string;
   description?: string;
-  address: string;
-  location?: {
-    type: 'Point';
-    coordinates: [number, number];
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    zipCode?: string;
+    country: string;
+    coordinates?: {
+      type: 'Point';
+      coordinates: [number, number];
+    };
   };
   sports: string[];
   facilities: string[];
-  images?: string[];
-  pricing: VenuePricing[];
-  availability: VenueAvailability[];
-  rating?: number;
-  ownerId: string;
+  amenities: string[];
+  images: string[];
+  operatingHours?: OperatingHours[];
+  rules?: string[];
+  cancellationPolicy?: string;
+  contact?: {
+    phone?: string;
+    email?: string;
+    website?: string;
+  };
+  pricing?: VenuePricing[];
+  ratings?: {
+    average: number;
+    count: number;
+  };
+  status: 'active' | 'inactive' | 'maintenance';
+  isVerified: boolean;
+  owner: {
+    _id: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+    };
+  };
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
+}
+
+export interface OperatingHours {
+  day: string;
+  open: string;
+  close: string;
+  isClosed: boolean;
 }
 
 export interface VenuePricing {
   sport?: string;
   pricePerHour: number;
   currency: string;
-}
-
-export interface VenueAvailability {
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string;
+  peakHourMultiplier?: number;
 }
 
 export interface Booking {
-  id: string;
-  venueId: string;
-  venue?: Venue;
-  userId: string;
+  _id: string;
+  venue: {
+    _id: string;
+    name: string;
+    location: {
+      address: string;
+    };
+  };
+  user: {
+    _id: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+    };
+  };
+  sport: string;
+  date: string;
   startTime: string;
   endTime: string;
-  sport: string;
-  participants: string[];
+  duration: number;
+  participants?: number;
+  pricing: {
+    baseRate: number;
+    totalCost: number;
+    currency: string;
+    discount?: number;
+    tax?: number;
+  };
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
-  paymentStatus: 'pending' | 'paid' | 'refunded';
-  totalPrice: number;
-  promoCode?: string;
-  checkIn?: string;
-  checkOut?: string;
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+  notes?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface CreateBookingRequest {
   venueId: string;
+  sport: string;
+  date: string;
   startTime: string;
   endTime: string;
-  sport: string;
-  participants?: string[];
-  promoCode?: string;
+  participants?: number;
+  notes?: string;
 }
 
 export interface CheckAvailabilityRequest {
   venueId: string;
+  date: string;
   startTime: string;
   endTime: string;
 }
 
 export interface CheckAvailabilityResponse {
   available: boolean;
-  conflictingBookings?: Booking[];
+  conflictingBookings?: {
+    _id: string;
+    startTime: string;
+    endTime: string;
+  }[];
+  suggestedSlots?: {
+    startTime: string;
+    endTime: string;
+  }[];
 }
