@@ -95,7 +95,7 @@ const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
         Alert.alert('Success', 'Team created successfully!', [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('TeamDetail', { teamId: result.data.id }),
+            onPress: () => navigation.navigate('TeamDetail', { teamId: result.data!.id }),
           },
         ]);
       }
