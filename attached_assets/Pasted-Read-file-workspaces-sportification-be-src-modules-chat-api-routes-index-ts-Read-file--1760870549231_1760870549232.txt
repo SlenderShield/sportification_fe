@@ -1,0 +1,249 @@
+Read [](file:///workspaces/sportification-be/src/modules/chat/api/routes/index.ts)
+
+Read [](file:///workspaces/sportification-be/README.md#1-1), lines 1 to 201
+
+## Document Metadata
+| Field | Value |
+| --- | --- |
+| Title | PRD: Sportification - Cross-Platform React Native Mobile App |
+| Version | 1.0 |
+| Date | 19 Oct 2025 |
+| Author | GitHub Copilot PM Team |
+| Stakeholders | Product Owner, Mobile Dev Team, Backend Dev Team, QA, Design, Customer Success |
+| Revision History | Version | Date | Author | Summary |
+|  | 1.0 | 19 Oct 2025 | GitHub Copilot PM Team | Initial draft |
+
+## Executive Summary
+Sportification is a sports community platform whose backend already powers user onboarding, match and tournament coordination, venue bookings, social networking, chat, notifications, and analytics via a modular monolith with JWT auth, Socket.IO real-time messaging, and event-driven notifications. This PRD defines a React Native app for iOS and Android that surfaces those capabilities through a cohesive mobile experience, enabling players, organizers, and venue managers to register, discover and manage events, coordinate teams, communicate, and receive timely alerts anywhere.
+
+## Problem Statement & Objectives
+- **Pain Points**
+  - Web-only access limits engagement during on-the-go sports planning.
+  - Players miss timely updates without mobile push and lightweight chat.
+  - Venue managers lack simplified booking management and analytics in the field.
+- **Business Objectives**
+  - Launch mobile channels that lift active monthly users by 30% within six months.
+  - Increase match and tournament participation conversions by 20% via mobile-first flows.
+  - Drive 25% more repeat bookings through real-time notifications and analytics.
+- **Success Metrics (KPIs)**
+  - DAU/MAU ratio ≥ 0.35 by Q2 2026.
+  - 90-day retention ≥ 45% for mobile cohorts.
+  - Crash-free sessions ≥ 99%.
+  - Push notification opt-in ≥ 70% of activated users.
+  - Average booking creation time < 3 minutes.
+
+## Target Audience & User Personas
+| Persona Name | Description | Goals | Pain Points | Tech Savviness |
+| --- | --- | --- | --- | --- |
+| Community Player | Ages 18-35, joins public matches, wants social play | Discover matches, manage profile, chat | Missed updates, clunky desktop flows | High |
+| Organizer Coach | Leads teams/tournaments, coordinates schedules | Create matches/tournaments, track participants, broadcast | Manual coordination, no mobile bracket view | Medium-High |
+| Venue Manager | Owns facility, manages bookings & payments | Confirm bookings, review analytics, mark check-ins | Overbookings, low visibility on mobile | Medium |
+
+## Scope & Assumptions
+- **In Scope**
+  - JWT-based authentication, profile management, password updates.
+  - Match browsing, creation, participation, scoring tied to `/api/v1/matches`.
+  - Tournament creation, joining, bracket monitoring via `/api/v1/tournaments`.
+  - Venue discovery and bookings, pricing, check-in/out (`/api/v1/venues`, `/api/v1/venues/bookings`).
+  - Team management and membership flows (`/api/v1/teams`).
+  - Real-time chat and Socket.IO feeds; RESTful message history.
+  - Event-driven notifications plus push integration mapping backend Notification events.
+  - Friends, stats, and achievements display via `/api/v1/users`.
+  - Admin/moderator tooling limited to existing role-gated endpoints.
+- **Out of Scope**
+  - Web or desktop clients.
+  - New backend capabilities (payments, ML, advanced analytics) beyond exposed APIs.
+  - Offline write-behind conflict resolution beyond simple optimistic updates.
+  - Custom modules marked TODO in backend (AI module, etc.).
+- **Assumptions**
+  - Backend REST & Socket.IO endpoints published at `/api/v1` with HTTPS access and CORS configured.
+  - React Native 0.72+, TypeScript, React Navigation stack.
+  - Expo not mandated; bare React Native with Fastlane-based CI/CD.
+  - Firebase (FCM/APNs) available for push and analytics SDK permitted.
+  - Users authenticate with email/password; MFA prompts handled via backend response `requiresMFA`.
+- **Dependencies**
+  - Backend availability (MongoDB, Redis, EventBus) and versioned OpenAPI spec (openapi.yaml).
+  - Third-party libs: Axios (networking), Redux Toolkit/RTK Query or React Query, Socket.IO client, react-native-push-notification/Notifee, react-native-async-storage.
+  - Apple Developer and Google Play accounts for distribution.
+  - Infrastructure for secrets management (e.g., AWS Secrets Manager / dotenv pipeline).
+
+## Functional Requirements
+### MoSCoW Prioritization & User Stories
+**Must Have**
+- **Authentication**
+  - As a user, I sign up via `/api/v1/auth/register` to create an account and receive access/refresh tokens.
+  - As a user, I log in with `/api/v1/auth/login`, store JWTs securely (AsyncStorage + Keychain/Keystore), refresh via `/api/v1/auth/refresh-token`.
+  - As a user, I can view `/api/v1/auth/profile`, update password (`/auth/change-password`), and log out (invalidate refresh tokens).
+- **Profile & Social**
+  - As a user, I edit profile (`/api/v1/users/profile`) including avatar uploads (TBD) and view achievements/stats.
+  - As a user, I search friends (`/api/v1/users/search`), add/remove friends (`/users/{id}/friend`).
+- **Matches**
+  - Create match: POST `/api/v1/matches` with validation (future-date schedule, max participants).
+  - Browse matches: GET `/api/v1/matches` with filters (sport, status, date).
+  - View match detail: GET `/api/v1/matches/{id}` with participants, venue, status.
+  - Join/leave match: POST `/matches/{id}/join|leave`, handle conflict errors.
+  - Update score/status: PUT `/matches/{id}/score`, `/matches/{id}/status` with role guard.
+- **Tournaments**
+  - CRUD: POST/GET `/api/v1/tournaments`, GET `/tournaments/{id}`, PUT `/tournaments/{id}`, DELETE (admin).
+  - Participation: POST `/tournaments/{id}/join|leave`, PUT `/tournaments/{id}/start`.
+  - Display bracket/standings using `bracket`, `participants`, `status`.
+- **Teams**
+  - Manage teams via `/api/v1/teams`: create, list, detail, join, leave, update, delete (role-based).
+- **Venues & Bookings**
+  - List venues `/api/v1/venues`, detail `/venues/{id}`.
+  - Booking flow: check availability `/venues/bookings/check-availability`, create booking `/venues/bookings`, view my bookings `/venues/bookings/my-bookings`, update/cancel, confirm payment (admin), check-in/out, mark no-show, view calendar/analytics.
+- **Chat & Real-Time**
+  - REST messaging: create chat `/api/v1/chats`, fetch chats/messages, send message (POST).
+  - Socket.IO: authenticate, join rooms (`user:{id}`, `match:{id}`), receive `new-message`, `match-updated`.
+- **Notifications**
+  - Fetch notifications `/api/v1/notifications`, mark read `/notifications/{id}`, mark all read.
+  - Push handling: convert NotificationService events into push payloads; maintain unread badge count.
+- **Analytics & Activity**
+  - For admin/mod roles: fetch dashboards `/api/v1/admin/analytics`, security events, BI metrics (subset prioritized for mobile).
+- **Error Handling & Localization**
+  - Display backend error `success: false`, message, `code`.
+  - Support English; infrastructure ready for future localization.
+
+**Should Have**
+- MFA challenge UX when `/auth/login` returns `requiresMFA`.
+- Offline caching for read endpoints (matches, chats) via persistent storage.
+- In-app reporting of suspicious activity tied to analytics/audit endpoints.
+- Match reminders and booking reminders (scheduled push using backend events + OS schedulers).
+- Map integration for venue location (lat/long from venue model).
+
+**Could Have**
+- Native biometric login (Face ID/Touch ID) for shortcut access to stored credentials.
+- Deep links for invites (`sportification://match/{id}`) mapping to detail screens.
+- Analytics visualizations for venue managers using `/venues/bookings/dashboard/stats`.
+- Apple/Google wallet passes for booking confirmations.
+
+**Won’t Have (V1)**
+- Social login (backend has placeholders only).
+- Payment processing UI beyond recording confirm payment (assumes done externally).
+- Custom theming beyond light/dark preference sync with backend.
+
+### Key Flows
+- **Authentication Flow (text diagram)**
+  ```
+  Login Screen -> POST /auth/login -> if requiresMFA -> MFA Screen -> POST /auth/login/mfa (TBD) -> tokens saved -> User Context hydrate -> navigate Home
+  ```
+- **Match Life Cycle**
+  ```
+  Home Feed -> Match Detail -> Join Match -> EventBus publishes matches.playerJoined -> Notifications + Socket rooms update -> Chat accessible -> Score update -> Completed -> Notification per participant
+  ```
+- **Booking Flow**
+  ```
+  Venue Detail -> Availability check -> Slot selection -> Booking form -> POST /venues/bookings -> Pending payment -> Confirm payment (if admin) -> Check-in/out -> Analytics update
+  ```
+
+### API Integrations
+| Feature | Endpoint(s) | Request/Response Schema | Error Handling |
+| --- | --- | --- | --- |
+| Register/Login | `/api/v1/auth/register`, `/auth/login`, `/auth/refresh-token` | JSON body (email, password, profile); response `{ success, data: { user, tokens } }` | 400 validation, 401 invalid credentials, 429 rate limit |
+| Profile | `/api/v1/auth/profile`, `/users/profile`, `/users/{id}` | GET returns profile, stats, achievements; PUT accepts optional fields | 401 auth required, 400 invalid fields |
+| Matches | `/matches`, `/matches/{id}`, `/matches/{id}/join|leave|score|status` | POST requires sport, schedule; responses embed participants, pagination | 400 validation, 403 forbidden, 404 not found, 409 conflicts (full, already participating) |
+| Tournaments | `/tournaments`, `/tournaments/{id}`, `/tournaments/{id}/join|leave|start` | Schema includes schedule startDate, participants array, status enums | 400/403/409 transitions, 404 missing |
+| Teams | `/teams`, `/teams/{id}`, `/teams/{id}/join|leave` | Members array with role; update limited to captain | 400 validation, 409 already member, 403 unauthorized |
+| Venues & Bookings | `/venues`, `/venues/bookings`, `/venues/bookings/{id}/*`, `/venues/{venueId}/analytics|calendar` | Booking DTO covering times, participants, promo codes; analytics returns counts/revenue | 400 validation, 403 owner-only accesses, 409 slot conflicts |
+| Chat | `/chats`, `/chats/{id}/messages` + Socket.IO events | REST returns chat participants, lastMessage; sockets emit JSON message objects | 401 if unauthenticated, 404 when not participant |
+| Notifications | `/notifications`, `/notifications/{id}`, `/notifications/mark-all-read` | Response includes unreadCount, event-driven payload metadata | 401 unauthorized |
+| Analytics (admin) | `/admin/analytics/*` | Complex dashboards with KPIs, trends arrays | 403 for non-admin roles |
+
+## Non-Functional Requirements
+- **Performance**: Initial load < 2s on mid-tier devices; subsequent screen transitions < 500ms with cached data. Match list paginated (limit 10 default). Use background sync for chats/bookings.
+- **Security**: Encrypt tokens using SecureStore/Keychain. Enforce TLS, verify SSL pinning (phase 2). Support biometric auth. Respect backend rate limiting, handle 401 with token refresh.
+- **Accessibility**: WCAG 2.1 AA (semantic labels, adjustable font sizes, color contrast). VoiceOver/TalkBack support for match cards, toggles.
+- **Scalability**: App must handle simultaneous Socket.IO connections equal to backend capacity (≥ 10k). Use lazy loading for lists.
+- **Reliability**: Automatically reconnect sockets, retry idempotent GETs (exponential backoff). Crash reporting integrated (Sentry/Firebase).
+- **Cross-Platform Consistency**: ≥95% shared code; platform-specific modules for push, biometrics, Apple sign-in (future). Test matrix: iOS 14+, Android 10+, tablets.
+
+## Technical Specifications
+- **Architecture (ASCII)**
+  ```
+  React Native App (Redux/React Query + Screens)
+        |-- Axios REST client --> HTTPS /api/v1/*
+        |-- Socket.IO client ----> ws(s)://.../socket.io
+        |-- Push handler <---- FCM/APNs notifications
+        |-- AsyncStorage/SecureStore for caching & tokens
+        v
+  Sportification Backend (Express, Modules: IAM, Users, Matches, Tournaments, Teams, Venues, Chat, Notifications)
+        -> MongoDB (Atlas)
+        -> Redis (sessions, rate limit)
+        -> EventBus -> Notification Service -> Push/Email
+  ```
+- **Tech Stack**
+  - React Native 0.72+, TypeScript, React Navigation v6 (stack + tabs).
+  - State: Redux Toolkit with RTK Query or React Query + Zustand for UI state.
+  - Networking: Axios with interceptors (auth token, refresh).
+  - Form handling: react-hook-form + yup for validation mirrored with express-validator rules.
+  - Styling: Tailwind (NativeWind) or Design System tokens; dark/light themes from user preferences.
+  - Socket.IO client 4.x for real-time.
+  - Push: Firebase Cloud Messaging + APNs (native modules).
+  - Analytics: Firebase Analytics + backend endpoints for admin screens.
+- **Development Workflow**
+  - GitFlow or trunk-based with feature branches.
+  - Linting via ESLint + Prettier; Type checking with `tsc`.
+  - CI/CD: GitHub Actions -> Fastlane for builds, App Center/TestFlight distribution.
+  - Secrets via `.env`, env-specific config using react-native-config; do not bundle sensitive server secrets.
+- **Testing Strategy**
+  - Unit: Jest + React Native Testing Library (components, hooks).
+  - Integration: Detox for E2E (login, match join, booking).
+  - Contract tests using backend OpenAPI (schemathesis or Dredd) to validate API adherence.
+  - Manual QA on key flows per release (auth, match creation, booking).
+  - Performance profiling with Flipper and Xcode Instruments.
+
+## UI/UX Design Guidelines
+- **Design System**
+  - Colors: Primary #1E3A8A (deep navy), Secondary #10B981 (green), Accent #F97316 (orange), Background #F9FAFB/#111827 (dark).
+  - Typography: SF Pro / Roboto with hierarchy (H1 28pt, H2 22pt, body 16pt).
+  - Components: Card (match, tournament, venue), FAB (create action), segmented controls for filters, pill tags (status), progress stepper (booking).
+- **Screen Wireframe Descriptions**
+  - Login: Branding header, email/password fields, CTA, “Forgot password”, social login placeholder.
+  - Dashboard: Tabs (Matches, Tournaments, Teams, Venues). Each tab lists cards with CTA chips (Join/View). Notification badge top-right.
+  - Match Detail: Hero image (sport), participants carousel, schedule/venue map, CTA join/leave, chat preview, stats, status timeline.
+  - Booking Flow: Calendar selector → Availability matrix → Pricing summary → Confirmation sheet with dynamic pricing breakdown.
+  - Chat: Conversation list sorted by `lastActivity`, message thread with bubbles, read receipts, quick reply composer, attachments (text only v1).
+  - Notifications Center: Filter chips (All, Matches, Teams, System), swipe to mark read, push toggle linking to preferences.
+  - Admin Analytics (role-gated): Dashboard showing KPIs cards, charts for active users, error rate, bookings.
+- **User Flows**
+  - First-time onboarding: Splash → Login/Register → Permissions (push, location) → Profile completion checklist.
+  - Match creation: Dashboard FAB → Select sport & type → Schedule & venue selection → Review → POST create → Confirmation.
+  - Booking management (venue manager): Dashboard → Venue analytics → Calendar view → Tap booking → Check-in/out actions.
+  - Real-time updates: Participate in match → Receive socket events for chat/match-updates → Push fallback if offline.
+
+## Risks & Mitigations
+| Risk | Likelihood | Impact | Mitigation |
+| --- | --- | --- | --- |
+| API contract drift between mobile and backend | Medium | High | Use OpenAPI codegen/contract tests; monitor backend release notes. |
+| Socket.IO disconnects on poor networks | High | Medium | Implement auto-reconnect, offline queue for messages, show connection state. |
+| Push notification delivery delays | Medium | Medium | Use event metadata for in-app fallbacks; background fetch to sync. |
+| Unauthorized access to admin endpoints from mobile | Low | High | Enforce role checks server-side, hide UI for non-admins, monitor audit logs. |
+| Large data payloads (chat history, analytics) degrade performance | Medium | Medium | Pagination, lazy loading, request compression. |
+| Platform-specific issues (biometrics, background tasks) | Medium | Medium | Feature flag advanced native features; start with basic token auth, test on real devices. |
+| Booking conflicts due to outdated client view | Medium | High | Always call `/check-availability` before booking; handle 409 gracefully with suggested slots. |
+
+## Timeline & Milestones
+| Phase | Duration | Milestones | Resources |
+| --- | --- | --- | --- |
+| Discovery & UX | 1 week | User flows, wireframes, API validation | PM, Designer, Lead Dev |
+| Foundation Sprint | 2 weeks | Auth, navigation, design system, API client setup | 2 RN devs, QA |
+| Core Features Sprint | 4 weeks | Matches, Tournaments, Teams, Notifications, Chat (REST + sockets) | 2 RN devs, backend support |
+| Bookings & Venues | 3 weeks | Booking flows, pricing display, venue management | RN dev, backend integrator |
+| Admin/Analytics & Polish | 2 weeks | Role-based UI, analytics dashboards, accessibility | RN dev, QA, designer |
+| Beta & Hardening | 2 weeks | E2E tests, crash fix, store preparation, push integration | Entire team |
+| Launch Readiness | 1 week | App Store/Play listing, marketing assets | PM, Design, Marketing |
+
+## Appendix
+- **Glossary**
+  - JWT: JSON Web Token used for access/refresh tokens.
+  - EventBus: In-app pub/sub channel linking module events (matches.match.created, etc.).
+  - Booking Status: `pending`, `confirmed`, `checked_in`, `completed`, `cancelled`, `no_show`.
+  - Match Types: `public`, `private`.
+  - Roles: `user`, `moderator`, `admin`.
+- **References**
+  - Backend modular architecture guide (PROJECT_STRUCTURE.md).
+  - API reference (openapi.yaml, Swagger at `/api/v1/docs`).
+  - Socket.IO usage documented in app.ts.
+  - Notification event mappings in NotificationEventSubscriber.ts.
+  - Booking business rules in BookingService.ts.
+  - Error handling contract in errorHandler.ts.
