@@ -6,7 +6,17 @@ Sportification is a React Native mobile application for iOS and Android (includi
 
 ## Recent Changes (October 19, 2025)
 
-**Backend API Integration - COMPLETE (Latest):**
+**Removed Web Support - Mobile-Only Focus (Latest):**
+- **Removed Web Server workflow**: Deleted webpack-based web server configuration
+- **Cleaned up web dependencies**: Removed react-native-web, webpack, babel-plugin-react-native-web, and related packages
+- **Deleted web files**: Removed index.web.js, webpack.config.js, and src/config/env.web.ts
+- **Updated package.json**: Removed web scripts (web, build:web), added iPad simulator script
+- **Created responsive utilities**: Built src/utils/responsive.ts with device detection, font scaling, spacing, and layout helpers
+- **Added tablet/iPad documentation**: Created TABLET_SUPPORT.md with implementation guidelines and best practices
+- **Updated architecture docs**: Modified replit.md to reflect mobile-first approach with tablet/iPad support
+- **App now supports**: iOS (iPhone/iPad) and Android (phone/tablet) with responsive layouts
+
+**Backend API Integration - COMPLETE:**
 - **Migrated all API types to MongoDB schema**: Updated all interfaces to use `_id` instead of `id` to match backend MongoDB documents
 - **Standardized API response format**: All responses now follow `{ success, data, message, timestamp }` structure
 - **Updated authentication endpoints**: Fixed token refresh endpoint from `/auth/refresh-token` to `/auth/refresh`
