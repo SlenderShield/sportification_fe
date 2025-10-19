@@ -64,11 +64,14 @@ src/
 - ⏳ Profile editing (pending)
 
 ### Matches
-- ✅ Match browsing with pagination
-- ✅ Match detail view
-- ⏳ Match creation
-- ⏳ Join/leave functionality
-- ⏳ Score updates
+- ✅ Match browsing with pagination and status badges
+- ✅ Match detail view with participant list and organizer badge
+- ✅ Match creation with sport/venue selection and validation
+- ✅ Join/leave functionality
+- ✅ Update match status (start, complete, cancel) - organizer only
+- ✅ Score display for completed matches
+- ✅ Delete match (organizer only)
+- ✅ Match navigation stack integrated
 
 ### Tournaments
 - ✅ Tournament listing
@@ -141,8 +144,13 @@ npm run android
 ## Recent Changes
 
 ### October 19, 2025 - Latest Update
+- **Match Management Complete**: Implemented full match CRUD with MatchDetailScreen, CreateMatchScreen, and MatchesNavigator
+  - Match creation with required validation (maxParticipants ≥2)
+  - Join/leave matches with participant tracking
+  - Status updates (start, complete, cancel) for organizers
+  - Score display for completed matches
 - **Team Management Complete**: Implemented full team CRUD with TeamsScreen, TeamDetailScreen, and CreateTeamScreen
-- **Navigation Enhancement**: Added Teams tab to bottom navigation with stack navigator
+- **Navigation Enhancement**: Added Teams and Matches stacks to bottom navigation
 - **Security Fix**: Migrated token storage from AsyncStorage to react-native-keychain for iOS Keychain/Android KeyStore
 - **Authentication Flow**: Fixed navigation issues - now relies on auth state instead of manual navigation
 - **API Integration**: Updated RootNavigator to use Axios instance instead of direct fetch
