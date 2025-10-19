@@ -18,6 +18,7 @@ module.exports = {
       'react-native$': 'react-native-web',
       '@env': path.resolve(appDirectory, 'src/config/env.web.ts'),
     },
+    fullySpecified: false,
   },
   module: {
     rules: [

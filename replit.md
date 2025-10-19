@@ -15,9 +15,16 @@ Sportification is a cross-platform React Native mobile application that serves a
 - Created userApi service for user and friends management endpoints
 - Fixed all type mismatches in Venue and Chat components
 - All navigators (Tournaments, Venues, Chats, Profile) integrated into MainNavigator
+- Firebase Cloud Messaging (FCM) for push notifications with foreground/background handling
+- React Native Web support with webpack configuration for web deployment
 
-**Outstanding:**
-- Firebase Cloud Messaging (FCM) setup for push notifications (PRD Must Have)
+**Technical Highlights:**
+- Cross-platform support: iOS, Android, and Web
+- Push notifications via FCM with Notifee for rich notifications
+- Web application served on port 5000 via webpack dev server
+- Platform-specific code execution (FCM only on native, web excluded)
+- Secure credential storage using iOS Keychain and Android KeyStore
+- JWT authentication with automatic token refresh
 
 ## User Preferences
 
