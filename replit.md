@@ -4,6 +4,21 @@
 
 Sportification is a cross-platform React Native mobile application that serves as the mobile companion to a sports community platform. The app enables users to discover and organize sports matches, participate in tournaments, manage teams, book venues, communicate through real-time chat, and receive notifications. Built with TypeScript and React Native 0.76.5, it provides iOS and Android users with comprehensive sports community features including social networking, event coordination, and venue management.
 
+## Recent Changes (October 19, 2025)
+
+**Completed Features:**
+- Tournament management with bracket view, join/leave, and start tournament functionality
+- Venue booking system with availability checking and booking creation
+- Real-time chat integration using Socket.IO for message history and live messaging
+- Notifications center with mark as read and navigation to related content
+- Profile features: edit profile, change password, friends management (search/add/remove)
+- Created userApi service for user and friends management endpoints
+- Fixed all type mismatches in Venue and Chat components
+- All navigators (Tournaments, Venues, Chats, Profile) integrated into MainNavigator
+
+**Outstanding:**
+- Firebase Cloud Messaging (FCM) setup for push notifications (PRD Must Have)
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -51,7 +66,8 @@ Preferred communication style: Simple, everyday language.
 - Automatic disconnection on logout
 
 **API Service Domains**
-- Auth: login, registration, profile management, stats, achievements, friend management
+- Auth: login, registration, profile management, stats, achievements, password change
+- User: profile updates, friends management (get/search/add/remove)
 - Matches: CRUD operations, participant management, scoring, status updates
 - Tournaments: creation, joining, bracket viewing, standings
 - Teams: team management, membership, captain operations
