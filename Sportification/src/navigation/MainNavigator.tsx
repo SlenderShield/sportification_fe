@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MatchesScreen from '../screens/Matches/MatchesScreen';
 import TournamentsScreen from '../screens/Tournaments/TournamentsScreen';
+import TeamsNavigator from './TeamsNavigator';
 import VenuesScreen from '../screens/Venues/VenuesScreen';
 import ChatsScreen from '../screens/Chat/ChatsScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
@@ -29,6 +30,14 @@ const MainNavigator = () => {
         component={TournamentsScreen}
         options={{
           title: 'Tournaments',
+        }}
+      />
+      <Tab.Screen
+        name="Teams"
+        component={TeamsNavigator}
+        options={{
+          title: 'Teams',
+          headerShown: false,
         }}
       />
       <Tab.Screen
