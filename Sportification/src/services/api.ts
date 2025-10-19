@@ -1,11 +1,8 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 import { API_CONFIG, getApiUrl } from '../config/api';
 
-const STORAGE_KEYS = {
-  ACCESS_TOKEN: '@sportification/access_token',
-  REFRESH_TOKEN: '@sportification/refresh_token',
-};
+const KEYCHAIN_SERVICE = 'com.sportification.app';
 
 class ApiService {
   private api: AxiosInstance;
@@ -26,7 +23,7 @@ class ApiService {
   private setupInterceptors() {
     this.api.interceptors.request.use(
       async (config: InternalAxiosRequestConfig) => {
-        const token = await AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+        const token = await this.getAccessToken();
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -67,10 +64,12 @@ class ApiService {
 
     this.refreshPromise = (async () => {
       try {
-        const refreshToken = await AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-        if (!refreshToken) {
+        const credentials = await Keychain.getGenericPassword({ service: KEYCHAIN_SERVICE });
+        if (!credentials) {
           throw new Error('No refresh token available');
         }
+
+        const { password: refreshToken } = credentials;
 
         const response = await axios.post(
           getApiUrl('/auth/refresh-token'),
@@ -89,21 +88,23 @@ class ApiService {
   }
 
   async saveTokens(accessToken: string, refreshToken: string): Promise<void> {
-    await AsyncStorage.multiSet([
-      [STORAGE_KEYS.ACCESS_TOKEN, accessToken],
-      [STORAGE_KEYS.REFRESH_TOKEN, refreshToken],
-    ]);
+    await Keychain.setGenericPassword(accessToken, refreshToken, {
+      service: KEYCHAIN_SERVICE,
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+    });
   }
 
   async clearTokens(): Promise<void> {
-    await AsyncStorage.multiRemove([
-      STORAGE_KEYS.ACCESS_TOKEN,
-      STORAGE_KEYS.REFRESH_TOKEN,
-    ]);
+    await Keychain.resetGenericPassword({ service: KEYCHAIN_SERVICE });
   }
 
   async getAccessToken(): Promise<string | null> {
-    return AsyncStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    try {
+      const credentials = await Keychain.getGenericPassword({ service: KEYCHAIN_SERVICE });
+      return credentials ? credentials.username : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   getAxiosInstance(): AxiosInstance {
