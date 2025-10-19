@@ -20,7 +20,9 @@ target 'Sportification' do
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    # Hermes is now enabled by default. To disable Hermes, set this to false.
+    :hermes_enabled => true
   )
 
   target 'SportificationTests' do

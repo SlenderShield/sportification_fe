@@ -1,0 +1,6 @@
+{
+  "optimization": "max",
+  "emitSourceMap": true,
+  "bytecode": true,
+  "sourceMapUrl": "index.android.bundle.map"
+}
