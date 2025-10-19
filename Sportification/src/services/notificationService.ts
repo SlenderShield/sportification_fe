@@ -14,6 +14,10 @@ class NotificationService {
     }
 
     try {
+      if (Platform.OS === 'ios') {
+        await messaging().registerDeviceForRemoteMessages();
+      }
+      
       await this.requestPermission();
       await this.setupNotificationHandlers();
       this.initialized = true;
@@ -63,10 +67,6 @@ class NotificationService {
     messaging().onMessage(async (remoteMessage) => {
       console.log('Foreground message received:', remoteMessage);
       await this.displayNotification(remoteMessage);
-    });
-
-    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-      console.log('Background message received:', remoteMessage);
     });
 
     notifee.onBackgroundEvent(async ({ type, detail }) => {
