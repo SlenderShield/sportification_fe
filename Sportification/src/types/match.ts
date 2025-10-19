@@ -1,63 +1,120 @@
 export interface Match {
-  id: string;
+  _id: string;
+  type: 'public' | 'private';
   sport: string;
   title: string;
   description?: string;
-  venue?: {
-    id: string;
-    name: string;
-    address: string;
-  };
+  venue?: Venue;
   schedule: {
-    startTime: string;
-    endTime: string;
+    date: string;
+    time: string;
+    timezone: string;
+    duration: number;
   };
   maxParticipants: number;
+  currentParticipants: number;
   participants: Participant[];
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'upcoming' | 'in-progress' | 'completed' | 'cancelled';
+  rules?: {
+    format?: string;
+    scoringSystem?: string;
+    skillLevel?: string;
+    equipment?: string;
+  };
+  requirements?: {
+    minSkillLevel?: string;
+    maxSkillLevel?: string;
+    ageRange?: {
+      min: number;
+      max: number;
+    };
+  };
   score?: MatchScore;
-  createdBy: string;
+  organizer: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  chat?: {
+    _id: string;
+    unreadCount?: number;
+  };
+  inviteCode?: string;
   createdAt: string;
   updatedAt: string;
 }
 
+export interface Venue {
+  _id: string;
+  name: string;
+  location: {
+    address: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  amenities?: string[];
+}
+
 export interface Participant {
-  userId: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
   username: string;
-  avatar?: string;
-  joinedAt: string;
-  status: 'confirmed' | 'pending' | 'declined';
+  role?: 'organizer' | 'participant';
+  profile?: {
+    skillLevel?: string;
+  };
 }
 
 export interface MatchScore {
-  team1: number;
-  team2: number;
+  team1?: number;
+  team2?: number;
   winner?: string;
 }
 
 export interface CreateMatchRequest {
+  type: 'public' | 'private';
   sport: string;
   title: string;
   description?: string;
-  venueId?: string;
-  schedule: {
-    startTime: string;
-    endTime: string;
-  };
   maxParticipants: number;
+  schedule: {
+    date: string;
+    time: string;
+    timezone: string;
+    duration: number;
+  };
+  venue?: string;
+  rules?: {
+    format?: string;
+    scoringSystem?: string;
+    skillLevel?: string;
+    equipment?: string;
+  };
+  requirements?: {
+    minSkillLevel?: string;
+    maxSkillLevel?: string;
+    ageRange?: {
+      min: number;
+      max: number;
+    };
+  };
 }
 
 export interface UpdateScoreRequest {
-  team1: number;
-  team2: number;
+  team1?: number;
+  team2?: number;
   winner?: string;
 }
 
 export interface MatchFilters {
   sport?: string;
   status?: string;
-  startDate?: string;
-  endDate?: string;
+  type?: string;
+  date?: string;
+  location?: string;
   page?: number;
   limit?: number;
 }

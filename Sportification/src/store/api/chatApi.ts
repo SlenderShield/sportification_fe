@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '../../config/api';
 import { Chat, Message, SendMessageRequest, CreateChatRequest } from '../../types/chat';
-import { ApiResponse, PaginatedResponse } from '../../types/api';
+import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 
 export const chatApi = createApi({
@@ -18,15 +18,20 @@ export const chatApi = createApi({
   }),
   tagTypes: ['Chat', 'Chats', 'Messages'],
   endpoints: (builder) => ({
-    getChats: builder.query<ApiResponse<PaginatedResponse<Chat>>, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 20 }) => `/chats?page=${page}&limit=${limit}`,
+    getChats: builder.query<ApiResponse<Chat[]>, { page?: number; limit?: number }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append('page', String(params.page));
+        if (params.limit) queryParams.append('limit', String(params.limit));
+        return `/chats?${queryParams.toString()}`;
+      },
       providesTags: ['Chats'],
     }),
-    getChat: builder.query<ApiResponse<Chat>, string>({
+    getChat: builder.query<ApiResponse<{ chat: Chat }>, string>({
       query: (id) => `/chats/${id}`,
       providesTags: (result, error, id) => [{ type: 'Chat', id }],
     }),
-    createChat: builder.mutation<ApiResponse<Chat>, CreateChatRequest>({
+    createChat: builder.mutation<ApiResponse<{ chat: Chat }>, CreateChatRequest>({
       query: (chatData) => ({
         url: '/chats',
         method: 'POST',
@@ -34,15 +39,22 @@ export const chatApi = createApi({
       }),
       invalidatesTags: ['Chats'],
     }),
-    getChatMessages: builder.query<ApiResponse<PaginatedResponse<Message>>, { chatId: string; page?: number; limit?: number }>({
-      query: ({ chatId, page = 1, limit = 50 }) => `/chats/${chatId}/messages?page=${page}&limit=${limit}`,
+    getChatMessages: builder.query<ApiResponse<Message[]>, { chatId: string; page?: number; limit?: number; before?: string; after?: string }>({
+      query: ({ chatId, page, limit, before, after }) => {
+        const params = new URLSearchParams();
+        if (page) params.append('page', String(page));
+        if (limit) params.append('limit', String(limit));
+        if (before) params.append('before', before);
+        if (after) params.append('after', after);
+        return `/chats/${chatId}/messages?${params.toString()}`;
+      },
       providesTags: (result, error, { chatId }) => [{ type: 'Messages', id: chatId }],
     }),
-    sendMessage: builder.mutation<ApiResponse<Message>, SendMessageRequest>({
-      query: ({ chatId, content, type = 'text' }) => ({
+    sendMessage: builder.mutation<ApiResponse<{ message: Message }>, { chatId: string; data: SendMessageRequest }>({
+      query: ({ chatId, data }) => ({
         url: `/chats/${chatId}/messages`,
         method: 'POST',
-        body: { content, type },
+        body: data,
       }),
       invalidatesTags: (result, error, { chatId }) => [
         { type: 'Messages', id: chatId },
@@ -58,5 +70,6 @@ export const {
   useGetChatQuery,
   useCreateChatMutation,
   useGetChatMessagesQuery,
+  useLazyGetChatMessagesQuery,
   useSendMessageMutation,
 } = chatApi;

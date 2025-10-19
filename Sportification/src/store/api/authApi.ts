@@ -35,7 +35,7 @@ export const authApi = createApi({
         try {
           const { data } = await queryFulfilled;
           if (data.success && data.data) {
-            const { accessToken, refreshToken } = data.data.tokens;
+            const { accessToken, refreshToken } = data.data;
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
@@ -53,7 +53,7 @@ export const authApi = createApi({
         try {
           const { data } = await queryFulfilled;
           if (data.success && data.data) {
-            const { accessToken, refreshToken } = data.data.tokens;
+            const { accessToken, refreshToken } = data.data;
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
@@ -61,7 +61,7 @@ export const authApi = createApi({
         }
       },
     }),
-    getProfile: builder.query<ApiResponse<User>, void>({
+    getProfile: builder.query<ApiResponse<{ user: User }>, void>({
       query: () => '/auth/profile',
       providesTags: ['Profile'],
     }),
@@ -87,8 +87,14 @@ export const authApi = createApi({
     getUserAchievements: builder.query<ApiResponse<Achievement[]>, string>({
       query: (userId) => `/users/${userId}/achievements`,
     }),
-    searchUsers: builder.query<ApiResponse<User[]>, string>({
-      query: (searchTerm) => `/users/search?q=${searchTerm}`,
+    searchUsers: builder.query<ApiResponse<User[]>, { search?: string; page?: number; limit?: number }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.search) queryParams.append('search', params.search);
+        if (params.page) queryParams.append('page', String(params.page));
+        if (params.limit) queryParams.append('limit', String(params.limit));
+        return `/users?${queryParams.toString()}`;
+      },
     }),
     addFriend: builder.mutation<ApiResponse<void>, string>({
       query: (userId) => ({

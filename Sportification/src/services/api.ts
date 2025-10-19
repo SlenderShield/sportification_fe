@@ -72,11 +72,12 @@ class ApiService {
         const { password: refreshToken } = credentials;
 
         const response = await axios.post(
-          getApiUrl('/auth/refresh-token'),
+          getApiUrl('/auth/refresh'),
           { refreshToken }
         );
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens;
+        const { accessToken } = response.data.data;
+        const newRefreshToken = refreshToken;
         await this.saveTokens(accessToken, newRefreshToken);
         return accessToken;
       } finally {

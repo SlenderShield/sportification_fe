@@ -18,21 +18,28 @@ export const notificationApi = createApi({
   }),
   tagTypes: ['Notification', 'Notifications'],
   endpoints: (builder) => ({
-    getNotifications: builder.query<ApiResponse<PaginatedResponse<Notification> & { unreadCount: number }>, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 20 }) => `/notifications?page=${page}&limit=${limit}`,
+    getNotifications: builder.query<ApiResponse<Notification[]>, { page?: number; limit?: number; read?: boolean; type?: string }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append('page', String(params.page));
+        if (params.limit) queryParams.append('limit', String(params.limit));
+        if (params.read !== undefined) queryParams.append('read', String(params.read));
+        if (params.type) queryParams.append('type', params.type);
+        return `/notifications?${queryParams.toString()}`;
+      },
       providesTags: ['Notifications'],
     }),
     markAsRead: builder.mutation<ApiResponse<void>, string>({
       query: (id) => ({
-        url: `/notifications/${id}`,
-        method: 'PUT',
+        url: `/notifications/${id}/read`,
+        method: 'PATCH',
       }),
       invalidatesTags: ['Notifications'],
     }),
     markAllAsRead: builder.mutation<ApiResponse<void>, void>({
       query: () => ({
-        url: '/notifications/mark-all-read',
-        method: 'PUT',
+        url: '/notifications/read-all',
+        method: 'PATCH',
       }),
       invalidatesTags: ['Notifications'],
     }),

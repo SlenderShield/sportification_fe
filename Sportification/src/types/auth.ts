@@ -1,10 +1,16 @@
 export interface User {
-  id: string;
+  _id: string;
   email: string;
+  firstName: string;
+  lastName: string;
   username: string;
+  isVerified: boolean;
   profile: UserProfile;
-  role: 'user' | 'admin' | 'moderator';
-  isEmailVerified: boolean;
+  settings?: UserSettings;
+  role?: 'user' | 'admin' | 'moderator';
+  isOnline?: boolean;
+  lastActiveAt?: string;
+  lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,21 +23,36 @@ export interface UserProfile {
   location?: string;
   sports?: string[];
   skillLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  achievements?: Achievement[];
+  statistics?: UserStats;
+}
+
+export interface UserSettings {
+  privacy?: {
+    profileVisibility?: 'public' | 'friends' | 'private';
+    showEmail?: boolean;
+    showLocation?: boolean;
+  };
+  notifications?: {
+    email?: boolean;
+    push?: boolean;
+    types?: string[];
+  };
 }
 
 export interface UserStats {
   matchesPlayed: number;
   matchesWon: number;
-  tournamentsPlayed: number;
+  winRate?: number;
+  tournamentsJoined: number;
   tournamentsWon: number;
-  totalScore: number;
+  averageRating?: number;
 }
 
 export interface Achievement {
-  id: string;
-  name: string;
+  type: string;
+  title: string;
   description: string;
-  icon: string;
   earnedAt: string;
 }
 
@@ -47,13 +68,20 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   user: User;
-  tokens: AuthTokens;
-  requiresMFA?: boolean;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface RegisterRequest {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
   username: string;
-  profile?: Partial<UserProfile>;
+  profile?: {
+    bio?: string;
+    location?: string;
+    sports?: string[];
+    skillLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  };
 }

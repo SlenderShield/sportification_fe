@@ -1,29 +1,63 @@
 export interface Tournament {
-  id: string;
+  _id: string;
   name: string;
   description?: string;
   sport: string;
+  type: 'elimination';
   format: 'single_elimination' | 'double_elimination' | 'round_robin';
   maxParticipants: number;
+  currentParticipants: number;
   participants: TournamentParticipant[];
-  schedule: {
-    startDate: string;
-    endDate: string;
+  status: 'registration_open' | 'in_progress' | 'completed' | 'cancelled';
+  registrationDeadline: string;
+  startDate: string;
+  endDate: string;
+  venue?: {
+    _id: string;
+    name: string;
+    location: {
+      address: string;
+    };
   };
-  status: 'upcoming' | 'in_progress' | 'completed' | 'cancelled';
+  rules?: {
+    matchFormat?: string;
+    scoringSystem?: string;
+    tiebreakRules?: string;
+    skillLevelRequired?: string;
+  };
+  prize?: {
+    total: number;
+    currency: string;
+    distribution?: {
+      first?: number;
+      second?: number;
+      third?: number;
+    };
+  };
   bracket?: TournamentBracket;
   standings?: TournamentStanding[];
-  createdBy: string;
+  organizer: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  entryFee?: {
+    amount: number;
+    currency: string;
+  };
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface TournamentParticipant {
-  userId?: string;
-  teamId?: string;
-  name: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
+  profile?: {
+    skillLevel?: string;
+  };
   seed?: number;
-  joinedAt: string;
+  joinedAt?: string;
 }
 
 export interface TournamentBracket {
@@ -31,20 +65,21 @@ export interface TournamentBracket {
 }
 
 export interface BracketRound {
-  roundNumber: number;
+  round: number;
   matches: BracketMatch[];
 }
 
 export interface BracketMatch {
-  id: string;
-  participant1?: string;
-  participant2?: string;
+  matchId: string;
+  player1?: string;
+  player2?: string;
   winner?: string;
+  status?: 'scheduled' | 'in_progress' | 'completed';
+  scheduledAt?: string;
   score?: {
-    participant1: number;
-    participant2: number;
+    player1?: number;
+    player2?: number;
   };
-  scheduledTime?: string;
 }
 
 export interface TournamentStanding {
@@ -62,8 +97,12 @@ export interface CreateTournamentRequest {
   sport: string;
   format: 'single_elimination' | 'double_elimination' | 'round_robin';
   maxParticipants: number;
-  schedule: {
-    startDate: string;
-    endDate: string;
+  registrationDeadline: string;
+  startDate: string;
+  endDate: string;
+  venueId?: string;
+  entryFee?: {
+    amount: number;
+    currency: string;
   };
 }

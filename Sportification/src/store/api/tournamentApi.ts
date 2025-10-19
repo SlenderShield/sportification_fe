@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '../../config/api';
-import { Tournament, CreateTournamentRequest } from '../../types/tournament';
-import { ApiResponse, PaginatedResponse } from '../../types/api';
+import { Tournament, CreateTournamentRequest, TournamentBracket } from '../../types/tournament';
+import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 
 export const tournamentApi = createApi({
@@ -16,17 +16,23 @@ export const tournamentApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Tournament', 'Tournaments'],
+  tagTypes: ['Tournament', 'Tournaments', 'Bracket', 'Standings'],
   endpoints: (builder) => ({
-    getTournaments: builder.query<ApiResponse<PaginatedResponse<Tournament>>, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 10 }) => `/tournaments?page=${page}&limit=${limit}`,
+    getTournaments: builder.query<ApiResponse<Tournament[]>, { page?: number; limit?: number; sport?: string }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append('page', String(params.page));
+        if (params.limit) queryParams.append('limit', String(params.limit));
+        if (params.sport) queryParams.append('sport', params.sport);
+        return `/tournaments?${queryParams.toString()}`;
+      },
       providesTags: ['Tournaments'],
     }),
-    getTournament: builder.query<ApiResponse<Tournament>, string>({
+    getTournament: builder.query<ApiResponse<{ tournament: Tournament }>, string>({
       query: (id) => `/tournaments/${id}`,
       providesTags: (result, error, id) => [{ type: 'Tournament', id }],
     }),
-    createTournament: builder.mutation<ApiResponse<Tournament>, CreateTournamentRequest>({
+    createTournament: builder.mutation<ApiResponse<{ tournament: Tournament }>, CreateTournamentRequest>({
       query: (tournamentData) => ({
         url: '/tournaments',
         method: 'POST',
@@ -34,15 +40,15 @@ export const tournamentApi = createApi({
       }),
       invalidatesTags: ['Tournaments'],
     }),
-    updateTournament: builder.mutation<ApiResponse<Tournament>, { id: string; data: Partial<CreateTournamentRequest> }>({
+    updateTournament: builder.mutation<ApiResponse<{ tournament: Tournament }>, { id: string; data: Partial<CreateTournamentRequest> }>({
       query: ({ id, data }) => ({
         url: `/tournaments/${id}`,
-        method: 'PUT',
+        method: 'PATCH',
         body: data,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Tournament', id }, 'Tournaments'],
     }),
-    joinTournament: builder.mutation<ApiResponse<void>, string>({
+    joinTournament: builder.mutation<ApiResponse<{ tournament: Tournament }>, string>({
       query: (id) => ({
         url: `/tournaments/${id}/join`,
         method: 'POST',
@@ -56,12 +62,20 @@ export const tournamentApi = createApi({
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Tournament', id }, 'Tournaments'],
     }),
-    startTournament: builder.mutation<ApiResponse<Tournament>, string>({
+    startTournament: builder.mutation<ApiResponse<{ tournament: Tournament }>, string>({
       query: (id) => ({
         url: `/tournaments/${id}/start`,
-        method: 'PUT',
+        method: 'POST',
       }),
-      invalidatesTags: (result, error, id) => [{ type: 'Tournament', id }, 'Tournaments'],
+      invalidatesTags: (result, error, id) => [{ type: 'Tournament', id }, 'Bracket'],
+    }),
+    getBracket: builder.query<ApiResponse<{ bracket: TournamentBracket }>, string>({
+      query: (id) => `/tournaments/${id}/bracket`,
+      providesTags: (result, error, id) => [{ type: 'Bracket', id }],
+    }),
+    getStandings: builder.query<ApiResponse<any>, string>({
+      query: (id) => `/tournaments/${id}/standings`,
+      providesTags: ['Standings'],
     }),
     deleteTournament: builder.mutation<ApiResponse<void>, string>({
       query: (id) => ({
@@ -81,5 +95,7 @@ export const {
   useJoinTournamentMutation,
   useLeaveTournamentMutation,
   useStartTournamentMutation,
+  useGetBracketQuery,
+  useGetStandingsQuery,
   useDeleteTournamentMutation,
 } = tournamentApi;

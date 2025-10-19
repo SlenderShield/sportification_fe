@@ -1,20 +1,40 @@
 export interface Team {
-  id: string;
+  _id: string;
   name: string;
   description?: string;
   sport: string;
   avatar?: string;
+  captain: {
+    _id: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+      username: string;
+    };
+  };
   members: TeamMember[];
-  captain: string;
-  maxMembers?: number;
+  chat?: {
+    _id: string;
+    type: string;
+    name?: string;
+  };
+  memberCount: number;
+  maxMembers: number;
+  isFull: boolean;
+  isActive: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface TeamMember {
-  userId: string;
-  username: string;
-  avatar?: string;
+  user: {
+    _id: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+      username: string;
+    };
+  };
   role: 'captain' | 'member';
   joinedAt: string;
 }
@@ -29,5 +49,6 @@ export interface CreateTeamRequest {
 export interface UpdateTeamRequest {
   name?: string;
   description?: string;
+  sport?: string;
   maxMembers?: number;
 }

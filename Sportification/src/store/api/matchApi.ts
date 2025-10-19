@@ -18,7 +18,7 @@ export const matchApi = createApi({
   }),
   tagTypes: ['Match', 'Matches'],
   endpoints: (builder) => ({
-    getMatches: builder.query<ApiResponse<PaginatedResponse<Match>>, MatchFilters>({
+    getMatches: builder.query<ApiResponse<Match[]>, MatchFilters>({
       query: (filters) => {
         const params = new URLSearchParams();
         Object.entries(filters).forEach(([key, value]) => {
@@ -30,11 +30,11 @@ export const matchApi = createApi({
       },
       providesTags: ['Matches'],
     }),
-    getMatch: builder.query<ApiResponse<Match>, string>({
+    getMatch: builder.query<ApiResponse<{ match: Match }>, string>({
       query: (id) => `/matches/${id}`,
       providesTags: (result, error, id) => [{ type: 'Match', id }],
     }),
-    createMatch: builder.mutation<ApiResponse<Match>, CreateMatchRequest>({
+    createMatch: builder.mutation<ApiResponse<{ match: Match }>, CreateMatchRequest>({
       query: (matchData) => ({
         url: '/matches',
         method: 'POST',
@@ -42,15 +42,15 @@ export const matchApi = createApi({
       }),
       invalidatesTags: ['Matches'],
     }),
-    updateMatch: builder.mutation<ApiResponse<Match>, { id: string; data: Partial<CreateMatchRequest> }>({
+    updateMatch: builder.mutation<ApiResponse<{ match: Match }>, { id: string; data: Partial<CreateMatchRequest> }>({
       query: ({ id, data }) => ({
         url: `/matches/${id}`,
-        method: 'PUT',
+        method: 'PATCH',
         body: data,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Match', id }, 'Matches'],
     }),
-    joinMatch: builder.mutation<ApiResponse<void>, string>({
+    joinMatch: builder.mutation<ApiResponse<{ match: Match }>, string>({
       query: (id) => ({
         url: `/matches/${id}/join`,
         method: 'POST',
@@ -64,18 +64,18 @@ export const matchApi = createApi({
       }),
       invalidatesTags: (result, error, id) => [{ type: 'Match', id }, 'Matches'],
     }),
-    updateScore: builder.mutation<ApiResponse<Match>, { id: string; score: UpdateScoreRequest }>({
+    updateScore: builder.mutation<ApiResponse<{ match: Match }>, { id: string; score: UpdateScoreRequest }>({
       query: ({ id, score }) => ({
         url: `/matches/${id}/score`,
-        method: 'PUT',
+        method: 'PATCH',
         body: score,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Match', id }, 'Matches'],
     }),
-    updateStatus: builder.mutation<ApiResponse<Match>, { id: string; status: string }>({
+    updateStatus: builder.mutation<ApiResponse<{ match: Match }>, { id: string; status: string }>({
       query: ({ id, status }) => ({
         url: `/matches/${id}/status`,
-        method: 'PUT',
+        method: 'PATCH',
         body: { status },
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Match', id }, 'Matches'],
