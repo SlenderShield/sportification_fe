@@ -24,17 +24,21 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx|ts|tsx)$/,
-        exclude: /node_modules\/(?!(@react-native|react-native))/,
+        exclude: /node_modules\/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler))/,
         use: {
           loader: 'babel-loader',
           options: {
+            cacheDirectory: true,
             presets: [
-              '@babel/preset-env',
+              ['@babel/preset-env', { targets: { browsers: ['last 2 versions'] } }],
               '@babel/preset-react',
               '@babel/preset-typescript',
             ],
             plugins: [
               '@babel/plugin-transform-runtime',
+              ['@babel/plugin-transform-class-properties', { loose: true }],
+              ['@babel/plugin-transform-private-methods', { loose: true }],
+              ['@babel/plugin-transform-private-property-in-object', { loose: true }],
               'react-native-web',
             ],
           },
@@ -58,6 +62,9 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
       __DEV__: process.env.NODE_ENV !== 'production',
     }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
   ],
   devServer: {
     static: {
@@ -71,6 +78,10 @@ module.exports = {
     allowedHosts: 'all',
     headers: {
       'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
     },
   },
+  ignoreWarnings: [
+    /Can't resolve 'react-native-reanimated'/,
+  ],
 };
