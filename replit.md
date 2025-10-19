@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sportification is a React Native mobile application for iOS and Android (including tablets and iPads) that provides a comprehensive sports community platform. The app enables users to discover and organize sports matches, participate in tournaments, manage teams, book venues, communicate through real-time chat, and receive notifications. Built with TypeScript and React Native 0.76.5, it delivers a responsive, tablet-optimized experience with comprehensive sports community features including social networking, event coordination, and venue management.
+Sportification is a React Native mobile application for iOS and Android (including tablets and iPads) that provides a comprehensive sports community platform. The app enables users to discover and organize sports matches, participate in tournaments, manage teams, book venues, communicate through real-time chat, and receive notifications. Built with TypeScript 5.9.3 and React Native 0.81.2, it delivers a responsive, tablet-optimized experience with comprehensive sports community features including social networking, event coordination, and venue management.
 
 ## Recent Changes (October 19, 2025)
 
