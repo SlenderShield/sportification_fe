@@ -6,25 +6,28 @@ Sportification is a cross-platform React Native mobile application that serves a
 
 ## Recent Changes (October 19, 2025)
 
-**Backend API Integration (Latest):**
+**Backend API Integration - COMPLETE (Latest):**
 - **Migrated all API types to MongoDB schema**: Updated all interfaces to use `_id` instead of `id` to match backend MongoDB documents
 - **Standardized API response format**: All responses now follow `{ success, data, message, timestamp }` structure
 - **Updated authentication endpoints**: Fixed token refresh endpoint from `/auth/refresh-token` to `/auth/refresh`
+- **Implemented transformResponse across all API services**: Created reusable helpers (unwrapApiResponse, unwrapNestedData) and applied to all 8 API services
 - **Enhanced API services with full backend integration**:
-  - matchApi: Added complete CRUD, join/leave, scoring, status management with proper filters
-  - tournamentApi: Added bracket and standings endpoints, updated to match tournament lifecycle
-  - teamApi: Added getMyTeams endpoint, member removal, proper response unwrapping
-  - chatApi: Updated message pagination with before/after cursors, proper message sending
-  - notificationApi: Updated read status management with correct endpoints
-  - userApi: Added user search, getUser with relationship data, comprehensive filtering
-  - venueApi: Restructured to separate venues and bookings, updated availability checking
+  - matchApi: Complete CRUD, join/leave, scoring, status management with proper filters, all endpoints unwrapped
+  - tournamentApi: Bracket and standings endpoints, tournament lifecycle management, all endpoints unwrapped
+  - teamApi: getMyTeams endpoint, member removal, all endpoints unwrapped
+  - chatApi: Message pagination with before/after cursors, message sending, all endpoints unwrapped
+  - notificationApi: Read status management with correct endpoints, all endpoints unwrapped
+  - userApi: User search, getUser with relationship data, comprehensive filtering, all endpoints unwrapped
+  - venueApi: Separate venues and bookings endpoints, availability checking, all endpoints unwrapped
+  - authApi: Login/register with token storage, profile management, all endpoints unwrapped
 - **Enhanced Socket.IO integration**:
   - Added typed event handlers for all backend WebSocket events
   - Implemented chat room management (join_chat, leave_chat, send_message)
   - Added match and tournament room subscriptions
   - Implemented typing indicators and message read receipts
   - Enhanced reconnection logic with event handler persistence
-- **Response data structure**: Updated all API hooks to properly unwrap nested data responses
+- **Response data handling**: All API hooks now return domain objects directly (Match[], Tournament[], etc.) instead of wrapped ApiResponse types, maintaining full backward compatibility with existing screens and components
+- **Void mutation support**: Properly handles endpoints that return no data (leaveMatch, changePassword, markAsRead, etc.)
 
 **Previously Completed Features:**
 - Tournament management with bracket view, join/leave, and start tournament functionality
