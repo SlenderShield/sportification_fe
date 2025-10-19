@@ -8,7 +8,9 @@
     "ios:ipad": "react-native run-ios --simulator='iPad Pro (12.9-inch)'",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "hermes:debug": "react-native start --experimental-debugger",
+    "hermes:profile": "react-native run-android --variant=release && adb shell am start -n com.sportification/.MainActivity"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
