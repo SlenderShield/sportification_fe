@@ -6,7 +6,7 @@ const appDirectory = path.resolve(__dirname);
 
 module.exports = {
   mode: 'development',
-  entry: path.resolve(appDirectory, 'index.web.js'),
+  entry: path.resolve(appDirectory, 'index.web.simple.js'),
   output: {
     filename: 'bundle.js',
     path: path.resolve(appDirectory, 'dist'),
@@ -17,11 +17,20 @@ module.exports = {
     alias: {
       'react-native$': 'react-native-web',
       '@env': path.resolve(appDirectory, 'src/config/env.web.ts'),
+      'react': path.resolve(appDirectory, 'node_modules/react'),
+      'react-dom': path.resolve(appDirectory, 'node_modules/react-dom'),
     },
     fullySpecified: false,
+    mainFields: ['browser', 'module', 'main'],
   },
   module: {
     rules: [
+      {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules\/(?!(react-native|@react-native|@react-navigation|react-native-vector-icons|react-native-safe-area-context|react-native-screens|react-native-gesture-handler))/,
