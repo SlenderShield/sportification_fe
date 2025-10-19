@@ -8,6 +8,7 @@ import { teamApi } from './api/teamApi';
 import { venueApi } from './api/venueApi';
 import { chatApi } from './api/chatApi';
 import { notificationApi } from './api/notificationApi';
+import { userApi } from './api/userApi';
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     [venueApi.reducerPath]: venueApi.reducer,
     [chatApi.reducerPath]: chatApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
+    [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -28,7 +30,8 @@ export const store = configureStore({
       teamApi.middleware,
       venueApi.middleware,
       chatApi.middleware,
-      notificationApi.middleware
+      notificationApi.middleware,
+      userApi.middleware
     ),
 });
 

@@ -1,11 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MatchesNavigator from './MatchesNavigator';
-import TournamentsScreen from '../screens/Tournaments/TournamentsScreen';
+import TournamentsNavigator from './TournamentsNavigator';
 import TeamsNavigator from './TeamsNavigator';
-import VenuesScreen from '../screens/Venues/VenuesScreen';
-import ChatsScreen from '../screens/Chat/ChatsScreen';
-import ProfileScreen from '../screens/Profile/ProfileScreen';
+import VenuesNavigator from './VenuesNavigator';
+import ChatsNavigator from './ChatsNavigator';
+import ProfileNavigator from './ProfileNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,9 +28,10 @@ const MainNavigator = () => {
       />
       <Tab.Screen
         name="Tournaments"
-        component={TournamentsScreen}
+        component={TournamentsNavigator}
         options={{
           title: 'Tournaments',
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -43,23 +44,26 @@ const MainNavigator = () => {
       />
       <Tab.Screen
         name="Venues"
-        component={VenuesScreen}
+        component={VenuesNavigator}
         options={{
           title: 'Venues',
+          headerShown: false,
         }}
       />
       <Tab.Screen
         name="Chats"
-        component={ChatsScreen}
+        component={ChatsNavigator}
         options={{
           title: 'Chats',
+          headerShown: false,
         }}
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileNavigator}
         options={{
           title: 'Profile',
+          headerShown: false,
         }}
       />
     </Tab.Navigator>

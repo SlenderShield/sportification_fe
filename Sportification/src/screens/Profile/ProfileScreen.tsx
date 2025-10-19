@@ -133,6 +133,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
+          onPress={() => navigation.navigate('Notifications')}
+        >
+          <Text style={styles.menuText}>Notifications</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuItem}
           onPress={() => navigation.navigate('ChangePassword')}
         >
           <Text style={styles.menuText}>Change Password</Text>
