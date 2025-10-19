@@ -14,10 +14,6 @@ author = "agent"
 task = "workflow.run"
 args = "Metro"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Web Server"
-
 [[workflows.workflow]]
 name = "Metro"
 author = "agent"
@@ -28,18 +24,6 @@ args = "cd Sportification && npm start"
 
 [workflows.workflow.metadata]
 outputType = "console"
-
-[[workflows.workflow]]
-name = "Web Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd Sportification && npm run web"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [nix]
 channel = "stable-25_05"

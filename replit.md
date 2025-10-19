@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sportification is a cross-platform React Native mobile application that serves as the mobile companion to a sports community platform. The app enables users to discover and organize sports matches, participate in tournaments, manage teams, book venues, communicate through real-time chat, and receive notifications. Built with TypeScript and React Native 0.76.5, it provides iOS and Android users with comprehensive sports community features including social networking, event coordination, and venue management.
+Sportification is a React Native mobile application for iOS and Android (including tablets and iPads) that provides a comprehensive sports community platform. The app enables users to discover and organize sports matches, participate in tournaments, manage teams, book venues, communicate through real-time chat, and receive notifications. Built with TypeScript and React Native 0.76.5, it delivers a responsive, tablet-optimized experience with comprehensive sports community features including social networking, event coordination, and venue management.
 
 ## Recent Changes (October 19, 2025)
 
@@ -37,18 +37,18 @@ Sportification is a cross-platform React Native mobile application that serves a
 - Profile features: edit profile, change password, friends management (search/add/remove)
 - All navigators (Tournaments, Venues, Chats, Profile) integrated into MainNavigator
 - Firebase Cloud Messaging (FCM) for push notifications with foreground/background handling
-- React Native Web support with webpack configuration for web deployment
+- **Tablet and iPad optimization** with responsive layouts and multi-column support
 
 **Technical Highlights:**
-- Cross-platform support: iOS, Android, and Web
+- **Mobile-first design**: iOS and Android with full tablet/iPad support
+- **Responsive UI**: Adaptive layouts for phones, tablets, and iPads (both orientations)
 - Full backend API integration with MongoDB-based data structures
 - Standardized API response handling across all services
 - Type-safe Socket.IO event system with comprehensive event handlers
 - Push notifications via FCM with Notifee for rich notifications
-- Web application served on port 5000 via webpack dev server
-- Platform-specific code execution (FCM only on native, web excluded)
 - Secure credential storage using iOS Keychain and Android KeyStore
 - JWT authentication with automatic token refresh via `/auth/refresh` endpoint
+- Device-aware scaling for fonts, spacing, and touch targets
 
 ## User Preferences
 
@@ -60,8 +60,10 @@ Preferred communication style: Simple, everyday language.
 
 **Framework & Platform**
 - React Native 0.76.5 with TypeScript for cross-platform mobile development (iOS & Android)
+- **Tablet and iPad optimized** with responsive utilities and adaptive layouts
 - Navigation managed through React Navigation with separate stacks for authenticated and unauthenticated flows
 - Bottom tab navigation for main app sections (Matches, Tournaments, Teams, Venues, Chats, Profile)
+- **Multi-column layouts** on tablets for efficient content display
 
 **State Management**
 - Redux Toolkit for global application state
@@ -143,12 +145,18 @@ Preferred communication style: Simple, everyday language.
 - Error handling with user-friendly messages
 - Pull-to-refresh for all list views
 - Pagination for large data sets
+- **Responsive components** that adapt to device type and orientation
 
-**Styling**
+**Styling & Responsiveness**
 - StyleSheet API for consistent styling
+- **Responsive utilities** (`src/utils/responsive.ts`) for device-aware sizing
+- **Adaptive font sizes**: 1.3x scaling on tablets
+- **Adaptive spacing**: 1.5x scaling on tablets
+- **Multi-column grids**: 1-3 columns based on device and orientation
 - Platform-specific adjustments where necessary
 - Safe area handling with react-native-safe-area-context
 - Gesture handling with react-native-gesture-handler
+- **Touch target optimization**: Minimum 44x44 points on all devices
 
 ## External Dependencies
 
