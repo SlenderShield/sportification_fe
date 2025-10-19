@@ -6,25 +6,46 @@ Sportification is a cross-platform React Native mobile application that serves a
 
 ## Recent Changes (October 19, 2025)
 
-**Completed Features:**
+**Backend API Integration (Latest):**
+- **Migrated all API types to MongoDB schema**: Updated all interfaces to use `_id` instead of `id` to match backend MongoDB documents
+- **Standardized API response format**: All responses now follow `{ success, data, message, timestamp }` structure
+- **Updated authentication endpoints**: Fixed token refresh endpoint from `/auth/refresh-token` to `/auth/refresh`
+- **Enhanced API services with full backend integration**:
+  - matchApi: Added complete CRUD, join/leave, scoring, status management with proper filters
+  - tournamentApi: Added bracket and standings endpoints, updated to match tournament lifecycle
+  - teamApi: Added getMyTeams endpoint, member removal, proper response unwrapping
+  - chatApi: Updated message pagination with before/after cursors, proper message sending
+  - notificationApi: Updated read status management with correct endpoints
+  - userApi: Added user search, getUser with relationship data, comprehensive filtering
+  - venueApi: Restructured to separate venues and bookings, updated availability checking
+- **Enhanced Socket.IO integration**:
+  - Added typed event handlers for all backend WebSocket events
+  - Implemented chat room management (join_chat, leave_chat, send_message)
+  - Added match and tournament room subscriptions
+  - Implemented typing indicators and message read receipts
+  - Enhanced reconnection logic with event handler persistence
+- **Response data structure**: Updated all API hooks to properly unwrap nested data responses
+
+**Previously Completed Features:**
 - Tournament management with bracket view, join/leave, and start tournament functionality
 - Venue booking system with availability checking and booking creation
 - Real-time chat integration using Socket.IO for message history and live messaging
 - Notifications center with mark as read and navigation to related content
 - Profile features: edit profile, change password, friends management (search/add/remove)
-- Created userApi service for user and friends management endpoints
-- Fixed all type mismatches in Venue and Chat components
 - All navigators (Tournaments, Venues, Chats, Profile) integrated into MainNavigator
 - Firebase Cloud Messaging (FCM) for push notifications with foreground/background handling
 - React Native Web support with webpack configuration for web deployment
 
 **Technical Highlights:**
 - Cross-platform support: iOS, Android, and Web
+- Full backend API integration with MongoDB-based data structures
+- Standardized API response handling across all services
+- Type-safe Socket.IO event system with comprehensive event handlers
 - Push notifications via FCM with Notifee for rich notifications
 - Web application served on port 5000 via webpack dev server
 - Platform-specific code execution (FCM only on native, web excluded)
 - Secure credential storage using iOS Keychain and Android KeyStore
-- JWT authentication with automatic token refresh
+- JWT authentication with automatic token refresh via `/auth/refresh` endpoint
 
 ## User Preferences
 
@@ -62,25 +83,34 @@ Preferred communication style: Simple, everyday language.
 **REST API Communication**
 - Axios-based HTTP client with configurable base URL and timeout
 - Request interceptor automatically attaches JWT access tokens to headers
-- Response interceptor handles token refresh flow without user intervention
+- Response interceptor handles token refresh flow via `/auth/refresh` without user intervention
 - All API endpoints follow `/api/v1` versioning pattern
+- Standardized response format: `{ success: boolean, data: T, message: string, timestamp: string }`
+- MongoDB-based data structures with `_id` fields throughout
 
 **Real-time Communication**
 - Socket.IO client for real-time updates (chat messages, match updates, notifications)
-- Automatic connection on successful authentication
-- Exponential backoff reconnection strategy with configurable max attempts
+- Type-safe event system with comprehensive event handlers:
+  - Chat events: new_message, message_sent, message_delivered, message_read, typing indicators
+  - Match events: match_updated, match_participant_joined/left, match_started/completed
+  - Tournament events: tournament_updated, tournament_started, tournament_match_completed
+  - User events: user_online, user_offline
+  - Notification events: real-time notification delivery
+- Room-based subscriptions (join_chat, join_match, join_tournament)
+- Automatic connection on successful authentication with token-based auth
+- Exponential backoff reconnection strategy with event handler persistence
 - Event listeners for connection, disconnection, and error handling
 - Automatic disconnection on logout
 
 **API Service Domains**
-- Auth: login, registration, profile management, stats, achievements, password change
-- User: profile updates, friends management (get/search/add/remove)
-- Matches: CRUD operations, participant management, scoring, status updates
-- Tournaments: creation, joining, bracket viewing, standings
-- Teams: team management, membership, captain operations
-- Venues: discovery, details, booking creation, availability checking
-- Chat: chat listing, message history, sending messages
-- Notifications: list retrieval, read status management
+- **Auth API** (`/auth`): login, registration, profile management, stats, achievements, password change, token refresh
+- **User API** (`/users`): profile updates, user search with filters, friends management (list/add/remove), relationship data
+- **Match API** (`/matches`): CRUD operations, participant join/leave, scoring, status updates, comprehensive filtering (sport, status, type, date, location)
+- **Tournament API** (`/tournaments`): creation, registration, bracket generation, standings, participant join/leave, tournament lifecycle management
+- **Team API** (`/teams`): team CRUD, my teams listing, member management (join/leave/remove), captain operations, team search
+- **Venue API** (`/venues` & `/bookings`): venue discovery with filters, availability checking, booking CRUD, check-in/check-out, booking status management
+- **Chat API** (`/chats`): chat listing, chat details, message history with pagination (before/after cursors), message sending with reply support
+- **Notification API** (`/notifications`): notification listing with filters, mark as read, mark all as read, unread count
 
 ### Data Storage
 

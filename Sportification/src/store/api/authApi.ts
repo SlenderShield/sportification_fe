@@ -10,6 +10,7 @@ import {
 } from '../../types/auth';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
+import { unwrapApiResponse } from '../../utils/apiHelpers';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -25,17 +26,18 @@ export const authApi = createApi({
   }),
   tagTypes: ['User', 'Profile', 'Stats', 'Friends'],
   endpoints: (builder) => ({
-    login: builder.mutation<ApiResponse<LoginResponse>, LoginRequest>({
+    login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
         url: '/auth/login',
         method: 'POST',
         body: credentials,
       }),
+      transformResponse: (response: ApiResponse<LoginResponse>) => unwrapApiResponse(response),
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data.success && data.data) {
-            const { accessToken, refreshToken } = data.data;
+          if (data) {
+            const { accessToken, refreshToken } = data;
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
@@ -43,17 +45,18 @@ export const authApi = createApi({
         }
       },
     }),
-    register: builder.mutation<ApiResponse<LoginResponse>, RegisterRequest>({
+    register: builder.mutation<LoginResponse, RegisterRequest>({
       query: (userData) => ({
         url: '/auth/register',
         method: 'POST',
         body: userData,
       }),
+      transformResponse: (response: ApiResponse<LoginResponse>) => unwrapApiResponse(response),
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data.success && data.data) {
-            const { accessToken, refreshToken } = data.data;
+          if (data) {
+            const { accessToken, refreshToken } = data;
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
@@ -61,33 +64,41 @@ export const authApi = createApi({
         }
       },
     }),
-    getProfile: builder.query<ApiResponse<{ user: User }>, void>({
+    getProfile: builder.query<User, void>({
       query: () => '/auth/profile',
+      transformResponse: (response: ApiResponse<{ user: User }>) => {
+        const data = unwrapApiResponse(response);
+        return data.user;
+      },
       providesTags: ['Profile'],
     }),
-    updateProfile: builder.mutation<ApiResponse<User>, Partial<User>>({
+    updateProfile: builder.mutation<User, Partial<User>>({
       query: (profileData) => ({
         url: '/users/profile',
         method: 'PUT',
         body: profileData,
       }),
+      transformResponse: (response: ApiResponse<User>) => unwrapApiResponse(response),
       invalidatesTags: ['Profile'],
     }),
-    changePassword: builder.mutation<ApiResponse<void>, { currentPassword: string; newPassword: string }>({
+    changePassword: builder.mutation<void, { currentPassword: string; newPassword: string }>({
       query: (passwords) => ({
         url: '/auth/change-password',
         method: 'POST',
         body: passwords,
       }),
+      transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
     }),
-    getUserStats: builder.query<ApiResponse<UserStats>, string>({
+    getUserStats: builder.query<UserStats, string>({
       query: (userId) => `/users/${userId}/stats`,
+      transformResponse: (response: ApiResponse<UserStats>) => unwrapApiResponse(response),
       providesTags: ['Stats'],
     }),
-    getUserAchievements: builder.query<ApiResponse<Achievement[]>, string>({
+    getUserAchievements: builder.query<Achievement[], string>({
       query: (userId) => `/users/${userId}/achievements`,
+      transformResponse: (response: ApiResponse<Achievement[]>) => unwrapApiResponse(response),
     }),
-    searchUsers: builder.query<ApiResponse<User[]>, { search?: string; page?: number; limit?: number }>({
+    searchUsers: builder.query<User[], { search?: string; page?: number; limit?: number }>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params.search) queryParams.append('search', params.search);
@@ -95,23 +106,27 @@ export const authApi = createApi({
         if (params.limit) queryParams.append('limit', String(params.limit));
         return `/users?${queryParams.toString()}`;
       },
+      transformResponse: (response: ApiResponse<User[]>) => unwrapApiResponse(response),
     }),
-    addFriend: builder.mutation<ApiResponse<void>, string>({
+    addFriend: builder.mutation<void, string>({
       query: (userId) => ({
         url: `/users/${userId}/friend`,
         method: 'POST',
       }),
+      transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
       invalidatesTags: ['Friends'],
     }),
-    removeFriend: builder.mutation<ApiResponse<void>, string>({
+    removeFriend: builder.mutation<void, string>({
       query: (userId) => ({
         url: `/users/${userId}/friend`,
         method: 'DELETE',
       }),
+      transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
       invalidatesTags: ['Friends'],
     }),
-    getFriends: builder.query<ApiResponse<User[]>, void>({
+    getFriends: builder.query<User[], void>({
       query: () => '/users/friends',
+      transformResponse: (response: ApiResponse<User[]>) => unwrapApiResponse(response),
       providesTags: ['Friends'],
     }),
   }),

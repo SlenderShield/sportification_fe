@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '../../config/api';
 import { Notification } from '../../types/notification';
-import { ApiResponse, PaginatedResponse } from '../../types/api';
+import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
+import { unwrapApiResponse } from '../../utils/apiHelpers';
 
 export const notificationApi = createApi({
   reducerPath: 'notificationApi',
@@ -18,7 +19,7 @@ export const notificationApi = createApi({
   }),
   tagTypes: ['Notification', 'Notifications'],
   endpoints: (builder) => ({
-    getNotifications: builder.query<ApiResponse<Notification[]>, { page?: number; limit?: number; read?: boolean; type?: string }>({
+    getNotifications: builder.query<Notification[], { page?: number; limit?: number; read?: boolean; type?: string }>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params.page) queryParams.append('page', String(params.page));
@@ -27,20 +28,23 @@ export const notificationApi = createApi({
         if (params.type) queryParams.append('type', params.type);
         return `/notifications?${queryParams.toString()}`;
       },
+      transformResponse: (response: ApiResponse<Notification[]>) => unwrapApiResponse(response),
       providesTags: ['Notifications'],
     }),
-    markAsRead: builder.mutation<ApiResponse<void>, string>({
+    markAsRead: builder.mutation<void, string>({
       query: (id) => ({
         url: `/notifications/${id}/read`,
         method: 'PATCH',
       }),
+      transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
       invalidatesTags: ['Notifications'],
     }),
-    markAllAsRead: builder.mutation<ApiResponse<void>, void>({
+    markAllAsRead: builder.mutation<void, void>({
       query: () => ({
         url: '/notifications/read-all',
         method: 'PATCH',
       }),
+      transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
       invalidatesTags: ['Notifications'],
     }),
   }),
