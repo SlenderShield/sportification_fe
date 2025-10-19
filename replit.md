@@ -6,7 +6,18 @@ Sportification is a React Native mobile application for iOS and Android (includi
 
 ## Recent Changes (October 19, 2025)
 
-**Removed Web Support - Mobile-Only Focus (Latest):**
+**Updated to Latest Stable Libraries (Latest):**
+- **React Native 0.81.2**: Upgraded from 0.76.5 - includes Android 16 support, faster iOS builds, and improved performance
+- **React 19.1.1**: Updated to latest React version with improved performance and new features
+- **Redux Toolkit 2.9.1**: Latest version with infinite query support and bundle size optimizations
+- **TypeScript 5.9.3**: Upgraded with deferred imports, improved tsc --init, and better type inference
+- **React Navigation 7.x**: Latest stable navigation library with improved static API
+- **Socket.IO Client 4.8.1**: Latest version with improved reconnection and timeout handling
+- **Axios 1.12.2**: Updated HTTP client with better TypeScript support
+- **Updated all supporting libraries**: Babel 7.26, ESLint 9.15, Jest 29.7, Prettier 3.3.3
+- **Enhanced tsconfig.json**: Optimized for TypeScript 5.9 with strict mode and modern module resolution
+
+**Removed Web Support - Mobile-Only Focus:**
 - **Removed Web Server workflow**: Deleted webpack-based web server configuration
 - **Cleaned up web dependencies**: Removed react-native-web, webpack, babel-plugin-react-native-web, and related packages
 - **Deleted web files**: Removed index.web.js, webpack.config.js, and src/config/env.web.ts
@@ -69,9 +80,11 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 
 **Framework & Platform**
-- React Native 0.76.5 with TypeScript for cross-platform mobile development (iOS & Android)
+- React Native 0.81.2 with TypeScript 5.9.3 for cross-platform mobile development (iOS & Android)
+- React 19.1.1 with latest performance improvements
+- Metro 0.83.3 bundler for fast development and builds
 - **Tablet and iPad optimized** with responsive utilities and adaptive layouts
-- Navigation managed through React Navigation with separate stacks for authenticated and unauthenticated flows
+- Navigation managed through React Navigation 7.x with separate stacks for authenticated and unauthenticated flows
 - Bottom tab navigation for main app sections (Matches, Tournaments, Teams, Venues, Chats, Profile)
 - **Multi-column layouts** on tablets for efficient content display
 
@@ -210,8 +223,8 @@ Preferred communication style: Simple, everyday language.
 - react-native-dotenv for environment configuration
 
 **Development Tools**
-- TypeScript for type safety
-- ESLint with @react-native/eslint-config for code quality
-- Prettier for code formatting
-- Jest for unit testing
-- Babel with react-native-dotenv plugin for environment variables
+- TypeScript 5.9.3 with strict mode and modern module resolution
+- ESLint 9.15 with @react-native/eslint-config for code quality
+- Prettier 3.3.3 for code formatting
+- Jest 29.7 for unit testing
+- Babel 7.26 with react-native-dotenv plugin for environment variables
