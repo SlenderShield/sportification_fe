@@ -4,12 +4,14 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetTournamentsQuery } from '../../store/api/tournamentApi';
+import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
+import { Card, FAB, Badge } from '../../components/ui';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
 interface TournamentsScreenProps {
@@ -17,27 +19,136 @@ interface TournamentsScreenProps {
 }
 
 const TournamentsScreen: React.FC<TournamentsScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const { data, isLoading, refetch } = useGetTournamentsQuery({ page: 1, limit: 10 });
   const tournaments = data?.data?.items || [];
 
-  const renderTournamentItem = ({ item }: any) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate('TournamentDetail', { tournamentId: item.id })}
-    >
-      <Text style={styles.title}>{item.name}</Text>
-      <Text style={styles.sport}>{item.sport}</Text>
-      <Text style={styles.format}>{item.format.replace('_', ' ')}</Text>
-      <Text style={styles.date}>
-        {format(new Date(item.schedule.startDate), 'MMM dd, yyyy')}
-      </Text>
-      <Text style={styles.participants}>
-        {item.participants.length} / {item.maxParticipants} participants
-      </Text>
-      <View style={styles.statusBadge}>
-        <Text style={styles.statusText}>{item.status}</Text>
-      </View>
-    </TouchableOpacity>
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'upcoming':
+        return 'info';
+      case 'in_progress':
+        return 'warning';
+      case 'completed':
+        return 'success';
+      case 'cancelled':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  const renderTournamentItem = ({ item, index }: any) => (
+    <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
+      <Card
+        onPress={() => navigation.navigate('TournamentDetail', { tournamentId: item.id })}
+        style={{ marginBottom: theme.spacing.md }}
+        elevation="md"
+      >
+        <View style={{ padding: theme.spacing.base }}>
+          <View style={styles.header}>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  theme.typography.titleLarge,
+                  { color: theme.colors.text, marginBottom: theme.spacing.xs },
+                ]}
+                numberOfLines={2}
+              >
+                {item.name}
+              </Text>
+              <Badge
+                label={item.status}
+                variant={getStatusVariant(item.status)}
+                size="small"
+              />
+            </View>
+            <View
+              style={[
+                styles.iconContainer,
+                {
+                  backgroundColor: theme.colors.primaryContainer,
+                  borderRadius: theme.borderRadius.md,
+                },
+              ]}
+            >
+              <Icon name="trophy" size={32} color={theme.colors.primary} />
+            </View>
+          </View>
+
+          <View style={[styles.infoRow, { marginTop: theme.spacing.md }]}>
+            <Icon
+              name="soccer"
+              size={16}
+              color={theme.colors.primary}
+              style={{ marginRight: theme.spacing.sm }}
+            />
+            <Text
+              style={[
+                theme.typography.bodyMedium,
+                { color: theme.colors.primary, fontWeight: '600' },
+              ]}
+            >
+              {item.sport}
+            </Text>
+          </View>
+
+          <View style={[styles.infoRow, { marginTop: theme.spacing.sm }]}>
+            <Icon
+              name="format-list-bulleted"
+              size={16}
+              color={theme.colors.textSecondary}
+              style={{ marginRight: theme.spacing.sm }}
+            />
+            <Text
+              style={[
+                theme.typography.bodySmall,
+                {
+                  color: theme.colors.textSecondary,
+                  textTransform: 'capitalize',
+                },
+              ]}
+            >
+              {item.format.replace('_', ' ')}
+            </Text>
+          </View>
+
+          <View style={[styles.infoRow, { marginTop: theme.spacing.sm }]}>
+            <Icon
+              name="calendar"
+              size={16}
+              color={theme.colors.textSecondary}
+              style={{ marginRight: theme.spacing.sm }}
+            />
+            <Text
+              style={[
+                theme.typography.bodySmall,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              {format(new Date(item.schedule.startDate), 'MMM dd, yyyy')}
+            </Text>
+          </View>
+
+          <View style={[styles.infoRow, { marginTop: theme.spacing.sm }]}>
+            <Icon
+              name="account-group"
+              size={16}
+              color={theme.colors.textSecondary}
+              style={{ marginRight: theme.spacing.sm }}
+            />
+            <Text
+              style={[
+                theme.typography.bodySmall,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              {item.participants.length} / {item.maxParticipants} participants
+            </Text>
+          </View>
+        </View>
+      </Card>
+    </Animated.View>
   );
 
   if (isLoading && tournaments.length === 0) {
@@ -45,27 +156,59 @@ const TournamentsScreen: React.FC<TournamentsScreenProps> = ({ navigation }) => 
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <FlatList
         data={tournaments}
         renderItem={renderTournamentItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          { padding: theme.spacing.base, paddingBottom: 80 },
+        ]}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No tournaments found</Text>
+            <Icon
+              name="trophy-outline"
+              size={64}
+              color={theme.colors.textTertiary}
+              style={{ marginBottom: theme.spacing.base }}
+            />
+            <Text
+              style={[
+                theme.typography.titleMedium,
+                { color: theme.colors.textSecondary, textAlign: 'center' },
+              ]}
+            >
+              No tournaments found
+            </Text>
+            <Text
+              style={[
+                theme.typography.bodySmall,
+                {
+                  color: theme.colors.textTertiary,
+                  textAlign: 'center',
+                  marginTop: theme.spacing.sm,
+                },
+              ]}
+            >
+              Create your first tournament to get started
+            </Text>
           </View>
         }
       />
-      <View style={styles.fab}>
-        <Button
-          title="Create Tournament"
-          onPress={() => navigation.navigate('CreateTournament')}
-        />
-      </View>
+      <FAB
+        icon="plus"
+        onPress={() => navigation.navigate('CreateTournament')}
+        variant="primary"
+      />
     </View>
   );
 };
@@ -73,88 +216,31 @@ const TournamentsScreen: React.FC<TournamentsScreenProps> = ({ navigation }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   list: {
-    padding: 16,
-    paddingBottom: 80,
+    flexGrow: 1,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+  iconContainer: {
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  sport: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  format: {
-    fontSize: 14,
-    color: '#666',
-    textTransform: 'capitalize',
-    marginBottom: 4,
-  },
-  date: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  participants: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
-  },
-  statusupcoming: {
-    backgroundColor: '#E3F2FD',
-  },
-  statusin_progress: {
-    backgroundColor: '#FFF3E0',
-  },
-  statuscompleted: {
-    backgroundColor: '#E8F5E9',
-  },
-  statuscancelled: {
-    backgroundColor: '#FFEBEE',
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'capitalize',
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
+    minHeight: 400,
   },
 });
 
