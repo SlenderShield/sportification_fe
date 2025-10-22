@@ -1,19 +1,31 @@
 import React from 'react';
 import {
-  TouchableOpacity,
   Text,
   StyleSheet,
   ActivityIndicator,
   ViewStyle,
   TextStyle,
+  Pressable,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { useTheme } from '../../theme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'text';
+  size?: 'small' | 'medium' | 'large';
   loading?: boolean;
   disabled?: boolean;
+  icon?: string;
+  iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
 }
@@ -22,70 +34,163 @@ const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
   variant = 'primary',
+  size = 'medium',
   loading = false,
   disabled = false,
+  icon,
+  iconPosition = 'left',
+  fullWidth = false,
   style,
   textStyle,
 }) => {
+  const { theme } = useTheme();
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
   const isDisabled = disabled || loading;
 
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    };
+  });
+
+  const handlePressIn = () => {
+    if (!isDisabled) {
+      scale.value = withSpring(0.96, theme.animations.spring.snappy);
+      opacity.value = withTiming(0.8, { duration: theme.animations.duration.fast });
+    }
+  };
+
+  const handlePressOut = () => {
+    if (!isDisabled) {
+      scale.value = withSpring(1, theme.animations.spring.bouncy);
+      opacity.value = withTiming(1, { duration: theme.animations.duration.fast });
+    }
+  };
+
+  const sizeStyles = {
+    small: {
+      paddingVertical: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.base,
+      minHeight: 36,
+    },
+    medium: {
+      paddingVertical: theme.spacing.md,
+      paddingHorizontal: theme.spacing.xl,
+      minHeight: 48,
+    },
+    large: {
+      paddingVertical: theme.spacing.base,
+      paddingHorizontal: theme.spacing['2xl'],
+      minHeight: 56,
+    },
+  };
+
+  const textSizeStyles = {
+    small: theme.typography.labelMedium,
+    medium: theme.typography.labelLarge,
+    large: theme.typography.titleMedium,
+  };
+
+  const iconSizes = {
+    small: 16,
+    medium: 20,
+    large: 24,
+  };
+
+  const variantStyles = {
+    primary: {
+      backgroundColor: theme.colors.primary,
+      color: theme.colors.onPrimary,
+    },
+    secondary: {
+      backgroundColor: theme.colors.secondary,
+      color: theme.colors.onSecondary,
+    },
+    outline: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: theme.colors.outline,
+      color: theme.colors.primary,
+    },
+    text: {
+      backgroundColor: 'transparent',
+      color: theme.colors.primary,
+    },
+  };
+
   return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        styles[variant],
-        isDisabled && styles.disabled,
-        style,
-      ]}
-      onPress={onPress}
-      disabled={isDisabled}
-    >
-      {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? '#007AFF' : '#fff'} />
-      ) : (
-        <Text style={[styles.text, styles[`${variant}Text`], textStyle]}>
-          {title}
-        </Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={[animatedStyle, fullWidth && styles.fullWidth]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={isDisabled}
+        style={[
+          styles.button,
+          sizeStyles[size],
+          {
+            backgroundColor: variantStyles[variant].backgroundColor,
+            borderRadius: theme.borderRadius.md,
+          },
+          variant === 'outline' && {
+            borderWidth: variantStyles.outline.borderWidth,
+            borderColor: variantStyles.outline.borderColor,
+          },
+          isDisabled && { opacity: 0.5 },
+          theme.elevation[variant === 'primary' || variant === 'secondary' ? 'sm' : 'none'],
+          style,
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator
+            color={variantStyles[variant].color}
+            size={size === 'small' ? 'small' : 'small'}
+          />
+        ) : (
+          <>
+            {icon && iconPosition === 'left' && (
+              <Icon
+                name={icon}
+                size={iconSizes[size]}
+                color={variantStyles[variant].color}
+                style={{ marginRight: theme.spacing.sm }}
+              />
+            )}
+            <Text
+              style={[
+                textSizeStyles[size],
+                { color: variantStyles[variant].color },
+                textStyle,
+              ]}
+            >
+              {title}
+            </Text>
+            {icon && iconPosition === 'right' && (
+              <Icon
+                name={icon}
+                size={iconSizes[size]}
+                color={variantStyles[variant].color}
+                style={{ marginLeft: theme.spacing.sm }}
+              />
+            )}
+          </>
+        )}
+      </Pressable>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 48,
+    flexDirection: 'row',
   },
-  primary: {
-    backgroundColor: '#007AFF',
-  },
-  secondary: {
-    backgroundColor: '#5AC8FA',
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  text: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  primaryText: {
-    color: '#fff',
-  },
-  secondaryText: {
-    color: '#fff',
-  },
-  outlineText: {
-    color: '#007AFF',
+  fullWidth: {
+    width: '100%',
   },
 });
 

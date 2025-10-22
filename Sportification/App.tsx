@@ -2,12 +2,13 @@ import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Platform } from 'react-native';
+import { Platform, StatusBar } from 'react-native';
 import { PersistGate } from 'redux-persist/integration/react';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { I18nextProvider } from 'react-i18next';
 import { store, persistor } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
+import { ThemeProvider } from './src/theme';
 import { notificationService } from './src/services/notificationService';
 import { localizationService, i18n } from './src/services/localizationService';
 import { paymentService } from './src/services/paymentService';
@@ -75,15 +76,18 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <Provider store={store}>
-          <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
-            <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-              <I18nextProvider i18n={i18n}>
-                <RootNavigator />
-              </I18nextProvider>
-            </StripeProvider>
-          </PersistGate>
-        </Provider>
+        <ThemeProvider>
+          <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+          <Provider store={store}>
+            <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
+              <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+                <I18nextProvider i18n={i18n}>
+                  <RootNavigator />
+                </I18nextProvider>
+              </StripeProvider>
+            </PersistGate>
+          </Provider>
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
