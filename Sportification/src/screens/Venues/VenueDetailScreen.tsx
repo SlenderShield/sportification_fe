@@ -6,9 +6,11 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useGetVenueQuery } from '../../store/api/venueApi';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
+import MapComponent from '../../components/map/MapComponent';
 
 interface VenueDetailScreenProps {
   navigation: any;
@@ -16,6 +18,7 @@ interface VenueDetailScreenProps {
 }
 
 const VenueDetailScreen: React.FC<VenueDetailScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { venueId } = route.params;
   const { data, isLoading } = useGetVenueQuery(venueId);
 
@@ -28,23 +31,54 @@ const VenueDetailScreen: React.FC<VenueDetailScreenProps> = ({ navigation, route
   if (!venue) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Venue not found</Text>
+        <Text style={styles.errorText}>{t('venues.title')} not found</Text>
       </View>
     );
   }
+
+  // Extract coordinates for map
+  const venueCoordinates = venue.location?.coordinates
+    ? {
+        latitude: venue.location.coordinates.coordinates[1],
+        longitude: venue.location.coordinates.coordinates[0],
+      }
+    : null;
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.name}>{venue.name}</Text>
-        <Text style={styles.address}>{venue.address}</Text>
+        <Text style={styles.address}>
+          {venue.location?.address}, {venue.location?.city}
+        </Text>
         {venue.description && (
           <Text style={styles.description}>{venue.description}</Text>
         )}
       </View>
 
+      {/* Map Section */}
+      {venueCoordinates && (
+        <View style={styles.mapSection}>
+          <Text style={styles.sectionTitle}>{t('venues.getDirections')}</Text>
+          <MapComponent
+            markers={[
+              {
+                id: venue._id,
+                coordinate: venueCoordinates,
+                title: venue.name,
+                description: venue.location?.address,
+              },
+            ]}
+            height={250}
+            showUserLocation
+            showDirectionsButton
+            selectedMarkerId={venue._id}
+          />
+        </View>
+      )}
+
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Available Sports</Text>
+        <Text style={styles.sectionTitle}>{t('matches.sport')}</Text>
         <View style={styles.sportsContainer}>
           {venue.sports.map((sport, index) => (
             <View key={index} style={styles.sportTag}>
@@ -56,7 +90,7 @@ const VenueDetailScreen: React.FC<VenueDetailScreenProps> = ({ navigation, route
 
       {venue.pricing && venue.pricing.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Pricing</Text>
+          <Text style={styles.sectionTitle}>{t('venues.pricing')}</Text>
           {venue.pricing.map((price, index) => (
             <View key={index} style={styles.pricingRow}>
               <Text style={styles.pricingLabel}>{price.sport || 'General'}</Text>
@@ -70,7 +104,7 @@ const VenueDetailScreen: React.FC<VenueDetailScreenProps> = ({ navigation, route
 
       {venue.facilities && venue.facilities.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Facilities</Text>
+          <Text style={styles.sectionTitle}>{t('venues.facilities')}</Text>
           <View style={styles.amenitiesContainer}>
             {venue.facilities.map((facility: string, index: number) => (
               <Text key={index} style={styles.amenityItem}>
@@ -81,16 +115,16 @@ const VenueDetailScreen: React.FC<VenueDetailScreenProps> = ({ navigation, route
         </View>
       )}
 
-      {venue.availability && venue.availability.length > 0 && (
+      {venue.operatingHours && venue.operatingHours.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Availability</Text>
-          {venue.availability.map((slot, index) => (
+          <Text style={styles.sectionTitle}>{t('venues.checkAvailability')}</Text>
+          {venue.operatingHours.map((hours, index) => (
             <View key={index} style={styles.hoursRow}>
               <Text style={styles.hoursLabel}>
-                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][slot.dayOfWeek]}:
+                {hours.day}:
               </Text>
               <Text style={styles.hoursValue}>
-                {slot.startTime} - {slot.endTime}
+                {hours.isClosed ? 'Closed' : `${hours.open} - ${hours.close}`}
               </Text>
             </View>
           ))}
@@ -99,13 +133,14 @@ const VenueDetailScreen: React.FC<VenueDetailScreenProps> = ({ navigation, route
 
       <View style={styles.actions}>
         <Button
-          title="Check Availability"
-          onPress={() => navigation.navigate('CheckAvailability', { venueId: venue.id })}
+          title={t('venues.checkAvailability')}
+          onPress={() => navigation.navigate('CheckAvailability', { venueId: venue._id })}
           style={styles.actionButton}
+          variant="outline"
         />
         <Button
-          title="Create Booking"
-          onPress={() => navigation.navigate('CreateBooking', { venueId: venue.id })}
+          title={t('venues.bookVenue')}
+          onPress={() => navigation.navigate('CreateBooking', { venueId: venue._id, venueName: venue.name })}
         />
       </View>
     </ScrollView>
@@ -139,6 +174,11 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 8,
   },
+  mapSection: {
+    backgroundColor: '#fff',
+    marginTop: 16,
+    padding: 16,
+  },
   section: {
     backgroundColor: '#fff',
     marginTop: 16,
@@ -156,7 +196,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sportTag: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#1E3A8A',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -207,6 +247,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     padding: 16,
+    marginBottom: 32,
   },
   actionButton: {
     marginBottom: 12,
