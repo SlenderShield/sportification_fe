@@ -1,5 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from './slices/authSlice';
 import { authApi } from './api/authApi';
 import { matchApi } from './api/matchApi';
@@ -9,21 +20,40 @@ import { venueApi } from './api/venueApi';
 import { chatApi } from './api/chatApi';
 import { notificationApi } from './api/notificationApi';
 import { userApi } from './api/userApi';
+import { paymentApi } from './api/paymentApi';
+import { recommendationApi } from './api/recommendationApi';
+
+const persistConfig = {
+  key: 'root',
+  version: 1,
+  storage: AsyncStorage,
+  whitelist: ['auth'], // Only persist auth state
+};
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [matchApi.reducerPath]: matchApi.reducer,
+  [tournamentApi.reducerPath]: tournamentApi.reducer,
+  [teamApi.reducerPath]: teamApi.reducer,
+  [venueApi.reducerPath]: venueApi.reducer,
+  [chatApi.reducerPath]: chatApi.reducer,
+  [notificationApi.reducerPath]: notificationApi.reducer,
+  [userApi.reducerPath]: userApi.reducer,
+  [paymentApi.reducerPath]: paymentApi.reducer,
+  [recommendationApi.reducerPath]: recommendationApi.reducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    [authApi.reducerPath]: authApi.reducer,
-    [matchApi.reducerPath]: matchApi.reducer,
-    [tournamentApi.reducerPath]: tournamentApi.reducer,
-    [teamApi.reducerPath]: teamApi.reducer,
-    [venueApi.reducerPath]: venueApi.reducer,
-    [chatApi.reducerPath]: chatApi.reducer,
-    [notificationApi.reducerPath]: notificationApi.reducer,
-    [userApi.reducerPath]: userApi.reducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(
       authApi.middleware,
       matchApi.middleware,
       tournamentApi.middleware,
@@ -31,9 +61,13 @@ export const store = configureStore({
       venueApi.middleware,
       chatApi.middleware,
       notificationApi.middleware,
-      userApi.middleware
+      userApi.middleware,
+      paymentApi.middleware,
+      recommendationApi.middleware
     ),
 });
+
+export const persistor = persistStore(store);
 
 setupListeners(store.dispatch);
 
