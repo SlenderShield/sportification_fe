@@ -89,6 +89,64 @@ export const authApi = createApi({
       }),
       transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
     }),
+    // Social login endpoints
+    loginWithGoogle: builder.mutation<LoginResponse, { idToken: string }>({
+      query: (data) => ({
+        url: '/auth/google',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<LoginResponse>) => unwrapApiResponse(response),
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data) {
+            const { accessToken, refreshToken } = data;
+            await apiService.saveTokens(accessToken, refreshToken);
+          }
+        } catch (error) {
+          console.error('Google login error:', error);
+        }
+      },
+    }),
+    loginWithApple: builder.mutation<LoginResponse, { identityToken: string; authorizationCode: string; user: string }>({
+      query: (data) => ({
+        url: '/auth/apple',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<LoginResponse>) => unwrapApiResponse(response),
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data) {
+            const { accessToken, refreshToken } = data;
+            await apiService.saveTokens(accessToken, refreshToken);
+          }
+        } catch (error) {
+          console.error('Apple login error:', error);
+        }
+      },
+    }),
+    loginWithFacebook: builder.mutation<LoginResponse, { accessToken: string }>({
+      query: (data) => ({
+        url: '/auth/facebook',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiResponse<LoginResponse>) => unwrapApiResponse(response),
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data) {
+            const { accessToken, refreshToken } = data;
+            await apiService.saveTokens(accessToken, refreshToken);
+          }
+        } catch (error) {
+          console.error('Facebook login error:', error);
+        }
+      },
+    }),
     getUserStats: builder.query<UserStats, string>({
       query: (userId) => `/users/${userId}/stats`,
       transformResponse: (response: ApiResponse<UserStats>) => unwrapApiResponse(response),
@@ -138,6 +196,9 @@ export const {
   useGetProfileQuery,
   useUpdateProfileMutation,
   useChangePasswordMutation,
+  useLoginWithGoogleMutation,
+  useLoginWithAppleMutation,
+  useLoginWithFacebookMutation,
   useGetUserStatsQuery,
   useGetUserAchievementsQuery,
   useSearchUsersQuery,

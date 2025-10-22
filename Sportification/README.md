@@ -1,26 +1,44 @@
 # Sportification Mobile App
 
-A cross-platform mobile and web application for sports community management, built with React Native 0.76.5 and TypeScript.
+A cross-platform mobile and web application for sports community management, built with React Native 0.81.2 and TypeScript.
+
+## V2.0 Features 🚀
+
+### New in V2.0
+- **🗺️ Maps Integration**: Location-aware matches, tournaments, and venues with Google Maps
+- **💳 Payment Processing**: Secure Stripe integration for venue bookings
+- **🔐 Biometric Auth**: Quick login with Face ID / Touch ID
+- **🌐 Localization**: Multi-language support (English, Hindi)
+- **🧠 AI Recommendations**: Personalized match and venue suggestions
+- **📊 Advanced Analytics**: Firebase Analytics and Crashlytics
+- **💾 Offline Support**: Redux Persist for reliable offline experience
+- **👥 Social Login**: Google, Apple, and Facebook authentication
+
+> See [V2_FEATURES.md](./V2_FEATURES.md) for comprehensive V2 documentation.
 
 ## Features
 
 ### Core Functionality
-- **User Authentication**: Secure JWT-based authentication with token refresh
+- **User Authentication**: JWT-based auth with social login (Google, Apple, Facebook)
 - **Match Management**: Create, join, and manage sports matches with real-time updates
 - **Tournament System**: Bracket-style tournaments with standings and participant management
 - **Team Management**: Create teams, manage members, and coordinate activities
-- **Venue Booking**: Discover and book sports venues with availability checking
+- **Venue Booking**: Discover and book sports venues with map view and secure payments
 - **Real-time Chat**: Socket.IO-powered messaging for seamless communication
 - **Push Notifications**: Firebase Cloud Messaging for instant updates (iOS/Android only)
 - **Friends System**: Search, add, and manage your sports network
+- **AI Recommendations**: Personalized content based on location and preferences
 
 ### Technical Highlights
 - **Cross-platform**: iOS, Android, and Web support
 - **TypeScript**: Full type safety across the codebase
-- **Redux Toolkit**: State management with RTK Query for API caching
+- **Redux Toolkit**: State management with RTK Query for API caching and Redux Persist
 - **React Navigation**: Seamless navigation with stack and tab navigators
 - **Secure Storage**: iOS Keychain and Android KeyStore for sensitive data
 - **Form Validation**: React Hook Form with Yup schemas
+- **Internationalization**: i18next for multi-language support
+- **Analytics**: Firebase Analytics and Crashlytics
+- **Maps**: React Native Maps with location services
 
 ## Quick Start
 
@@ -71,18 +89,34 @@ npm start
 
 ### Environment Variables
 
-The following environment variables are already configured in Replit Secrets:
+The following environment variables need to be configured in Replit Secrets or `.env` file:
 
 ```env
+# API Configuration
 API_BASE_URL=http://your-backend-url:3000
 SOCKET_URL=http://your-backend-url:3000
+
+# Stripe Payment
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_key
+
+# Google Maps
+GOOGLE_MAPS_API_KEY_ANDROID=your_android_maps_key
+GOOGLE_MAPS_API_KEY_IOS=your_ios_maps_key
+
+# Firebase (Mobile only)
 FIREBASE_API_KEY=your_firebase_api_key
 FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 FIREBASE_PROJECT_ID=your_project_id
 FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 FIREBASE_APP_ID=your_app_id
+
+# Social Login
+GOOGLE_OAUTH_WEB_CLIENT_ID=your_google_oauth_client_id
+FACEBOOK_APP_ID=your_facebook_app_id
 ```
+
+For detailed setup, see [V2_FEATURES.md](./V2_FEATURES.md).
 
 ### Firebase Setup
 

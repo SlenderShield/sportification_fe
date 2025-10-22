@@ -8,9 +8,13 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useCreateBookingMutation, useCheckAvailabilityMutation } from '../../store/api/venueApi';
+import { useCreatePaymentIntentMutation, useConfirmPaymentMutation } from '../../store/api/paymentApi';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import PaymentForm from '../../components/payment/PaymentForm';
+import { analyticsService } from '../../services/analyticsService';
 
 interface CreateBookingScreenProps {
   navigation: any;
@@ -18,14 +22,20 @@ interface CreateBookingScreenProps {
 }
 
 const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, route }) => {
-  const { venueId } = route.params;
+  const { t } = useTranslation();
+  const { venueId, venueName } = route.params;
+  const [step, setStep] = useState<'details' | 'payment'>('details');
+  const [bookingId, setBookingId] = useState<string>('');
+  const [paymentClientSecret, setPaymentClientSecret] = useState<string>('');
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+
   const [formData, setFormData] = useState({
     sport: '',
     date: '',
     startTime: '',
     endTime: '',
     participants: '',
-    promoCode: '',
+    notes: '',
   });
   const [errors, setErrors] = useState({
     sport: '',
@@ -37,18 +47,20 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
 
   const [createBooking, { isLoading }] = useCreateBookingMutation();
   const [checkAvailability, { isLoading: isChecking }] = useCheckAvailabilityMutation();
+  const [createPaymentIntent, { isLoading: isCreatingIntent }] = useCreatePaymentIntentMutation();
+  const [confirmPayment] = useConfirmPaymentMutation();
 
   const validate = (): boolean => {
     let valid = true;
     const newErrors = { sport: '', date: '', startTime: '', endTime: '', participants: '' };
 
     if (!formData.sport.trim()) {
-      newErrors.sport = 'Sport is required';
+      newErrors.sport = t('errors.required');
       valid = false;
     }
 
     if (!formData.date.trim()) {
-      newErrors.date = 'Date is required';
+      newErrors.date = t('errors.required');
       valid = false;
     } else {
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -59,7 +71,7 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
     }
 
     if (!formData.startTime.trim()) {
-      newErrors.startTime = 'Start time is required';
+      newErrors.startTime = t('errors.required');
       valid = false;
     } else {
       const timeRegex = /^\d{2}:\d{2}$/;
@@ -70,7 +82,7 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
     }
 
     if (!formData.endTime.trim()) {
-      newErrors.endTime = 'End time is required';
+      newErrors.endTime = t('errors.required');
       valid = false;
     } else {
       const timeRegex = /^\d{2}:\d{2}$/;
@@ -81,7 +93,7 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
     }
 
     if (!formData.participants.trim()) {
-      newErrors.participants = 'Number of participants is required';
+      newErrors.participants = t('errors.required');
       valid = false;
     } else {
       const num = parseInt(formData.participants, 10);
@@ -97,18 +109,16 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
 
   const handleCheckAvailability = async () => {
     if (!formData.date || !formData.startTime || !formData.endTime) {
-      Alert.alert('Error', 'Please fill in date, start time, and end time');
+      Alert.alert(t('common.error'), 'Please fill in date, start time, and end time');
       return;
     }
 
     try {
-      const startDateTime = `${formData.date}T${formData.startTime}:00.000Z`;
-      const endDateTime = `${formData.date}T${formData.endTime}:00.000Z`;
-
       const result = await checkAvailability({
         venueId,
-        startTime: startDateTime,
-        endTime: endDateTime,
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
       }).unwrap();
 
       if (result.success && result.data?.available) {
@@ -117,48 +127,134 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
         Alert.alert('Unavailable', 'This time slot is not available. Please choose another time.');
       }
     } catch (error: any) {
-      Alert.alert('Error', error?.data?.message || 'Failed to check availability');
+      Alert.alert(t('common.error'), error?.data?.message || 'Failed to check availability');
     }
   };
 
-  const handleCreate = async () => {
+  const handleProceedToPayment = async () => {
     if (!validate()) return;
 
     try {
-      const startDateTime = `${formData.date}T${formData.startTime}:00.000Z`;
-      const endDateTime = `${formData.date}T${formData.endTime}:00.000Z`;
-
       const bookingData: any = {
         venueId,
         sport: formData.sport.trim(),
-        startTime: startDateTime,
-        endTime: endDateTime,
-        numberOfParticipants: parseInt(formData.participants, 10),
-        promoCode: formData.promoCode.trim() || undefined,
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        participants: parseInt(formData.participants, 10),
+        notes: formData.notes.trim() || undefined,
       };
 
       const result = await createBooking(bookingData).unwrap();
 
-      if (result.success) {
-        Alert.alert('Success', 'Booking created successfully!', [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
+      if (result.success && result.data) {
+        const booking = result.data;
+        setBookingId(booking._id);
+        setTotalAmount(booking.pricing?.totalCost || 0);
+
+        // Create payment intent
+        const paymentResult = await createPaymentIntent({
+          amount: booking.pricing?.totalCost || 0,
+          currency: booking.pricing?.currency || 'USD',
+          bookingId: booking._id,
+          metadata: {
+            venueId,
+            venueName: venueName || 'Venue',
+            sport: formData.sport,
           },
-        ]);
+        }).unwrap();
+
+        setPaymentClientSecret(paymentResult.clientSecret);
+        setStep('payment');
+
+        // Log analytics
+        await analyticsService.logVenueBooking(venueId, booking.pricing?.totalCost || 0);
       }
     } catch (error: any) {
       Alert.alert(
-        'Error',
+        t('common.error'),
         error?.data?.message || 'Failed to create booking. Please try again.'
       );
     }
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    try {
+      await confirmPayment({
+        paymentIntentId,
+        bookingId,
+      }).unwrap();
+
+      // Log analytics
+      await analyticsService.logPayment(totalAmount, 'USD', 'card');
+
+      Alert.alert(
+        t('common.success'),
+        t('payments.paymentSuccessful') + '\nBooking confirmed!',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('MyBookings'),
+          },
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(t('common.error'), 'Booking created but payment confirmation failed');
+    }
+  };
+
+  const handlePaymentError = (error: string) => {
+    Alert.alert(t('payments.paymentFailed'), error);
   };
 
   const updateField = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
     setErrors({ ...errors, [field]: '' });
   };
+
+  if (step === 'payment') {
+    return (
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.content}>
+            <Text style={styles.title}>{t('payments.payNow')}</Text>
+            <Text style={styles.subtitle}>Complete your booking payment</Text>
+
+            <View style={styles.bookingSummary}>
+              <Text style={styles.summaryLabel}>{t('matches.sport')}:</Text>
+              <Text style={styles.summaryValue}>{formData.sport}</Text>
+              
+              <Text style={styles.summaryLabel}>Date & Time:</Text>
+              <Text style={styles.summaryValue}>
+                {formData.date} at {formData.startTime} - {formData.endTime}
+              </Text>
+              
+              <Text style={styles.summaryLabel}>{t('tournaments.participants')}:</Text>
+              <Text style={styles.summaryValue}>{formData.participants}</Text>
+            </View>
+
+            <PaymentForm
+              amount={totalAmount}
+              currency="USD"
+              clientSecret={paymentClientSecret}
+              onPaymentSuccess={handlePaymentSuccess}
+              onPaymentError={handlePaymentError}
+            />
+
+            <Button
+              title={t('common.cancel')}
+              onPress={() => setStep('details')}
+              variant="outline"
+              style={styles.cancelButton}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -167,11 +263,11 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Text style={styles.title}>Create Booking</Text>
-          <Text style={styles.subtitle}>Reserve a time slot at this venue</Text>
+          <Text style={styles.title}>{t('venues.bookVenue')}</Text>
+          <Text style={styles.subtitle}>Reserve a time slot at {venueName || 'this venue'}</Text>
 
           <Input
-            label="Sport *"
+            label={`${t('matches.sport')} *`}
             value={formData.sport}
             onChangeText={(text) => updateField('sport', text)}
             placeholder="e.g., Basketball"
@@ -208,7 +304,7 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
           </View>
 
           <Input
-            label="Number of Participants *"
+            label={`${t('tournaments.participants')} *`}
             value={formData.participants}
             onChangeText={(text) => updateField('participants', text)}
             placeholder="e.g., 10"
@@ -217,14 +313,16 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
           />
 
           <Input
-            label="Promo Code (Optional)"
-            value={formData.promoCode}
-            onChangeText={(text) => updateField('promoCode', text)}
-            placeholder="Enter promo code if you have one"
+            label="Notes (Optional)"
+            value={formData.notes}
+            onChangeText={(text) => updateField('notes', text)}
+            placeholder="Any special requests or notes"
+            multiline
+            numberOfLines={3}
           />
 
           <Button
-            title="Check Availability"
+            title={t('venues.checkAvailability')}
             onPress={handleCheckAvailability}
             loading={isChecking}
             variant="outline"
@@ -232,14 +330,14 @@ const CreateBookingScreen: React.FC<CreateBookingScreenProps> = ({ navigation, r
           />
 
           <Button
-            title="Create Booking"
-            onPress={handleCreate}
-            loading={isLoading}
+            title="Proceed to Payment"
+            onPress={handleProceedToPayment}
+            loading={isLoading || isCreatingIntent}
             style={styles.createButton}
           />
 
           <Button
-            title="Cancel"
+            title={t('common.cancel')}
             onPress={() => navigation.goBack()}
             variant="outline"
           />
@@ -284,6 +382,28 @@ const styles = StyleSheet.create({
   },
   createButton: {
     marginBottom: 12,
+  },
+  bookingSummary: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+  },
+  summaryValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  cancelButton: {
+    marginTop: 16,
   },
 });
 
