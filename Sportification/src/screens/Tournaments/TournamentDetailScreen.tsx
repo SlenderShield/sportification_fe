@@ -18,7 +18,7 @@ import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
+import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { format } from 'date-fns';
@@ -197,44 +197,15 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
       {/* Participants Card */}
       <Animated.View entering={FadeInDown.duration(300).delay(300)}>
         <Card style={styles.participantsCard}>
-          <View style={styles.sectionHeader}>
-            <Icon name="account-group" size={24} color={theme.colors.primary} />
-            <Text style={[styles.sectionTitle, theme.typography.titleLarge, { color: theme.colors.text }]}>
-              Participants ({tournament.participants.length})
-            </Text>
-          </View>
-
-          {tournament.participants.map((participant, index) => (
-            <Animated.View 
-              key={participant.userId || index} 
-              entering={FadeInDown.duration(300).delay(400 + index * 50)}
-            >
-              <Card variant="outlined" style={styles.participantItem}>
-                <Avatar 
-                  name={participant.name}
-                  size="small"
-                />
-                <View style={styles.participantInfo}>
-                  <Text style={[styles.participantName, theme.typography.titleMedium, { color: theme.colors.text }]}>
-                    {participant.name}
-                  </Text>
-                  {participant.seed && (
-                    <Text style={[styles.participantSeed, theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-                      Seed: {participant.seed}
-                    </Text>
-                  )}
-                </View>
-                {participant.userId === tournament.createdBy && (
-                  <Chip 
-                    label="Organizer"
-                    icon="crown"
-                    selected
-                    size="small"
-                  />
-                )}
-              </Card>
-            </Animated.View>
-          ))}
+          <ParticipantList
+            participants={tournament.participants}
+            title="Participants"
+            organizerId={tournament.createdBy}
+            emptyIcon="account-group-outline"
+            emptyTitle="No participants yet"
+            emptyMessage="Be the first to join this tournament!"
+            showSeed={true}
+          />
         </Card>
       </Animated.View>
 
@@ -409,21 +380,6 @@ const styles = StyleSheet.create({
   participantsCard: {
     marginHorizontal: 16,
     marginVertical: 8,
-  },
-  participantItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    marginBottom: 8,
-    gap: 12,
-  },
-  participantInfo: {
-    flex: 1,
-  },
-  participantName: {
-    marginBottom: 2,
-  },
-  participantSeed: {
   },
   bracketCard: {
     marginHorizontal: 16,

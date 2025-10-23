@@ -17,7 +17,7 @@ import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
+import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useEntityActions } from '../../hooks';
@@ -137,42 +137,13 @@ const TeamDetailScreen: React.FC<TeamDetailScreenProps> = ({ navigation, route }
       {/* Members Card */}
       <Animated.View entering={FadeInDown.duration(300).delay(300)}>
         <Card style={styles.membersCard}>
-          <View style={styles.sectionHeader}>
-            <Icon name="account-multiple" size={24} color={theme.colors.primary} />
-            <Text style={[styles.sectionTitle, theme.typography.titleLarge, { color: theme.colors.text }]}>
-              Members ({team.members.length})
-            </Text>
-          </View>
-
-          {team.members.map((member, index) => (
-            <Animated.View 
-              key={member.userId} 
-              entering={FadeInDown.duration(300).delay(400 + index * 50)}
-            >
-              <Card variant="outlined" style={styles.memberItem}>
-                <Avatar 
-                  name={member.username}
-                  size="small"
-                />
-                <View style={styles.memberInfo}>
-                  <Text style={[styles.memberName, theme.typography.titleMedium, { color: theme.colors.text }]}>
-                    {member.username}
-                  </Text>
-                  <Text style={[styles.memberJoined, theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
-                    Joined: {new Date(member.joinedAt).toLocaleDateString()}
-                  </Text>
-                </View>
-                {member.role === 'captain' && (
-                  <Chip 
-                    label="Captain"
-                    icon="crown"
-                    selected
-                    size="small"
-                  />
-                )}
-              </Card>
-            </Animated.View>
-          ))}
+          <ParticipantList
+            participants={team.members}
+            title="Members"
+            emptyIcon="account-group-outline"
+            emptyTitle="No members yet"
+            emptyMessage="Be the first to join this team!"
+          />
         </Card>
       </Animated.View>
 
@@ -286,21 +257,6 @@ const styles = StyleSheet.create({
   membersCard: {
     marginHorizontal: 16,
     marginVertical: 8,
-  },
-  memberItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    marginBottom: 8,
-    gap: 12,
-  },
-  memberInfo: {
-    flex: 1,
-  },
-  memberName: {
-    marginBottom: 2,
-  },
-  memberJoined: {
   },
   actions: {
     padding: 16,

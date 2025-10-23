@@ -125,10 +125,11 @@ While the redesign is complete, these refactoring tasks would further improve co
    - Status: **COMPLETE** - All 8 list screens now use EmptyState component (reduced ~160-240 lines total)
 
 ### Medium Priority
-4. **Extract Participant List Component**
-   - [ ] Create ParticipantList reusable component
-   - [ ] Use in MatchDetailScreen, TeamDetailScreen, TournamentDetailScreen
+4. **Extract Participant List Component** ✅
+   - [x] Create ParticipantList reusable component
+   - [x] Use in MatchDetailScreen, TeamDetailScreen, TournamentDetailScreen
    - Benefit: Consistent participant display
+   - Status: **COMPLETE** - Created reusable ParticipantList component with empty state support
 
 5. **Create Form Management Hook**
    - [ ] Create useForm hook for form state and validation
