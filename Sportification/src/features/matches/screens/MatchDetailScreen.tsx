@@ -1,28 +1,10 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import {
-  useGetMatchQuery,
-  useJoinMatchMutation,
-  useLeaveMatchMutation,
-  useDeleteMatchMutation,
-  useUpdateStatusMutation,
-} from '../../store/api/matchApi';
-import { useAppSelector } from '../../store/hooks';
-import { useTheme } from '../../theme';
-import { LoadingSpinner } from '@shared/components/atoms';
-import { Button } from '@shared/components/atoms';
-import { Card, Badge, Avatar, Divider, Chip, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { View, Text } from 'react-native';
+import { DetailScreenTemplate } from '@shared/components/templates';
+import { useMatchDetailScreen } from '../hooks';
+import { ParticipantList } from '@shared/components/organisms';
+import { DetailRow } from '@shared/components/molecules';
 import { format } from 'date-fns';
-import { MATCH_STATUS_COLORS } from '@core/constants';
-import { useEntityActions, useConfirmation } from '@shared/hooks';
 
 interface MatchDetailScreenProps {
   navigation: any;
@@ -30,24 +12,13 @@ interface MatchDetailScreenProps {
 }
 
 const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route }) => {
-  const { theme } = useTheme();
-  const { matchId } = route.params;
-  const user = useAppSelector((state) => state.auth.user);
-  const { data, isLoading, refetch } = useGetMatchQuery(matchId);
-  const [joinMatch, { isLoading: isJoining }] = useJoinMatchMutation();
-  const [leaveMatch, { isLoading: isLeaving }] = useLeaveMatchMutation();
-  const [deleteMatch, { isLoading: isDeleting }] = useDeleteMatchMutation();
-  const [updateStatus, { isLoading: isUpdating }] = useUpdateStatusMutation();
+  const props = useMatchDetailScreen(route, navigation);
   
-  // Use reusable hooks for common actions
-  const { handleJoin, handleLeave, handleDelete } = useEntityActions({
-    entityType: 'match',
-    navigation,
-    refetch,
-  });
-  const { showConfirmation } = useConfirmation();
+  if (!props.match) {
+    return null;
+  }
 
-  const match = data?.data;
+  const match = props.match;
 
   const isParticipant = match?.participants.some((p) => p.userId === user?.id);
   const isOrganizer = match?.createdBy === user?.id;
