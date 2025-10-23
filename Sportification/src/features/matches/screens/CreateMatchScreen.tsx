@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useCreateMatchMutation } from '../../store/api/matchApi';
 import { useGetVenuesQuery } from '../../store/api/venueApi';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
+import { Button } from '@shared/components/atoms';
+import { Input } from '@shared/components/atoms';
 import { Card, Chip, SportSelector, SectionHeader } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

@@ -7,7 +7,7 @@ import { apiService } from '../services/api';
 import { socketService } from '../services/socketService';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import { LoadingSpinner } from '@shared/components/atoms';
 
 const Stack = createStackNavigator();
 

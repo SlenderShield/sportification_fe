@@ -11,8 +11,8 @@ import {
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useChangePasswordMutation } from '../../store/api/authApi';
 import { useTheme } from '../../theme';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
+import { Button } from '@shared/components/atoms';
+import { Input } from '@shared/components/atoms';
 import { Card } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 

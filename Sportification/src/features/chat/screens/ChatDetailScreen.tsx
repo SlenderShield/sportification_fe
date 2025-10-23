@@ -14,7 +14,7 @@ import {
   useSendMessageMutation,
 } from '../../store/api/chatApi';
 import { useAppSelector } from '../../store/hooks';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { LoadingSpinner } from '@shared/components/atoms';
 import { IconButton, EmptyState } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

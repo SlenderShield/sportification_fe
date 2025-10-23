@@ -8,8 +8,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useGetVenueQuery } from '../../store/api/venueApi';
 import { useTheme } from '../../theme';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
+import { LoadingSpinner } from '@shared/components/atoms';
+import { Button } from '@shared/components/atoms';
 import { Card, Chip } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';

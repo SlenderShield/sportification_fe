@@ -13,7 +13,7 @@ import { localizationService } from '../../services/localizationService';
 import { biometricService } from '../../services/biometricService';
 import { analyticsService } from '../../services/analyticsService';
 import { useTheme } from '../../theme';
-import Button from '../../components/common/Button';
+import { Button } from '@shared/components/atoms';
 import { Card, Divider } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 

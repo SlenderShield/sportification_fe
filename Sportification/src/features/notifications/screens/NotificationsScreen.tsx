@@ -14,8 +14,8 @@ import {
   useMarkAllAsReadMutation,
 } from '../../store/api/notificationApi';
 import { useTheme } from '../../theme';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
+import { LoadingSpinner } from '@shared/components/atoms';
+import { Button } from '@shared/components/atoms';
 import { Card, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';

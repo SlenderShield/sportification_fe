@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useCreateTournamentMutation } from '../../store/api/tournamentApi';
 import { useTheme } from '../../theme';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
+import { Button } from '@shared/components/atoms';
+import { Input } from '@shared/components/atoms';
 import { Card, Chip, SportSelector, SectionHeader } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';

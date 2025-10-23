@@ -14,7 +14,7 @@ import {
   useRemoveFriendMutation,
 } from '../../store/api/userApi';
 import { useAppSelector } from '../../store/hooks';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { LoadingSpinner } from '@shared/components/atoms';
 import { Card, Avatar, Badge, IconButton, EmptyState, SearchBar } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

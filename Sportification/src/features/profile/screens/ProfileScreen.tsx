@@ -13,9 +13,9 @@ import { clearUser } from '../../store/slices/authSlice';
 import { apiService } from '../../services/api';
 import { socketService } from '../../services/socketService';
 import { useTheme } from '../../theme';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
-import Card from '../../components/ui/Card';
+import { LoadingSpinner } from '@shared/components/atoms';
+import { Button } from '@shared/components/atoms';
+import { Card } from '@shared/components/organisms';
 import Avatar from '../../components/ui/Avatar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 

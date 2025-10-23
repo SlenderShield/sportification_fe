@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useTheme } from '../../theme';
-import Button from '../../components/common/Button';
+import { Button } from '@shared/components/atoms';
 import { triggerSuccessNotification } from '../../utils/hapticFeedback';
 
 const { width } = Dimensions.get('window');

@@ -9,7 +9,7 @@ import {
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetChatsQuery } from '../../store/api/chatApi';
 import { useTheme } from '../../theme';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { LoadingSpinner } from '@shared/components/atoms';
 import { Card, Avatar, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';

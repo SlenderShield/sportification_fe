@@ -16,8 +16,8 @@ import {
 } from '../../store/api/tournamentApi';
 import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
+import { LoadingSpinner } from '@shared/components/atoms';
+import { Button } from '@shared/components/atoms';
 import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
