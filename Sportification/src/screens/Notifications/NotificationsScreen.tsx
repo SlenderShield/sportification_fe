@@ -4,17 +4,20 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   RefreshControl,
   Alert,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import {
   useGetNotificationsQuery,
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
 } from '../../store/api/notificationApi';
+import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
+import { Card, Badge } from '../../components/ui';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
 interface NotificationsScreenProps {
@@ -22,12 +25,50 @@ interface NotificationsScreenProps {
 }
 
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const { data, isLoading, refetch } = useGetNotificationsQuery({ page: 1, limit: 50 });
   const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead, { isLoading: isMarkingAll }] = useMarkAllAsReadMutation();
 
   const notifications = data?.data?.items || [];
   const unreadCount = data?.data?.unreadCount || 0;
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'match':
+      case 'match_reminder':
+      case 'match_started':
+      case 'match_completed':
+        return 'soccer';
+      case 'tournament':
+      case 'tournament_started':
+        return 'trophy';
+      case 'booking':
+      case 'booking_confirmed':
+        return 'calendar-check';
+      case 'team':
+        return 'account-group';
+      case 'message':
+        return 'message';
+      default:
+        return 'bell';
+    }
+  };
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case 'match_started':
+      case 'tournament_started':
+        return theme.colors.warning;
+      case 'match_completed':
+      case 'booking_confirmed':
+        return theme.colors.success;
+      case 'message':
+        return theme.colors.info;
+      default:
+        return theme.colors.primary;
+    }
+  };
 
   const handleNotificationPress = async (notification: any) => {
     if (!notification.read) {
@@ -99,21 +140,90 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     }
   };
 
-  const renderNotification = ({ item }: any) => (
-    <TouchableOpacity
-      style={[styles.notificationCard, !item.read && styles.unreadCard]}
-      onPress={() => handleNotificationPress(item)}
-    >
-      <View style={styles.notificationHeader}>
-        <Text style={styles.notificationType}>{item.type.replace('_', ' ')}</Text>
-        <Text style={styles.notificationTime}>
-          {format(new Date(item.createdAt), 'MMM dd, HH:mm')}
-        </Text>
-      </View>
-      <Text style={styles.notificationTitle}>{item.title}</Text>
-      <Text style={styles.notificationMessage}>{item.message}</Text>
-      {!item.read && <View style={styles.unreadDot} />}
-    </TouchableOpacity>
+  const renderNotification = ({ item, index }: any) => (
+    <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
+      <Card
+        onPress={() => handleNotificationPress(item)}
+        style={{
+          marginBottom: theme.spacing.sm,
+          opacity: item.read ? 0.7 : 1,
+        }}
+        elevation="sm"
+      >
+        <View style={{ padding: theme.spacing.base }}>
+          <View style={styles.notificationRow}>
+            <View
+              style={[
+                styles.iconContainer,
+                {
+                  backgroundColor: item.read
+                    ? theme.colors.surfaceVariant
+                    : `${getNotificationColor(item.type)}20`,
+                  borderRadius: theme.borderRadius.md,
+                },
+              ]}
+            >
+              <Icon
+                name={getNotificationIcon(item.type)}
+                size={24}
+                color={item.read ? theme.colors.textSecondary : getNotificationColor(item.type)}
+              />
+            </View>
+
+            <View style={styles.notificationContent}>
+              <View style={styles.notificationHeader}>
+                <Badge
+                  label={item.type.replace('_', ' ')}
+                  variant={item.read ? 'default' : 'info'}
+                  size="small"
+                />
+                <Text
+                  style={[
+                    theme.typography.labelSmall,
+                    { color: theme.colors.textSecondary, marginLeft: theme.spacing.sm },
+                  ]}
+                >
+                  {format(new Date(item.createdAt), 'MMM dd, HH:mm')}
+                </Text>
+              </View>
+
+              <Text
+                style={[
+                  theme.typography.titleMedium,
+                  {
+                    color: theme.colors.text,
+                    marginTop: theme.spacing.xs,
+                    marginBottom: theme.spacing.xs,
+                  },
+                ]}
+                numberOfLines={2}
+              >
+                {item.title}
+              </Text>
+
+              <Text
+                style={[
+                  theme.typography.bodySmall,
+                  { color: theme.colors.textSecondary },
+                ]}
+                numberOfLines={2}
+              >
+                {item.message}
+              </Text>
+            </View>
+
+            {!item.read && (
+              <View
+                style={[
+                  styles.unreadDot,
+                  { backgroundColor: theme.colors.primary },
+                ]}
+              />
+            )}
+          </View>
+        </View>
+      </Card>
+    </Animated.View>
   );
 
   if (isLoading && notifications.length === 0) {
@@ -121,17 +231,42 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {unreadCount > 0 && (
-        <View style={styles.header}>
-          <Text style={styles.headerText}>{unreadCount} unread notifications</Text>
+        <View
+          style={[
+            styles.header,
+            {
+              backgroundColor: theme.colors.surface,
+              borderBottomWidth: 1,
+              borderBottomColor: theme.colors.divider,
+              padding: theme.spacing.base,
+            },
+          ]}
+        >
+          <View style={styles.headerContent}>
+            <Icon
+              name="bell-badge"
+              size={20}
+              color={theme.colors.primary}
+              style={{ marginRight: theme.spacing.sm }}
+            />
+            <Text
+              style={[
+                theme.typography.titleMedium,
+                { color: theme.colors.text, flex: 1 },
+              ]}
+            >
+              {unreadCount} unread
+            </Text>
+          </View>
           <Button
             title="Mark All Read"
             onPress={handleMarkAllRead}
             loading={isMarkingAll}
-            variant="outline"
-            style={styles.markAllButton}
-            textStyle={styles.markAllButtonText}
+            variant="text"
+            size="small"
+            icon="check-all"
           />
         </View>
       )}
@@ -140,14 +275,46 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
         data={notifications}
         renderItem={renderNotification}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          { padding: theme.spacing.base },
+        ]}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No notifications</Text>
-            <Text style={styles.emptySubtext}>You're all caught up!</Text>
+            <Icon
+              name="bell-check"
+              size={64}
+              color={theme.colors.success}
+              style={{ marginBottom: theme.spacing.base }}
+            />
+            <Text
+              style={[
+                theme.typography.titleLarge,
+                { color: theme.colors.text, textAlign: 'center' },
+              ]}
+            >
+              All Caught Up!
+            </Text>
+            <Text
+              style={[
+                theme.typography.bodyMedium,
+                {
+                  color: theme.colors.textSecondary,
+                  textAlign: 'center',
+                  marginTop: theme.spacing.sm,
+                },
+              ]}
+            >
+              You have no notifications
+            </Text>
           </View>
         }
       />
@@ -158,97 +325,50 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  markAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 32,
-  },
-  markAllButtonText: {
-    fontSize: 14,
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   list: {
-    padding: 16,
+    flexGrow: 1,
   },
-  notificationCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    position: 'relative',
+  notificationRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
-  unreadCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#007AFF',
+  iconContainer: {
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  notificationContent: {
+    flex: 1,
   },
   notificationHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  notificationType: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#007AFF',
-    textTransform: 'uppercase',
-  },
-  notificationTime: {
-    fontSize: 12,
-    color: '#999',
-  },
-  notificationTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  notificationMessage: {
-    fontSize: 14,
-    color: '#666',
+    alignItems: 'center',
   },
   unreadDot: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#007AFF',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginLeft: 8,
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 40,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#666',
+    minHeight: 400,
   },
 });
 

@@ -7,18 +7,23 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Pressable,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useRegisterMutation } from '../../store/api/authApi';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/slices/authSlice';
+import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface RegisterScreenProps {
   navigation: any;
 }
 
 const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -31,6 +36,8 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
     confirmPassword: '',
     username: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [register, { isLoading }] = useRegisterMutation();
   const dispatch = useDispatch();
@@ -105,63 +112,135 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join the Sportification community</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.content, { paddingHorizontal: theme.spacing.xl }]}>
+          {/* Header */}
+          <Animated.View
+            entering={FadeInDown.delay(100).springify()}
+            style={[styles.header, { marginBottom: theme.spacing['2xl'] }]}
+          >
+            <View
+              style={[
+                styles.logoContainer,
+                {
+                  backgroundColor: theme.colors.secondary,
+                  marginBottom: theme.spacing.xl,
+                },
+              ]}
+            >
+              <Icon name="account-plus" size={48} color={theme.colors.onSecondary} />
+            </View>
+            <Text
+              style={[
+                theme.typography.displaySmall,
+                { color: theme.colors.text, marginBottom: theme.spacing.xs },
+              ]}
+            >
+              Create Account
+            </Text>
+            <Text
+              style={[
+                theme.typography.bodyLarge,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Join the Sportification community
+            </Text>
+          </Animated.View>
 
-          <Input
-            label="Email"
-            value={formData.email}
-            onChangeText={(text) => updateField('email', text)}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            error={errors.email}
-          />
+          {/* Registration Form */}
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Input
+              label="Email"
+              value={formData.email}
+              onChangeText={(text) => updateField('email', text)}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              leftIcon="email"
+              variant="outlined"
+              error={errors.email}
+            />
 
-          <Input
-            label="Username"
-            value={formData.username}
-            onChangeText={(text) => updateField('username', text)}
-            placeholder="Choose a username"
-            autoCapitalize="none"
-            error={errors.username}
-          />
+            <Input
+              label="Username"
+              value={formData.username}
+              onChangeText={(text) => updateField('username', text)}
+              placeholder="Choose a username"
+              autoCapitalize="none"
+              leftIcon="account"
+              variant="outlined"
+              error={errors.username}
+              helperText="At least 3 characters"
+            />
 
-          <Input
-            label="Password"
-            value={formData.password}
-            onChangeText={(text) => updateField('password', text)}
-            placeholder="Create a password"
-            secureTextEntry
-            error={errors.password}
-          />
+            <Input
+              label="Password"
+              value={formData.password}
+              onChangeText={(text) => updateField('password', text)}
+              placeholder="Create a password"
+              secureTextEntry={!showPassword}
+              leftIcon="lock"
+              rightIcon={showPassword ? 'eye-off' : 'eye'}
+              onRightIconPress={() => setShowPassword(!showPassword)}
+              variant="outlined"
+              error={errors.password}
+              helperText="At least 6 characters"
+            />
 
-          <Input
-            label="Confirm Password"
-            value={formData.confirmPassword}
-            onChangeText={(text) => updateField('confirmPassword', text)}
-            placeholder="Confirm your password"
-            secureTextEntry
-            error={errors.confirmPassword}
-          />
+            <Input
+              label="Confirm Password"
+              value={formData.confirmPassword}
+              onChangeText={(text) => updateField('confirmPassword', text)}
+              placeholder="Confirm your password"
+              secureTextEntry={!showConfirmPassword}
+              leftIcon="lock-check"
+              rightIcon={showConfirmPassword ? 'eye-off' : 'eye'}
+              onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              variant="outlined"
+              error={errors.confirmPassword}
+            />
 
-          <Button
-            title="Create Account"
-            onPress={handleRegister}
-            loading={isLoading}
-            style={styles.registerButton}
-          />
+            <Button
+              title="Create Account"
+              onPress={handleRegister}
+              loading={isLoading}
+              icon="account-plus"
+              fullWidth
+              style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.md }}
+            />
+          </Animated.View>
 
-          <Button
-            title="Back to Sign In"
-            onPress={() => navigation.goBack()}
-            variant="outline"
-          />
+          {/* Sign In Link */}
+          <Animated.View
+            entering={FadeInUp.delay(300).springify()}
+            style={styles.signinContainer}
+          >
+            <Text
+              style={[
+                theme.typography.bodyMedium,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Already have an account?{' '}
+            </Text>
+            <Pressable onPress={() => navigation.goBack()}>
+              <Text
+                style={[
+                  theme.typography.bodyMedium,
+                  { color: theme.colors.primary, fontWeight: '600' },
+                ]}
+              >
+                Sign In
+              </Text>
+            </Pressable>
+          </Animated.View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -171,30 +250,31 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
+    paddingVertical: 32,
   },
   content: {
-    padding: 24,
+    flex: 1,
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
+  header: {
+    alignItems: 'center',
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
-    textAlign: 'center',
+  logoContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  registerButton: {
-    marginBottom: 12,
+  signinContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
   },
 });
 
