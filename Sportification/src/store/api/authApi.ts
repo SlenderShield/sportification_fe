@@ -7,7 +7,7 @@ import {
   User, 
   UserStats,
   Achievement,
-} from '../../types/auth';
+} from '@features/auth/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 import { unwrapApiResponse } from '../../utils/apiHelpers';

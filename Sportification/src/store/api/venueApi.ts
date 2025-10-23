@@ -6,7 +6,7 @@ import {
   CreateBookingRequest, 
   CheckAvailabilityRequest, 
   CheckAvailabilityResponse 
-} from '../../types/venue';
+} from '@features/venues/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 import { unwrapApiResponse, unwrapNestedData } from '../../utils/apiHelpers';

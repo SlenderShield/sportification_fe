@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '@core/config';
-import { User } from '../../types/auth';
+import { User } from '@features/auth/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 import { unwrapApiResponse, unwrapNestedData } from '../../utils/apiHelpers';

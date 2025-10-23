@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '@core/config';
-import { Notification } from '../../types/notification';
+import { Notification } from '@features/notifications/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 import { unwrapApiResponse } from '../../utils/apiHelpers';

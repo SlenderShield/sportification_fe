@@ -1,10 +1,10 @@
 import { io, Socket } from 'socket.io-client';
 import { API_CONFIG } from '@core/config';
 import { apiService } from './api';
-import { Message } from '../types/chat';
-import { Notification } from '../types/notification';
-import { Match } from '../types/match';
-import { Tournament } from '../types/tournament';
+import { Message } from '@features/chat/types';
+import { Notification } from '@features/notifications/types';
+import { Match } from '@features/matches/types';
+import { Tournament } from '@features/tournaments/types';
 
 export type SocketEventCallback = (data: any) => void;
 

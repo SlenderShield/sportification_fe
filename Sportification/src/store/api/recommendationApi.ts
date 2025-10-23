@@ -3,9 +3,9 @@ import { API_CONFIG } from '@core/config';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 import { unwrapApiResponse } from '../../utils/apiHelpers';
-import { Match } from '../../types/match';
-import { Venue } from '../../types/venue';
-import { User } from '../../types/auth';
+import { Match } from '@features/matches/types';
+import { Venue } from '@features/venues/types';
+import { User } from '@features/auth/types';
 
 export interface RecommendationsResponse {
   matches?: Match[];

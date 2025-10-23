@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '@core/config';
-import { Team, CreateTeamRequest, UpdateTeamRequest } from '../../types/team';
+import { Team, CreateTeamRequest, UpdateTeamRequest } from '@features/teams/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '../../services/api';
 import { unwrapApiResponse, unwrapNestedData } from '../../utils/apiHelpers';

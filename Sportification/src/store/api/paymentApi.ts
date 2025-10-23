@@ -8,7 +8,7 @@ import {
   CreatePaymentIntentResponse,
   PaymentHistory,
   RefundRequest,
-} from '../../types/payment';
+} from '@features/profile/types';
 
 export const paymentApi = createApi({
   reducerPath: 'paymentApi',
