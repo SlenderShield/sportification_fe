@@ -96,23 +96,33 @@ This document tracks completed work, pending items, and future enhancement oppor
 While the redesign is complete, these refactoring tasks would further improve code quality:
 
 ### High Priority
-1. **Migrate Create Screens to Use Reusable Components**
-   - [ ] Update CreateMatchScreen to use SportSelector
-   - [ ] Update CreateTeamScreen to use SportSelector
-   - [ ] Update CreateTournamentScreen to use SportSelector
-   - [ ] Replace duplicated validation with utility functions
+1. **Migrate Create Screens to Use Reusable Components** ✅
+   - [x] Update CreateMatchScreen to use SportSelector
+   - [x] Update CreateTeamScreen to use SportSelector
+   - [x] Update CreateTournamentScreen to use SportSelector
+   - [x] Replace duplicated validation with utility functions
    - Benefit: Reduce ~150 lines per screen
+   - Status: **COMPLETE** - All create screens now use SportSelector component
 
-2. **Migrate Detail Screens to Use Reusable Components**
-   - [ ] Update MatchDetailScreen to use DetailRow and useEntityActions
-   - [ ] Update TeamDetailScreen to use DetailRow and useEntityActions
-   - [ ] Update TournamentDetailScreen to use DetailRow and useEntityActions
-   - [ ] Update VenueDetailScreen to use DetailRow
+2. **Migrate Detail Screens to Use Reusable Components** ✅
+   - [x] Update MatchDetailScreen to use DetailRow and useEntityActions
+   - [x] Update TeamDetailScreen to use DetailRow and useEntityActions
+   - [x] Update TournamentDetailScreen to use DetailRow and useEntityActions
+   - [x] Update VenueDetailScreen to use DetailRow
    - Benefit: Reduce ~100 lines per screen, consistent styling
+   - Status: **COMPLETE** - All detail screens now use DetailRow and useEntityActions
 
-3. **Migrate List Screens to Use EmptyState Component**
-   - [ ] Update all list screens to use EmptyState component
+3. **Migrate List Screens to Use EmptyState Component** ✅
+   - [x] Update MatchesScreen to use EmptyState component
+   - [x] Update TeamsScreen to use EmptyState component
+   - [x] Update TournamentsScreen to use EmptyState component
+   - [x] Update VenuesScreen to use EmptyState component
+   - [x] Update ChatsScreen to use EmptyState component
+   - [x] Update FriendsScreen to use EmptyState component
+   - [x] Update NotificationsScreen to use EmptyState component
+   - [x] Update ChatDetailScreen to use EmptyState component
    - Benefit: Consistent empty states, reduce ~20 lines per screen
+   - Status: **COMPLETE** - All 8 list screens now use EmptyState component (reduced ~160-240 lines total)
 
 ### Medium Priority
 4. **Extract Participant List Component**
