@@ -10,7 +10,7 @@ import {
 } from '@features/auth/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '@shared/services/api';
-import { unwrapApiResponse } from '../../utils/apiHelpers';
+import { unwrapApiResponse } from '@shared/utils/apiHelpers';
 
 export const authApi = createApi({
   reducerPath: 'authApi',

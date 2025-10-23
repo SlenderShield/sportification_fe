@@ -16,7 +16,7 @@ import { Card, Chip, SportSelector, SectionHeader } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SPORTS, TOURNAMENT_FORMATS } from '@core/constants';
-import { validateName, validateDate, validateNumber, validateSelection } from '../../utils/validation';
+import { validateName, validateDate, validateNumber, validateSelection } from '@shared/utils/validation';
 
 interface CreateTournamentScreenProps {
   navigation: any;

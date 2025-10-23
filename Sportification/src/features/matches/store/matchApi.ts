@@ -3,7 +3,7 @@ import { API_CONFIG } from '@core/config';
 import { Match, CreateMatchRequest, UpdateScoreRequest, MatchFilters } from '@features/matches/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '@shared/services/api';
-import { unwrapApiResponse, unwrapNestedData } from '../../utils/apiHelpers';
+import { unwrapApiResponse, unwrapNestedData } from '@shared/utils/apiHelpers';
 
 export const matchApi = createApi({
   reducerPath: 'matchApi',

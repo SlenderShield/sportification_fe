@@ -8,7 +8,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useTheme } from '../../theme';
 import LottieLoader from '../common/LottieLoader';
-import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '../../utils/hapticFeedback';
+import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '@shared/utils/hapticFeedback';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 

@@ -22,7 +22,7 @@ import { Card, Badge, Avatar, Divider, Chip, DetailRow, SectionHeader, EmptyStat
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 import { MATCH_STATUS_COLORS } from '@core/constants';
-import { useEntityActions, useConfirmation } from '../../hooks';
+import { useEntityActions, useConfirmation } from '@shared/hooks';
 
 interface MatchDetailScreenProps {
   navigation: any;

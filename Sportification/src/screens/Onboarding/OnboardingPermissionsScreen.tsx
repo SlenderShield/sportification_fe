@@ -15,7 +15,7 @@ import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';
 import { Card } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerLightImpact, triggerSuccessNotification } from '../../utils/hapticFeedback';
+import { triggerLightImpact, triggerSuccessNotification } from '@shared/utils/hapticFeedback';
 
 interface OnboardingPermissionsScreenProps {
   onNext: () => void;

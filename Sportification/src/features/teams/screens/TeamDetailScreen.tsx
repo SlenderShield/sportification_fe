@@ -20,7 +20,7 @@ import { Button } from '@shared/components/atoms';
 import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useEntityActions } from '../../hooks';
+import { useEntityActions } from '@shared/hooks';
 
 interface TeamDetailScreenProps {
   navigation: any;

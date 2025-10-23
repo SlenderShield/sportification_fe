@@ -15,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerLightImpact } from '../../utils/hapticFeedback';
+import { triggerLightImpact } from '@shared/utils/hapticFeedback';
 
 interface ButtonProps {
   title: string;

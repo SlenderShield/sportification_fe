@@ -1,2 +1,1 @@
-// Export all shared contexts
-export {};
+export * from './AccessibilityContext';

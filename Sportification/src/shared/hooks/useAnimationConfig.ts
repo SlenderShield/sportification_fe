@@ -1,4 +1,4 @@
-import { useAccessibility } from '../contexts/AccessibilityContext';
+import { useAccessibility } from '@shared/contexts';
 import { animations } from '../theme/animations';
 
 /**

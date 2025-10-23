@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTheme } from '../../theme';
 import { Card } from '../ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerLightImpact } from '../../utils/hapticFeedback';
+import { triggerLightImpact } from '@shared/utils/hapticFeedback';
 import { formatDistanceToNow } from 'date-fns';
 
 export type NotificationType = 'match' | 'team' | 'tournament' | 'message' | 'friend' | 'system';

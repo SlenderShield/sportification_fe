@@ -9,7 +9,7 @@ import { useTheme } from '../../theme';
 import { BottomSheet, Chip } from '../ui';
 import Button from '../common/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerLightImpact, triggerSelection } from '../../utils/hapticFeedback';
+import { triggerLightImpact, triggerSelection } from '@shared/utils/hapticFeedback';
 
 export interface SortOption {
   id: string;

@@ -9,7 +9,7 @@ import { View, StyleSheet, Modal, Text } from 'react-native';
 import { useTheme } from '../../theme';
 import LottieView from 'lottie-react-native';
 import { celebrationAnimation } from '../../assets/animations';
-import { triggerSuccessNotification } from '../../utils/hapticFeedback';
+import { triggerSuccessNotification } from '@shared/utils/hapticFeedback';
 
 interface CelebrationProps {
   visible: boolean;

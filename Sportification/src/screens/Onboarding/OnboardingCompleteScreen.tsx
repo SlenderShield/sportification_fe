@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';
-import { triggerSuccessNotification } from '../../utils/hapticFeedback';
+import { triggerSuccessNotification } from '@shared/utils/hapticFeedback';
 
 const { width } = Dimensions.get('window');
 

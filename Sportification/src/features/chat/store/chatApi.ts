@@ -3,7 +3,7 @@ import { API_CONFIG } from '@core/config';
 import { Chat, Message, SendMessageRequest, CreateChatRequest } from '@features/chat/types';
 import { ApiResponse } from '../../types/api';
 import { apiService } from '@shared/services/api';
-import { unwrapApiResponse, unwrapNestedData } from '../../utils/apiHelpers';
+import { unwrapApiResponse, unwrapNestedData } from '@shared/utils/apiHelpers';
 
 export const chatApi = createApi({
   reducerPath: 'chatApi',

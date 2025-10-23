@@ -17,7 +17,7 @@ import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FadeInDown } from 'react-native-reanimated';
 import { SPORTS } from '@core/constants';
-import { validateName, validateDate, validateTime, validateNumber, validateSelection } from '../../utils/validation';
+import { validateName, validateDate, validateTime, validateNumber, validateSelection } from '@shared/utils/validation';
 
 interface CreateMatchScreenProps {
   navigation: any;

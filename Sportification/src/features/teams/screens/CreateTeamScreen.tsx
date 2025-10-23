@@ -16,7 +16,7 @@ import { Card, SportSelector, SectionHeader } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SPORTS } from '@core/constants';
-import { validateName, validateNumber, validateSelection } from '../../utils/validation';
+import { validateName, validateNumber, validateSelection } from '@shared/utils/validation';
 
 interface CreateTeamScreenProps {
   navigation: any;

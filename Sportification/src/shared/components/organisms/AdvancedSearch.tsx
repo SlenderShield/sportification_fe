@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, FlatList, Pressable, TextInput } from 'react-na
 import { useTheme } from '../../theme';
 import { Card, IconButton } from '../ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerLightImpact, triggerSelection } from '../../utils/hapticFeedback';
+import { triggerLightImpact, triggerSelection } from '@shared/utils/hapticFeedback';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SearchSuggestion {

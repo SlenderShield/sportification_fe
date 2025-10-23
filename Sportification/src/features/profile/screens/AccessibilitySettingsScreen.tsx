@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../theme';
-import { useAccessibility } from '../../contexts/AccessibilityContext';
+import { useAccessibility } from '@shared/contexts';
 import { Ionicons } from '@expo/vector-icons';
 import { SectionHeader, Divider } from '../../components/ui';
 

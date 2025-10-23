@@ -7,7 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerSelection } from '../../utils/hapticFeedback';
+import { triggerSelection } from '@shared/utils/hapticFeedback';
 
 interface ChipProps {
   label: string;

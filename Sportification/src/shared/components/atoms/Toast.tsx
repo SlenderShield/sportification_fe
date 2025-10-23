@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '../../utils/hapticFeedback';
+import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '@shared/utils/hapticFeedback';
 
 export interface ToastProps {
   message: string;

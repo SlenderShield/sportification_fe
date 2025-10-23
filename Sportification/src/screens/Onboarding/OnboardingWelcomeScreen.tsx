@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';
-import { triggerLightImpact } from '../../utils/hapticFeedback';
+import { triggerLightImpact } from '@shared/utils/hapticFeedback';
 
 const { width } = Dimensions.get('window');
 

@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
-import { useNetworkStatus } from '../../utils/offline';
+import { useNetworkStatus } from '@shared/utils/offline';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface OfflineIndicatorProps {
