@@ -5,3 +5,6 @@ export { default as Avatar } from './Avatar';
 export { default as Toast } from './Toast';
 export { default as BottomSheet } from './BottomSheet';
 export { default as SkeletonLoader, SkeletonCard } from './SkeletonLoader';
+export { default as Divider } from './Divider';
+export { default as ProgressBar } from './ProgressBar';
+export { default as IconButton } from './IconButton';
