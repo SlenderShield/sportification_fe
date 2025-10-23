@@ -29,6 +29,10 @@ interface ButtonProps {
   fullWidth?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  // Accessibility props
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  testID?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -43,6 +47,9 @@ const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   style,
   textStyle,
+  accessibilityLabel,
+  accessibilityHint,
+  testID,
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -130,6 +137,15 @@ const Button: React.FC<ButtonProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={isDisabled}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || title}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{
+          disabled: isDisabled,
+          busy: loading,
+        }}
+        testID={testID}
         style={[
           styles.button,
           sizeStyles[size],

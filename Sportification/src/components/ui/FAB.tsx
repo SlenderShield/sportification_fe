@@ -17,6 +17,10 @@ interface FABProps {
   variant?: 'primary' | 'secondary' | 'tertiary';
   position?: 'bottom-right' | 'bottom-center' | 'bottom-left';
   style?: ViewStyle;
+  // Accessibility props
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  testID?: string;
 }
 
 const FAB: React.FC<FABProps> = ({
@@ -27,6 +31,9 @@ const FAB: React.FC<FABProps> = ({
   variant = 'primary',
   position = 'bottom-right',
   style,
+  accessibilityLabel,
+  accessibilityHint,
+  testID,
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -92,6 +99,11 @@ const FAB: React.FC<FABProps> = ({
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || `${icon} floating action button`}
+        accessibilityHint={accessibilityHint}
+        testID={testID}
         style={[styles.pressable, sizeStyles[size]]}
       >
         {children || (

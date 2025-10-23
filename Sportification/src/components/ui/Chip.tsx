@@ -18,6 +18,10 @@ interface ChipProps {
   variant?: 'filled' | 'outlined';
   size?: 'small' | 'medium';
   style?: ViewStyle;
+  // Accessibility props
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  testID?: string;
 }
 
 const Chip: React.FC<ChipProps> = ({
@@ -29,6 +33,9 @@ const Chip: React.FC<ChipProps> = ({
   variant = 'filled',
   size = 'medium',
   style,
+  accessibilityLabel,
+  accessibilityHint,
+  testID,
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -84,6 +91,15 @@ const Chip: React.FC<ChipProps> = ({
         onPressIn={isInteractive ? handlePressIn : undefined}
         onPressOut={isInteractive ? handlePressOut : undefined}
         disabled={!isInteractive}
+        accessible={true}
+        accessibilityRole={isInteractive ? "button" : "text"}
+        accessibilityLabel={accessibilityLabel || label}
+        accessibilityHint={accessibilityHint || (selected ? "Selected" : "Not selected")}
+        accessibilityState={{
+          disabled: !isInteractive,
+          selected: selected,
+        }}
+        testID={testID}
         style={[
           styles.chip,
           {
