@@ -21,3 +21,4 @@ export { default as SwipeableCard } from './SwipeableCard';
 export { default as ActionButtons } from './ActionButtons';
 export { default as DatePicker } from './DatePicker';
 export { default as TimePicker } from './TimePicker';
+export { default as Celebration } from './Celebration';
