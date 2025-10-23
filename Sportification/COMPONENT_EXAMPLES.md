@@ -21,6 +21,9 @@ This document provides practical examples of how to use each component in the re
 16. [FilterChips](#filterchips)
 17. [SwipeableCard](#swipeablecard)
 18. [AnimatedToast](#animatedtoast)
+19. [DatePicker](#datepicker)
+20. [TimePicker](#timepicker)
+21. [useForm Hook](#useform-hook)
 
 ---
 
@@ -1236,6 +1239,186 @@ const [showToast, setShowToast] = useState(false);
 - `duration`: Auto-hide duration (default: 3000ms)
 - `onHide`: Callback when toast hides
 - `showAnimation`: Show Lottie animation (default: true)
+
+---
+
+## DatePicker
+
+The `DatePicker` component provides an enhanced date input with auto-formatting and validation.
+
+### Basic Usage
+```tsx
+import { DatePicker } from '../components/ui';
+
+<DatePicker
+  value={formData.date}
+  onChange={(date) => setFormData({ ...formData, date })}
+  label="Match Date"
+/>
+```
+
+### With Validation
+```tsx
+<DatePicker
+  value={formData.date}
+  onChange={(date) => setFormData({ ...formData, date })}
+  label="Event Date"
+  placeholder="YYYY-MM-DD"
+  minDate={new Date()}
+  maxDate={new Date('2025-12-31')}
+  required={true}
+  error={errors.date}
+/>
+```
+
+### Props
+- `value`: Date string in YYYY-MM-DD format
+- `onChange`: Callback when date changes
+- `label`: Field label
+- `placeholder`: Placeholder text (default: "YYYY-MM-DD")
+- `error`: Error message to display
+- `minDate`: Minimum allowed date
+- `maxDate`: Maximum allowed date
+- `disabled`: Disable input
+- `required`: Mark as required field
+
+---
+
+## TimePicker
+
+The `TimePicker` component provides an enhanced time input with auto-formatting and validation.
+
+### Basic Usage
+```tsx
+import { TimePicker } from '../components/ui';
+
+<TimePicker
+  value={formData.time}
+  onChange={(time) => setFormData({ ...formData, time })}
+  label="Start Time"
+/>
+```
+
+### 24-Hour Format
+```tsx
+<TimePicker
+  value={formData.time}
+  onChange={(time) => setFormData({ ...formData, time })}
+  label="Match Time"
+  placeholder="HH:MM"
+  format24h={true}
+  required={true}
+  error={errors.time}
+/>
+```
+
+### Props
+- `value`: Time string in HH:MM format
+- `onChange`: Callback when time changes
+- `label`: Field label
+- `placeholder`: Placeholder text (default: "HH:MM")
+- `error`: Error message to display
+- `format24h`: Use 24-hour format (default: true)
+- `disabled`: Disable input
+- `required`: Mark as required field
+
+---
+
+## useForm Hook
+
+The `useForm` hook provides comprehensive form state management with built-in validation.
+
+### Basic Usage
+```tsx
+import { useForm } from '../hooks';
+
+const { values, errors, handleChange, handleSubmit } = useForm({
+  initialValues: {
+    name: '',
+    email: '',
+    age: '',
+  },
+  validationRules: {
+    name: { required: true, minLength: 3 },
+    email: { required: true, pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ },
+    age: { required: true, min: 18, max: 100 },
+  },
+  onSubmit: async (values) => {
+    await createUser(values);
+  },
+});
+
+return (
+  <View>
+    <Input
+      value={values.name}
+      onChangeText={(text) => handleChange('name', text)}
+      error={errors.name}
+    />
+    <Button title="Submit" onPress={handleSubmit} loading={isSubmitting} />
+  </View>
+);
+```
+
+### Validation Rules
+```tsx
+const { values, errors, handleChange } = useForm({
+  initialValues: formData,
+  validationRules: {
+    title: {
+      required: true,
+      minLength: 3,
+      maxLength: 100,
+    },
+    description: {
+      minLength: 10,
+      maxLength: 500,
+    },
+    maxParticipants: {
+      required: true,
+      min: 2,
+      max: 100,
+    },
+    email: {
+      required: true,
+      pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+    },
+    password: {
+      required: true,
+      custom: (value) => {
+        if (value.length < 8) return 'Password must be at least 8 characters';
+        if (!/[A-Z]/.test(value)) return 'Password must contain uppercase';
+        if (!/[0-9]/.test(value)) return 'Password must contain number';
+        return null;
+      },
+    },
+  },
+  onSubmit: handleFormSubmit,
+});
+```
+
+### Available Validation Rules
+- `required`: Field is required
+- `minLength`: Minimum string length
+- `maxLength`: Maximum string length
+- `min`: Minimum numeric value
+- `max`: Maximum numeric value
+- `pattern`: RegExp pattern to match
+- `custom`: Custom validation function
+
+### Return Values
+- `values`: Current form values
+- `errors`: Current validation errors
+- `touched`: Fields that have been touched
+- `isSubmitting`: Submission loading state
+- `handleChange`: Update field value
+- `handleBlur`: Mark field as touched
+- `handleSubmit`: Submit form with validation
+- `setFieldValue`: Programmatically set field value
+- `setFieldError`: Programmatically set field error
+- `resetForm`: Reset to initial values
+- `validateField`: Validate single field
+- `validateForm`: Validate entire form
 
 ---
 
