@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
+import { useChatDetailScreen } from '../hooks';
 import {
   View,
   Text,
@@ -8,19 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {
-  useGetChatQuery,
-  useGetChatMessagesQuery,
-  useSendMessageMutation,
-} from '../../store/api/chatApi';
-import { useAppSelector } from '../../store/hooks';
 import { LoadingSpinner } from '@shared/components/atoms';
-import { IconButton, EmptyState } from '../../components/ui';
-import { useTheme } from '../../theme';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { IconButton, EmptyState } from '@shared/components/molecules';
+import { useTheme } from '../../../theme';
 import { format } from 'date-fns';
-import { socketService } from '@shared/services/socketService';
-import { FadeIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 interface ChatDetailScreenProps {
   navigation: any;
@@ -30,67 +23,15 @@ interface ChatDetailScreenProps {
 const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }) => {
   const { theme } = useTheme();
   const { chatId } = route.params;
-  const user = useAppSelector((state) => state.auth.user);
-  const { data: chatData } = useGetChatQuery(chatId);
-  const { data: messagesData, isLoading, refetch } = useGetChatMessagesQuery({ chatId, page: 1, limit: 50 });
-  const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
-
-  const [messageText, setMessageText] = useState('');
-  const [messages, setMessages] = useState<any[]>([]);
-  const flatListRef = useRef<FlatList>(null);
-
+  const props = useChatDetailScreen(chatId);
   const styles = createStyles(theme);
 
-  useEffect(() => {
-    if (messagesData?.data?.items) {
-      setMessages([...messagesData.data.items].reverse());
-    }
-  }, [messagesData]);
-
-  useEffect(() => {
-    const handleNewMessage = (message: any) => {
-      if (message.chatId === chatId) {
-        setMessages((prev) => [...prev, message]);
-        setTimeout(() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
-        }, 100);
-      }
-    };
-
-    socketService.on('new-message', handleNewMessage);
-
-    return () => {
-      socketService.off('new-message', handleNewMessage);
-    };
-  }, [chatId]);
-
-  const handleSend = async () => {
-    if (!messageText.trim()) return;
-
-    const tempMessage = messageText;
-    setMessageText('');
-
-    try {
-      await sendMessage({
-        chatId,
-        content: tempMessage,
-      }).unwrap();
-
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    } catch (error: any) {
-      setMessageText(tempMessage);
-      console.error('Failed to send message:', error);
-    }
-  };
-
   const renderMessage = ({ item }: any) => {
-    const isMe = item.senderId === user?.id;
+    const isMe = props.isMyMessage(item);
     const senderName = item.sender?.username || 'Unknown';
 
     return (
-      <FadeIn duration={300}>
+      <Animated.View entering={FadeIn.duration(300)}>
         <View style={[styles.messageContainer, isMe ? styles.myMessage : styles.theirMessage]}>
           {!isMe && (
             <Text style={[theme.typography.labelSmall, styles.senderName]}>
@@ -114,11 +55,11 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
             {format(new Date(item.createdAt), 'HH:mm')}
           </Text>
         </View>
-      </FadeIn>
+      </Animated.View>
     );
   };
 
-  if (isLoading && messages.length === 0) {
+  if (props.isLoading && props.messages.length === 0) {
     return <LoadingSpinner />;
   }
 
@@ -129,14 +70,14 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <FlatList
-        ref={flatListRef}
-        data={messages}
+        ref={props.flatListRef}
+        data={props.messages}
         renderItem={renderMessage}
         keyExtractor={(item, index) => item.id || `msg-${index}`}
         contentContainerStyle={styles.messagesList}
         onContentSizeChange={() => {
-          if (messages.length > 0) {
-            flatListRef.current?.scrollToEnd({ animated: false });
+          if (props.messages.length > 0) {
+            props.flatListRef.current?.scrollToEnd({ animated: false });
           }
         }}
         ListEmptyComponent={
@@ -151,8 +92,8 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
       <View style={styles.inputContainer}>
         <TextInput
           style={[theme.typography.bodyMedium, styles.input]}
-          value={messageText}
-          onChangeText={setMessageText}
+          value={props.messageText}
+          onChangeText={props.setMessageText}
           placeholder="Type a message..."
           placeholderTextColor={theme.colors.onSurfaceVariant}
           multiline
@@ -160,11 +101,11 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
         />
         <IconButton
           icon="send"
-          onPress={handleSend}
-          disabled={!messageText.trim() || isSending}
+          onPress={props.handleSend}
+          disabled={!props.messageText.trim() || props.isSending}
           variant="filled"
           size="medium"
-          color={messageText.trim() ? theme.colors.primary : theme.colors.surfaceVariant}
+          color={props.messageText.trim() ? theme.colors.primary : theme.colors.surfaceVariant}
         />
       </View>
     </KeyboardAvoidingView>
