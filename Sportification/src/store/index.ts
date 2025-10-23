@@ -12,16 +12,16 @@ import {
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from './slices/authSlice';
-import { authApi } from './api/authApi';
-import { matchApi } from './api/matchApi';
-import { tournamentApi } from './api/tournamentApi';
-import { teamApi } from './api/teamApi';
-import { venueApi } from './api/venueApi';
-import { chatApi } from './api/chatApi';
-import { notificationApi } from './api/notificationApi';
-import { userApi } from './api/userApi';
-import { paymentApi } from './api/paymentApi';
-import { recommendationApi } from './api/recommendationApi';
+import { authApi } from '@features/auth/store';
+import { userApi } from '@features/auth/store';
+import { matchApi } from '@features/matches/store';
+import { recommendationApi } from '@features/matches/store';
+import { tournamentApi } from '@features/tournaments/store';
+import { teamApi } from '@features/teams/store';
+import { venueApi } from '@features/venues/store';
+import { chatApi } from '@features/chat/store';
+import { notificationApi } from '@features/notifications/store';
+import { paymentApi } from '@features/profile/store';
 
 const persistConfig = {
   key: 'root',

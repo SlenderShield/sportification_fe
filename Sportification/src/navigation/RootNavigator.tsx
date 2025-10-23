@@ -3,11 +3,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setUser, setLoading } from '../store/slices/authSlice';
-import { apiService } from '../services/api';
-import { socketService } from '../services/socketService';
+import { apiService } from '@shared/services/api';
+import { socketService } from '@shared/services/socketService';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import { LoadingSpinner } from '@shared/components/atoms';
 
 const Stack = createStackNavigator();
 

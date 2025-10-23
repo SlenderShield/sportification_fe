@@ -10,11 +10,12 @@ import { store, persistor } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import { ThemeProvider } from './src/theme';
 import { AccessibilityProvider } from './src/contexts/AccessibilityContext';
-import { notificationService } from './src/services/notificationService';
-import { localizationService, i18n } from './src/services/localizationService';
-import { paymentService } from './src/services/paymentService';
-import { analyticsService } from './src/services/analyticsService';
-import LoadingSpinner from './src/components/common/LoadingSpinner';
+import { ContainerProvider } from './src/core/di';
+import { notificationService } from './src/shared/services/notificationService';
+import { localizationService, i18n } from './src/shared/services/localizationService';
+import { paymentService } from './src/features/profile/services/paymentService';
+import { analyticsService } from './src/shared/services/analyticsService';
+import { LoadingSpinner } from './src/shared/components/atoms';
 
 // Stripe publishable key - should be loaded from env
 const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
@@ -25,20 +26,22 @@ const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
  */
 const ThemedApp = () => {
   return (
-    <AccessibilityProvider>
-      <ThemeProviderWithAccessibility>
-        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-        <Provider store={store}>
-          <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
-            <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-              <I18nextProvider i18n={i18n}>
-                <RootNavigator />
-              </I18nextProvider>
-            </StripeProvider>
-          </PersistGate>
-        </Provider>
-      </ThemeProviderWithAccessibility>
-    </AccessibilityProvider>
+    <ContainerProvider>
+      <AccessibilityProvider>
+        <ThemeProviderWithAccessibility>
+          <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+          <Provider store={store}>
+            <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
+              <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+                <I18nextProvider i18n={i18n}>
+                  <RootNavigator />
+                </I18nextProvider>
+              </StripeProvider>
+            </PersistGate>
+          </Provider>
+        </ThemeProviderWithAccessibility>
+      </AccessibilityProvider>
+    </ContainerProvider>
   );
 };
 

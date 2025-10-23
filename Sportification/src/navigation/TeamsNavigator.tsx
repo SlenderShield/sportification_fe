@@ -1,8 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import TeamsScreen from '../screens/Teams/TeamsScreen';
-import TeamDetailScreen from '../screens/Teams/TeamDetailScreen';
-import CreateTeamScreen from '../screens/Teams/CreateTeamScreen';
+import TeamsScreen from '@features/teams/screens/TeamsScreen';
+import TeamDetailScreen from '@features/teams/screens/TeamDetailScreen';
+import CreateTeamScreen from '@features/teams/screens/CreateTeamScreen';
 
 const Stack = createStackNavigator();
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import TournamentsScreen from '../screens/Tournaments/TournamentsScreen';
-import TournamentDetailScreen from '../screens/Tournaments/TournamentDetailScreen';
-import CreateTournamentScreen from '../screens/Tournaments/CreateTournamentScreen';
+import TournamentsScreen from '@features/tournaments/screens/TournamentsScreen';
+import TournamentDetailScreen from '@features/tournaments/screens/TournamentDetailScreen';
+import CreateTournamentScreen from '@features/tournaments/screens/CreateTournamentScreen';
 
 const Stack = createStackNavigator();
 

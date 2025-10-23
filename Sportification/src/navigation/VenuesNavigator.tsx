@@ -1,8 +1,8 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import VenuesScreen from '../screens/Venues/VenuesScreen';
-import VenueDetailScreen from '../screens/Venues/VenueDetailScreen';
-import CreateBookingScreen from '../screens/Venues/CreateBookingScreen';
+import VenuesScreen from '@features/venues/screens/VenuesScreen';
+import VenueDetailScreen from '@features/venues/screens/VenueDetailScreen';
+import CreateBookingScreen from '@features/venues/screens/CreateBookingScreen';
 
 const Stack = createStackNavigator();
 

@@ -13,6 +13,28 @@ module.exports = {
         allowUndefined: true,
       },
     ],
+    [
+      'module-resolver',
+      {
+        root: ['./src'],
+        extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
+        alias: {
+          '@': './src',
+          '@core': './src/core',
+          '@features': './src/features',
+          '@shared': './src/shared',
+          '@screens': './src/screens',
+          '@components': './src/components',
+          '@navigation': './src/navigation',
+          '@services': './src/services',
+          '@store': './src/store',
+          '@utils': './src/utils',
+          '@types': './src/types',
+          '@config': './src/config',
+          '@theme': './src/theme',
+        },
+      },
+    ],
     'react-native-reanimated/plugin',
   ],
 };
