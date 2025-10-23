@@ -3,14 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
-  RefreshControl,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useGetTeamsQuery } from '../../store/api/teamApi';
-import { useTheme } from '../../theme';
-import { LoadingSpinner } from '@shared/components/atoms';
-import { Card, FAB, Avatar, Badge, EmptyState } from '../../components/ui';
+import { useTeamsScreen } from '../hooks';
+import { useTheme } from '../../../theme';
+import { ListScreenTemplate } from '@shared/components/templates';
+import { Card, Avatar } from '@shared/components/organisms';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface TeamsScreenProps {
@@ -19,16 +17,36 @@ interface TeamsScreenProps {
 
 const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
-  const { data, isLoading, refetch } = useGetTeamsQuery({ page: 1, limit: 10 });
-  const teams = data?.data?.items || [];
+  const props = useTeamsScreen(navigation);
 
-  const renderTeamItem = ({ item, index }: any) => {
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+} from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useTeamsScreen } from '../hooks';
+import { useTheme } from '../../../theme';
+import { ListScreenTemplate } from '@shared/components/templates';
+import { Card, Avatar } from '@shared/components/organisms';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+interface TeamsScreenProps {
+  navigation: any;
+}
+
+const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
+  const props = useTeamsScreen(navigation);
+
+  const renderTeamItem = (item: any, index: number) => {
     const captain = item.members.find((m: any) => m.role === 'captain');
     
     return (
       <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
         <Card
-          onPress={() => navigation.navigate('TeamDetail', { teamId: item.id })}
+          onPress={() => props.onTeamPress(item.id)}
           style={{ marginBottom: theme.spacing.md }}
           elevation="md"
         >
@@ -139,52 +157,22 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
     );
   };
 
-  if (isLoading && teams.length === 0) {
-    return <LoadingSpinner />;
-  }
-
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <FlatList
-        data={teams}
-        renderItem={renderTeamItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.list,
-          { padding: theme.spacing.base, paddingBottom: 80 },
-        ]}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refetch}
-            tintColor={theme.colors.primary}
-            colors={[theme.colors.primary]}
-          />
-        }
-        ListEmptyComponent={
-          <EmptyState
-            icon="account-group-outline"
-            title="No teams found"
-            message="Create your first team to get started"
-          />
-        }
-      />
-      <FAB
-        icon="plus"
-        onPress={() => navigation.navigate('CreateTeam')}
-        variant="secondary"
-      />
-    </View>
+    <ListScreenTemplate
+      title="Teams"
+      items={props.teams}
+      renderItem={renderTeamItem}
+      isLoading={props.isLoading}
+      error={props.error}
+      onRefresh={props.onRefresh}
+      onAddNew={props.onCreateTeam}
+      emptyMessage="No teams found"
+      searchPlaceholder="Search teams..."
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    flexGrow: 1,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

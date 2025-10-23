@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useGetMatchesQuery } from '../../store/api/matchApi';
-import { useTheme } from '../../theme';
-import { LoadingSpinner } from '@shared/components/atoms';
-import { Card, FAB, Badge, EmptyState } from '../../components/ui';
+import { useMatchesScreen } from '../hooks';
+import { useTheme } from '../../../theme';
+import { ListScreenTemplate } from '@shared/components/templates';
+import { Card, Badge } from '@shared/components/organisms';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
@@ -20,30 +14,12 @@ interface MatchesScreenProps {
 
 const MatchesScreen: React.FC<MatchesScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
-  const [page, setPage] = useState(1);
-  const { data, isLoading, refetch } = useGetMatchesQuery({ page, limit: 10 });
+  const props = useMatchesScreen(navigation);
 
-  const matches = data?.data?.items || [];
-
-  const getStatusVariant = (status: string) => {
-    switch (status) {
-      case 'scheduled':
-        return 'info';
-      case 'in_progress':
-        return 'warning';
-      case 'completed':
-        return 'success';
-      case 'cancelled':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
-
-  const renderMatchItem = ({ item, index }: any) => (
+  const renderMatchItem = (item: any, index: number) => (
     <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
       <Card
-        onPress={() => navigation.navigate('MatchDetail', { matchId: item.id })}
+        onPress={() => props.onMatchPress(item.id)}
         style={{ marginBottom: theme.spacing.md }}
       >
         <View style={{ padding: theme.spacing.base }}>
@@ -59,7 +35,7 @@ const MatchesScreen: React.FC<MatchesScreenProps> = ({ navigation }) => {
             </Text>
             <Badge
               label={item.status}
-              variant={getStatusVariant(item.status)}
+              variant={props.getStatusVariant(item.status)}
               size="small"
             />
           </View>
@@ -138,52 +114,22 @@ const MatchesScreen: React.FC<MatchesScreenProps> = ({ navigation }) => {
     </Animated.View>
   );
 
-  if (isLoading && matches.length === 0) {
-    return <LoadingSpinner />;
-  }
-
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <FlatList
-        data={matches}
-        renderItem={renderMatchItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.list,
-          { padding: theme.spacing.base, paddingBottom: 80 },
-        ]}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refetch}
-            tintColor={theme.colors.primary}
-            colors={[theme.colors.primary]}
-          />
-        }
-        ListEmptyComponent={
-          <EmptyState
-            icon="soccer-field"
-            title="No matches found"
-            message="Create your first match to get started"
-          />
-        }
-      />
-      <FAB
-        icon="plus"
-        onPress={() => navigation.navigate('CreateMatch')}
-        variant="primary"
-      />
-    </View>
+    <ListScreenTemplate
+      title="Matches"
+      items={props.matches}
+      renderItem={renderMatchItem}
+      isLoading={props.isLoading}
+      error={props.error}
+      onRefresh={props.onRefresh}
+      onAddNew={props.onCreateMatch}
+      emptyMessage="No matches found"
+      searchPlaceholder="Search matches..."
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    flexGrow: 1,
-  },
   matchHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

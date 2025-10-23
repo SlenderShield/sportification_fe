@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,23 +6,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   Pressable,
 } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { useLoginMutation, useLoginWithGoogleMutation, useLoginWithAppleMutation, useLoginWithFacebookMutation } from '../../store/api/authApi';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../../store/slices/authSlice';
+import { useLoginScreen } from '../hooks';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../theme';
-import { Button } from '@shared/components/atoms';
-import { Input } from '@shared/components/atoms';
+import { useTheme } from '../../../theme';
+import { Button, Input } from '@shared/components/atoms';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { googleAuthService } from '@features/auth/services/googleAuthService';
-import { appleAuthService } from '@features/auth/services/appleAuthService';
-import { facebookAuthService } from '@features/auth/services/facebookAuthService';
-import { biometricService } from '@features/auth/services/biometricService';
-import { analyticsService } from '@shared/services/analyticsService';
 
 interface LoginScreenProps {
   navigation: any;
@@ -31,138 +22,7 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
-  const [biometricAvailable, setBiometricAvailable] = useState(false);
-  const [biometricType, setBiometricType] = useState<string>('');
-
-  const [login, { isLoading }] = useLoginMutation();
-  const [loginWithGoogle, { isLoading: isGoogleLoading }] = useLoginWithGoogleMutation();
-  const [loginWithApple, { isLoading: isAppleLoading }] = useLoginWithAppleMutation();
-  const [loginWithFacebook, { isLoading: isFacebookLoading }] = useLoginWithFacebookMutation();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    checkBiometricAvailability();
-  }, []);
-
-  const checkBiometricAvailability = async () => {
-    const { available, biometryType } = await biometricService.checkAvailability();
-    setBiometricAvailable(available);
-    if (biometryType) {
-      setBiometricType(biometricService.getBiometryTypeName(biometryType));
-    }
-  };
-
-  const validate = (): boolean => {
-    let valid = true;
-    const newErrors = { email: '', password: '' };
-
-    if (!email) {
-      newErrors.email = t('errors.required');
-      valid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = t('errors.invalidEmail');
-      valid = false;
-    }
-
-    if (!password) {
-      newErrors.password = t('errors.required');
-      valid = false;
-    } else if (password.length < 6) {
-      newErrors.password = t('errors.weakPassword');
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleLogin = async () => {
-    if (!validate()) return;
-
-    try {
-      const result = await login({ email, password }).unwrap();
-      if (result.success && result.data) {
-        dispatch(setUser(result.data.user));
-        await analyticsService.logLogin('email');
-      }
-    } catch (error: any) {
-      Alert.alert(
-        t('common.error'),
-        error?.data?.message || t('errors.networkError')
-      );
-    }
-  };
-
-  const handleBiometricLogin = async () => {
-    const success = await biometricService.authenticate(t('auth.biometricLogin', { type: biometricType }));
-    if (success) {
-      // In a real app, you would retrieve stored credentials here
-      // For now, just show a success message
-      Alert.alert(t('common.success'), 'Biometric authentication successful');
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      const googleUser = await googleAuthService.signIn();
-      if (googleUser) {
-        const result = await loginWithGoogle({ idToken: googleUser.idToken }).unwrap();
-        if (result.success && result.data) {
-          dispatch(setUser(result.data.user));
-          await analyticsService.logLogin('google');
-        }
-      }
-    } catch (error: any) {
-      Alert.alert(
-        t('common.error'),
-        error?.data?.message || 'Google login failed'
-      );
-    }
-  };
-
-  const handleAppleLogin = async () => {
-    try {
-      const appleUser = await appleAuthService.signIn();
-      if (appleUser) {
-        const result = await loginWithApple({
-          identityToken: appleUser.identityToken,
-          authorizationCode: appleUser.authorizationCode,
-          user: appleUser.user,
-        }).unwrap();
-        if (result.success && result.data) {
-          dispatch(setUser(result.data.user));
-          await analyticsService.logLogin('apple');
-        }
-      }
-    } catch (error: any) {
-      Alert.alert(
-        t('common.error'),
-        error?.data?.message || 'Apple login failed'
-      );
-    }
-  };
-
-  const handleFacebookLogin = async () => {
-    try {
-      const facebookUser = await facebookAuthService.signIn();
-      if (facebookUser) {
-        const result = await loginWithFacebook({ accessToken: facebookUser.accessToken }).unwrap();
-        if (result.success && result.data) {
-          dispatch(setUser(result.data.user));
-          await analyticsService.logLogin('facebook');
-        }
-      }
-    } catch (error: any) {
-      Alert.alert(
-        t('common.error'),
-        error?.data?.message || 'Facebook login failed'
-      );
-    }
-  };
+  const props = useLoginScreen(navigation);
 
   return (
     <KeyboardAvoidingView
@@ -212,33 +72,27 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <Animated.View entering={FadeInDown.delay(200).springify()}>
             <Input
               label={t('auth.email')}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                setErrors({ ...errors, email: '' });
-              }}
+              value={props.email}
+              onChangeText={props.onEmailChange}
               placeholder="Enter your email"
               keyboardType="email-address"
               autoCapitalize="none"
               leftIcon="email"
               variant="outlined"
-              error={errors.email}
+              error={props.errors.email}
             />
 
             <Input
               label={t('auth.password')}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                setErrors({ ...errors, password: '' });
-              }}
+              value={props.password}
+              onChangeText={props.onPasswordChange}
               placeholder="Enter your password"
-              secureTextEntry={!showPassword}
+              secureTextEntry={!props.showPassword}
               leftIcon="lock"
-              rightIcon={showPassword ? 'eye-off' : 'eye'}
-              onRightIconPress={() => setShowPassword(!showPassword)}
+              rightIcon={props.showPassword ? 'eye-off' : 'eye'}
+              onRightIconPress={props.toggleShowPassword}
               variant="outlined"
-              error={errors.password}
+              error={props.errors.password}
             />
 
             <Pressable
@@ -257,17 +111,17 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
             <Button
               title={t('auth.login')}
-              onPress={handleLogin}
-              loading={isLoading}
+              onPress={props.handleLogin}
+              loading={props.isLoading}
               icon="login"
               fullWidth
               style={{ marginBottom: theme.spacing.md }}
             />
 
-            {biometricAvailable && (
+            {props.biometricAvailable && (
               <Button
-                title={t('auth.biometricLogin', { type: biometricType })}
-                onPress={handleBiometricLogin}
+                title={t('auth.biometricLogin', { type: props.biometricType })}
+                onPress={props.handleBiometricLogin}
                 variant="outline"
                 icon="fingerprint"
                 fullWidth
@@ -310,19 +164,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <Animated.View entering={FadeInDown.delay(400).springify()}>
             <Button
               title={t('auth.loginWithGoogle')}
-              onPress={handleGoogleLogin}
-              loading={isGoogleLoading}
+              onPress={props.handleGoogleLogin}
+              loading={props.isGoogleLoading}
               variant="outline"
               icon="google"
               fullWidth
               style={{ marginBottom: theme.spacing.sm }}
             />
 
-            {Platform.OS === 'ios' && appleAuthService.isSupported() && (
+            {props.showAppleLogin && (
               <Button
                 title={t('auth.loginWithApple')}
-                onPress={handleAppleLogin}
-                loading={isAppleLoading}
+                onPress={props.handleAppleLogin}
+                loading={props.isAppleLoading}
                 variant="outline"
                 icon="apple"
                 fullWidth
@@ -332,8 +186,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
             <Button
               title={t('auth.loginWithFacebook')}
-              onPress={handleFacebookLogin}
-              loading={isFacebookLoading}
+              onPress={props.handleFacebookLogin}
+              loading={props.isFacebookLoading}
               variant="outline"
               icon="facebook"
               fullWidth
