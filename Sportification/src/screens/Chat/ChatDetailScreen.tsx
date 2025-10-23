@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   TextInput,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -16,8 +15,12 @@ import {
 } from '../../store/api/chatApi';
 import { useAppSelector } from '../../store/hooks';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { IconButton } from '../../components/ui';
+import { useTheme } from '../../theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { socketService } from '../../services/socketService';
+import { FadeIn } from 'react-native-reanimated';
 
 interface ChatDetailScreenProps {
   navigation: any;
@@ -25,6 +28,7 @@ interface ChatDetailScreenProps {
 }
 
 const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }) => {
+  const { theme } = useTheme();
   const { chatId } = route.params;
   const user = useAppSelector((state) => state.auth.user);
   const { data: chatData } = useGetChatQuery(chatId);
@@ -34,6 +38,8 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const flatListRef = useRef<FlatList>(null);
+
+  const styles = createStyles(theme);
 
   useEffect(() => {
     if (messagesData?.data?.items) {
@@ -84,13 +90,31 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
     const senderName = item.sender?.username || 'Unknown';
 
     return (
-      <View style={[styles.messageContainer, isMe ? styles.myMessage : styles.theirMessage]}>
-        {!isMe && <Text style={styles.senderName}>{senderName}</Text>}
-        <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.messageTime}>
-          {format(new Date(item.createdAt), 'HH:mm')}
-        </Text>
-      </View>
+      <FadeIn duration={300}>
+        <View style={[styles.messageContainer, isMe ? styles.myMessage : styles.theirMessage]}>
+          {!isMe && (
+            <Text style={[theme.typography.labelSmall, styles.senderName]}>
+              {senderName}
+            </Text>
+          )}
+          <Text
+            style={[
+              theme.typography.bodyMedium,
+              isMe ? styles.myMessageText : styles.theirMessageText
+            ]}
+          >
+            {item.content}
+          </Text>
+          <Text
+            style={[
+              theme.typography.labelSmall,
+              isMe ? styles.myMessageTime : styles.theirMessageTime
+            ]}
+          >
+            {format(new Date(item.createdAt), 'HH:mm')}
+          </Text>
+        </View>
+      </FadeIn>
     );
   };
 
@@ -117,120 +141,124 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
         }}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No messages yet</Text>
-            <Text style={styles.emptySubtext}>Start the conversation!</Text>
+            <MaterialCommunityIcons
+              name="message-text-outline"
+              size={64}
+              color={theme.colors.onSurfaceVariant}
+              style={{ opacity: 0.5 }}
+            />
+            <Text style={[theme.typography.titleMedium, styles.emptyText]}>
+              No messages yet
+            </Text>
+            <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
+              Start the conversation!
+            </Text>
           </View>
         }
       />
 
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
+          style={[theme.typography.bodyMedium, styles.input]}
           value={messageText}
           onChangeText={setMessageText}
           placeholder="Type a message..."
+          placeholderTextColor={theme.colors.onSurfaceVariant}
           multiline
           maxLength={1000}
         />
-        <TouchableOpacity
-          style={[styles.sendButton, !messageText.trim() && styles.sendButtonDisabled]}
+        <IconButton
+          icon="send"
           onPress={handleSend}
           disabled={!messageText.trim() || isSending}
-        >
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
+          variant="filled"
+          size="medium"
+          color={messageText.trim() ? theme.colors.primary : theme.colors.surfaceVariant}
+        />
       </View>
     </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  messagesList: {
-    padding: 16,
-    flexGrow: 1,
-  },
-  messageContainer: {
-    maxWidth: '75%',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  myMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#007AFF',
-  },
-  theirMessage: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#fff',
-  },
-  senderName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#007AFF',
-    marginBottom: 4,
-  },
-  messageText: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 4,
-  },
-  messageTime: {
-    fontSize: 11,
-    color: '#999',
-    alignSelf: 'flex-end',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 12,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    alignItems: 'flex-end',
-  },
-  input: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    fontSize: 16,
-    maxHeight: 100,
-    marginRight: 8,
-  },
-  sendButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#ccc',
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#666',
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    messagesList: {
+      padding: theme.spacing.base,
+      flexGrow: 1,
+    },
+    messageContainer: {
+      maxWidth: '75%',
+      padding: theme.spacing.sm,
+      borderRadius: theme.borderRadius.lg,
+      marginBottom: theme.spacing.sm,
+    },
+    myMessage: {
+      alignSelf: 'flex-end',
+      backgroundColor: theme.colors.primaryContainer,
+      borderBottomRightRadius: theme.borderRadius.xs,
+    },
+    theirMessage: {
+      alignSelf: 'flex-start',
+      backgroundColor: theme.colors.surfaceVariant,
+      borderBottomLeftRadius: theme.borderRadius.xs,
+    },
+    senderName: {
+      color: theme.colors.primary,
+      marginBottom: theme.spacing.xs,
+    },
+    myMessageText: {
+      color: theme.colors.onPrimaryContainer,
+      marginBottom: theme.spacing.xs,
+    },
+    theirMessageText: {
+      color: theme.colors.onSurfaceVariant,
+      marginBottom: theme.spacing.xs,
+    },
+    myMessageTime: {
+      color: theme.colors.onPrimaryContainer,
+      opacity: 0.7,
+      alignSelf: 'flex-end',
+    },
+    theirMessageTime: {
+      color: theme.colors.onSurfaceVariant,
+      opacity: 0.7,
+      alignSelf: 'flex-end',
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      padding: theme.spacing.sm,
+      backgroundColor: theme.colors.surface,
+      ...theme.elevation.level2,
+      alignItems: 'flex-end',
+      gap: theme.spacing.sm,
+    },
+    input: {
+      flex: 1,
+      backgroundColor: theme.colors.surfaceVariant,
+      borderRadius: theme.borderRadius.xl,
+      paddingHorizontal: theme.spacing.base,
+      paddingVertical: theme.spacing.sm,
+      color: theme.colors.onSurface,
+      maxHeight: 100,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: theme.spacing.xl,
+      gap: theme.spacing.sm,
+    },
+    emptyText: {
+      color: theme.colors.onSurface,
+      marginTop: theme.spacing.sm,
+    },
+    emptySubtext: {
+      color: theme.colors.onSurfaceVariant,
+    },
+  });
 
 export default ChatDetailScreen;

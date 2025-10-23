@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
 import { useAppSelector } from '../../store/hooks';
@@ -13,14 +12,19 @@ import { useDispatch } from 'react-redux';
 import { clearUser } from '../../store/slices/authSlice';
 import { apiService } from '../../services/api';
 import { socketService } from '../../services/socketService';
+import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
+import Card from '../../components/ui/Card';
+import Avatar from '../../components/ui/Avatar';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ProfileScreenProps {
   navigation: any;
 }
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useDispatch();
 
@@ -51,8 +55,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   if (!user) {
     return (
-      <View style={styles.container}>
-        <Text>Please login</Text>
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <Text style={[theme.typography.bodyLarge, { color: theme.colors.text }]}>
+          Please login
+        </Text>
       </View>
     );
   }
@@ -60,97 +66,312 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const stats = statsData?.data;
   const achievements = achievementsData?.data || [];
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user.username.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-        <Text style={styles.username}>{user.username}</Text>
-        <Text style={styles.email}>{user.email}</Text>
-        {user.profile.bio && (
-          <Text style={styles.bio}>{user.profile.bio}</Text>
-        )}
-      </View>
+  const menuItems = [
+    { icon: 'account-edit', title: 'Edit Profile', screen: 'EditProfile' },
+    { icon: 'account-group', title: 'Friends', screen: 'Friends' },
+    { icon: 'bell', title: 'Notifications', screen: 'Notifications' },
+    { icon: 'lock', title: 'Change Password', screen: 'ChangePassword' },
+  ];
 
+  return (
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={{ paddingBottom: theme.spacing['2xl'] }}
+    >
+      {/* Header Section */}
+      <Card
+        variant="elevated"
+        style={{ marginBottom: theme.spacing.base }}
+      >
+        <View style={{ padding: theme.spacing.xl, alignItems: 'center' }}>
+          <Avatar
+            name={user.username}
+            size="xlarge"
+            variant="circular"
+            style={{ marginBottom: theme.spacing.md }}
+          />
+          <Text
+            style={[
+              theme.typography.headlineMedium,
+              { color: theme.colors.text, marginBottom: theme.spacing.xs },
+            ]}
+          >
+            {user.username}
+          </Text>
+          <Text
+            style={[
+              theme.typography.bodyMedium,
+              { color: theme.colors.textSecondary },
+            ]}
+          >
+            {user.email}
+          </Text>
+          {user.profile.bio && (
+            <Text
+              style={[
+                theme.typography.bodySmall,
+                {
+                  color: theme.colors.textSecondary,
+                  marginTop: theme.spacing.md,
+                  textAlign: 'center',
+                },
+              ]}
+            >
+              {user.profile.bio}
+            </Text>
+          )}
+        </View>
+      </Card>
+
+      {/* Statistics Section */}
       {statsLoading ? (
         <LoadingSpinner />
       ) : stats && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Statistics</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{stats.matchesPlayed}</Text>
-              <Text style={styles.statLabel}>Matches Played</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{stats.matchesWon}</Text>
-              <Text style={styles.statLabel}>Matches Won</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{stats.tournamentsPlayed}</Text>
-              <Text style={styles.statLabel}>Tournaments</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{stats.tournamentsWon}</Text>
-              <Text style={styles.statLabel}>Tournament Wins</Text>
-            </View>
-          </View>
-        </View>
-      )}
+        <Card
+          variant="elevated"
+          style={{ marginBottom: theme.spacing.base }}
+        >
+          <View style={{ padding: theme.spacing.base }}>
+            <Text
+              style={[
+                theme.typography.titleLarge,
+                {
+                  color: theme.colors.text,
+                  marginBottom: theme.spacing.base,
+                },
+              ]}
+            >
+              Statistics
+            </Text>
+            <View style={styles.statsGrid}>
+              <View style={[styles.statItem, { backgroundColor: theme.colors.primaryContainer }]}>
+                <Icon
+                  name="soccer"
+                  size={32}
+                  color={theme.colors.primary}
+                  style={{ marginBottom: theme.spacing.sm }}
+                />
+                <Text
+                  style={[
+                    theme.typography.displaySmall,
+                    {
+                      color: theme.colors.primary,
+                      marginBottom: theme.spacing.xs,
+                    },
+                  ]}
+                >
+                  {stats.matchesPlayed}
+                </Text>
+                <Text
+                  style={[
+                    theme.typography.labelSmall,
+                    { color: theme.colors.onPrimaryContainer, textAlign: 'center' },
+                  ]}
+                >
+                  Matches Played
+                </Text>
+              </View>
 
-      {!achievementsLoading && achievements.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Achievements</Text>
-          {achievements.map((achievement) => (
-            <View key={achievement.id} style={styles.achievementItem}>
-              <Text style={styles.achievementIcon}>{achievement.icon}</Text>
-              <View style={styles.achievementInfo}>
-                <Text style={styles.achievementName}>{achievement.name}</Text>
-                <Text style={styles.achievementDesc}>
-                  {achievement.description}
+              <View style={[styles.statItem, { backgroundColor: theme.colors.secondaryContainer }]}>
+                <Icon
+                  name="trophy"
+                  size={32}
+                  color={theme.colors.secondary}
+                  style={{ marginBottom: theme.spacing.sm }}
+                />
+                <Text
+                  style={[
+                    theme.typography.displaySmall,
+                    {
+                      color: theme.colors.secondary,
+                      marginBottom: theme.spacing.xs,
+                    },
+                  ]}
+                >
+                  {stats.matchesWon}
+                </Text>
+                <Text
+                  style={[
+                    theme.typography.labelSmall,
+                    { color: theme.colors.onSecondaryContainer, textAlign: 'center' },
+                  ]}
+                >
+                  Matches Won
+                </Text>
+              </View>
+
+              <View style={[styles.statItem, { backgroundColor: theme.colors.tertiaryContainer }]}>
+                <Icon
+                  name="tournament"
+                  size={32}
+                  color={theme.colors.tertiary}
+                  style={{ marginBottom: theme.spacing.sm }}
+                />
+                <Text
+                  style={[
+                    theme.typography.displaySmall,
+                    {
+                      color: theme.colors.tertiary,
+                      marginBottom: theme.spacing.xs,
+                    },
+                  ]}
+                >
+                  {stats.tournamentsPlayed}
+                </Text>
+                <Text
+                  style={[
+                    theme.typography.labelSmall,
+                    { color: theme.colors.onTertiaryContainer, textAlign: 'center' },
+                  ]}
+                >
+                  Tournaments
+                </Text>
+              </View>
+
+              <View style={[styles.statItem, { backgroundColor: theme.colors.primaryContainer }]}>
+                <Icon
+                  name="trophy-award"
+                  size={32}
+                  color={theme.colors.primary}
+                  style={{ marginBottom: theme.spacing.sm }}
+                />
+                <Text
+                  style={[
+                    theme.typography.displaySmall,
+                    {
+                      color: theme.colors.primary,
+                      marginBottom: theme.spacing.xs,
+                    },
+                  ]}
+                >
+                  {stats.tournamentsWon}
+                </Text>
+                <Text
+                  style={[
+                    theme.typography.labelSmall,
+                    { color: theme.colors.onPrimaryContainer, textAlign: 'center' },
+                  ]}
+                >
+                  Tournament Wins
                 </Text>
               </View>
             </View>
-          ))}
-        </View>
+          </View>
+        </Card>
       )}
 
-      <View style={styles.section}>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('EditProfile')}
+      {/* Achievements Section */}
+      {!achievementsLoading && achievements.length > 0 && (
+        <Card
+          variant="elevated"
+          style={{ marginBottom: theme.spacing.base }}
         >
-          <Text style={styles.menuText}>Edit Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('Friends')}
-        >
-          <Text style={styles.menuText}>Friends</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('Notifications')}
-        >
-          <Text style={styles.menuText}>Notifications</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('ChangePassword')}
-        >
-          <Text style={styles.menuText}>Change Password</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={{ padding: theme.spacing.base }}>
+            <Text
+              style={[
+                theme.typography.titleLarge,
+                {
+                  color: theme.colors.text,
+                  marginBottom: theme.spacing.base,
+                },
+              ]}
+            >
+              Achievements
+            </Text>
+            {achievements.map((achievement, index) => (
+              <View
+                key={achievement.id}
+                style={[
+                  styles.achievementItem,
+                  {
+                    paddingVertical: theme.spacing.md,
+                    borderBottomWidth: index < achievements.length - 1 ? 1 : 0,
+                    borderBottomColor: theme.colors.divider,
+                  },
+                ]}
+              >
+                <Text style={{ fontSize: 32, marginRight: theme.spacing.base }}>
+                  {achievement.icon}
+                </Text>
+                <View style={styles.achievementInfo}>
+                  <Text
+                    style={[
+                      theme.typography.titleMedium,
+                      { color: theme.colors.text, marginBottom: theme.spacing.xs },
+                    ]}
+                  >
+                    {achievement.name}
+                  </Text>
+                  <Text
+                    style={[
+                      theme.typography.bodySmall,
+                      { color: theme.colors.textSecondary },
+                    ]}
+                  >
+                    {achievement.description}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </Card>
+      )}
 
-      <Button
-        title="Logout"
-        onPress={handleLogout}
-        variant="outline"
-        style={styles.logoutButton}
-      />
+      {/* Menu Section */}
+      <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+        <View style={{ padding: theme.spacing.base }}>
+          {menuItems.map((item, index) => (
+            <Card
+              key={item.screen}
+              variant="filled"
+              onPress={() => navigation.navigate(item.screen)}
+              style={{
+                marginBottom:
+                  index < menuItems.length - 1 ? theme.spacing.sm : 0,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  padding: theme.spacing.base,
+                }}
+              >
+                <Icon
+                  name={item.icon}
+                  size={24}
+                  color={theme.colors.primary}
+                  style={{ marginRight: theme.spacing.base }}
+                />
+                <Text
+                  style={[
+                    theme.typography.bodyLarge,
+                    { color: theme.colors.text, flex: 1 },
+                  ]}
+                >
+                  {item.title}
+                </Text>
+                <Icon
+                  name="chevron-right"
+                  size={24}
+                  color={theme.colors.textTertiary}
+                />
+              </View>
+            </Card>
+          ))}
+        </View>
+      </Card>
+
+      {/* Logout Button */}
+      <View style={{ paddingHorizontal: theme.spacing.base }}>
+        <Button
+          title="Logout"
+          onPress={handleLogout}
+          variant="outline"
+          icon="logout"
+          fullWidth
+        />
+      </View>
     </ScrollView>
   );
 };
@@ -158,55 +379,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#fff',
-    padding: 24,
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  avatarText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  username: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 14,
-    color: '#666',
-  },
-  bio: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  section: {
-    backgroundColor: '#fff',
-    marginTop: 16,
-    padding: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -215,59 +387,17 @@ const styles = StyleSheet.create({
   },
   statItem: {
     width: '48%',
-    backgroundColor: '#f5f5f5',
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 12,
-  },
-  statValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
   },
   achievementItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  achievementIcon: {
-    fontSize: 32,
-    marginRight: 16,
   },
   achievementInfo: {
     flex: 1,
-  },
-  achievementName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  achievementDesc: {
-    fontSize: 14,
-    color: '#666',
-  },
-  menuItem: {
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  menuText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  logoutButton: {
-    margin: 16,
-    marginTop: 8,
   },
 });
 

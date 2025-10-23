@@ -4,40 +4,138 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   RefreshControl,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetVenuesQuery } from '../../store/api/venueApi';
+import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { Card, Badge } from '../../components/ui';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface VenuesScreenProps {
   navigation: any;
 }
 
 const VenuesScreen: React.FC<VenuesScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const { data, isLoading, refetch } = useGetVenuesQuery({ page: 1, limit: 10 });
   const venues = data?.data?.items || [];
 
-  const renderVenueItem = ({ item }: any) => (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate('VenueDetail', { venueId: item.id })}
-    >
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.address}>{item.address}</Text>
-      <View style={styles.sportsContainer}>
-        {item.sports.map((sport: string, index: number) => (
-          <View key={index} style={styles.sportTag}>
-            <Text style={styles.sportText}>{sport}</Text>
+  const renderVenueItem = ({ item, index }: any) => (
+    <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
+      <Card
+        onPress={() => navigation.navigate('VenueDetail', { venueId: item.id })}
+        style={{ marginBottom: theme.spacing.md }}
+        elevation="md"
+      >
+        <View style={{ padding: theme.spacing.base }}>
+          <View style={styles.header}>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={[
+                  theme.typography.titleLarge,
+                  {
+                    color: theme.colors.text,
+                    marginBottom: theme.spacing.xs,
+                  },
+                ]}
+                numberOfLines={1}
+              >
+                {item.name}
+              </Text>
+              
+              <View style={[styles.row, { marginBottom: theme.spacing.sm }]}>
+                <Icon
+                  name="map-marker"
+                  size={16}
+                  color={theme.colors.textSecondary}
+                  style={{ marginRight: theme.spacing.xs }}
+                />
+                <Text
+                  style={[
+                    theme.typography.bodySmall,
+                    { color: theme.colors.textSecondary, flex: 1 },
+                  ]}
+                  numberOfLines={2}
+                >
+                  {item.address}
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={[
+                styles.iconContainer,
+                {
+                  backgroundColor: theme.colors.tertiaryContainer,
+                  borderRadius: theme.borderRadius.md,
+                },
+              ]}
+            >
+              <Icon
+                name="map-marker-radius"
+                size={32}
+                color={theme.colors.tertiary}
+              />
+            </View>
           </View>
-        ))}
-      </View>
-      {item.pricing && item.pricing.length > 0 && (
-        <Text style={styles.price}>
-          From ${item.pricing[0].pricePerHour}/hour
-        </Text>
-      )}
-    </TouchableOpacity>
+
+          <View
+            style={[
+              styles.sportsContainer,
+              { marginTop: theme.spacing.md, marginBottom: theme.spacing.sm },
+            ]}
+          >
+            {item.sports.slice(0, 3).map((sport: string, idx: number) => (
+              <Badge
+                key={idx}
+                label={sport}
+                variant="info"
+                size="small"
+                style={{ marginRight: theme.spacing.xs, marginBottom: theme.spacing.xs }}
+              />
+            ))}
+            {item.sports.length > 3 && (
+              <Badge
+                label={`+${item.sports.length - 3}`}
+                variant="default"
+                size="small"
+              />
+            )}
+          </View>
+
+          {item.pricing && item.pricing.length > 0 && (
+            <View
+              style={[
+                styles.priceContainer,
+                {
+                  backgroundColor: theme.colors.successContainer,
+                  padding: theme.spacing.md,
+                  borderRadius: theme.borderRadius.sm,
+                  marginTop: theme.spacing.sm,
+                },
+              ]}
+            >
+              <Icon
+                name="cash"
+                size={20}
+                color={theme.colors.success}
+                style={{ marginRight: theme.spacing.sm }}
+              />
+              <Text
+                style={[
+                  theme.typography.titleMedium,
+                  { color: theme.colors.success },
+                ]}
+              >
+                From ${item.pricing[0].pricePerHour}/hour
+              </Text>
+            </View>
+          )}
+        </View>
+      </Card>
+    </Animated.View>
   );
 
   if (isLoading && venues.length === 0) {
@@ -45,18 +143,51 @@ const VenuesScreen: React.FC<VenuesScreenProps> = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <FlatList
         data={venues}
         renderItem={renderVenueItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          { padding: theme.spacing.base, paddingBottom: 80 },
+        ]}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            tintColor={theme.colors.primary}
+            colors={[theme.colors.primary]}
+          />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No venues found</Text>
+            <Icon
+              name="map-marker-off-outline"
+              size={64}
+              color={theme.colors.textTertiary}
+              style={{ marginBottom: theme.spacing.base }}
+            />
+            <Text
+              style={[
+                theme.typography.titleMedium,
+                { color: theme.colors.textSecondary, textAlign: 'center' },
+              ]}
+            >
+              No venues found
+            </Text>
+            <Text
+              style={[
+                theme.typography.bodySmall,
+                {
+                  color: theme.colors.textTertiary,
+                  textAlign: 'center',
+                  marginTop: theme.spacing.sm,
+                },
+              ]}
+            >
+              Search for venues in your area
+            </Text>
           </View>
         }
       />
@@ -67,64 +198,40 @@ const VenuesScreen: React.FC<VenuesScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   list: {
-    padding: 16,
+    flexGrow: 1,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+  iconContainer: {
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
   },
-  address: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
   sportsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 8,
+    alignItems: 'center',
   },
-  sportTag: {
-    backgroundColor: '#E3F2FD',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    marginRight: 8,
-    marginBottom: 4,
-  },
-  sportText: {
-    fontSize: 12,
-    color: '#007AFF',
-    fontWeight: '600',
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#007AFF',
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#666',
+    minHeight: 400,
   },
 });
 

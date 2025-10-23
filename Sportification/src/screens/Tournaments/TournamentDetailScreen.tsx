@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {
   useGetTournamentQuery,
@@ -14,24 +15,23 @@ import {
   useStartTournamentMutation,
 } from '../../store/api/tournamentApi';
 import { useAppSelector } from '../../store/hooks';
+import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
+import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
+import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { format } from 'date-fns';
+import { TOURNAMENT_STATUS_COLORS } from '../../constants/statusColors';
+import { useEntityActions, useConfirmation } from '../../hooks';
 
 interface TournamentDetailScreenProps {
   navigation: any;
   route: any;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  upcoming: '#007AFF',
-  registration: '#FF9500',
-  in_progress: '#FFD700',
-  completed: '#34C759',
-  cancelled: '#FF3B30',
-};
-
 const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigation, route }) => {
+  const { theme } = useTheme();
   const { tournamentId } = route.params;
   const user = useAppSelector((state) => state.auth.user);
   const { data, isLoading, refetch } = useGetTournamentQuery(tournamentId);
@@ -39,87 +39,37 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
   const [leaveTournament, { isLoading: isLeaving }] = useLeaveTournamentMutation();
   const [deleteTournament, { isLoading: isDeleting }] = useDeleteTournamentMutation();
   const [startTournament, { isLoading: isStarting }] = useStartTournamentMutation();
+  
+  // Use reusable hooks for common actions
+  const { handleJoin, handleLeave, handleDelete } = useEntityActions({
+    entityType: 'tournament',
+    navigation,
+    refetch,
+  });
+  const { showConfirmation } = useConfirmation();
 
   const tournament = data?.data;
 
   const isParticipant = tournament?.participants.some((p) => p.userId === user?.id);
   const isOrganizer = tournament?.createdBy === user?.id;
-
-  const handleJoin = async () => {
-    try {
-      await joinTournament(tournamentId).unwrap();
-      Alert.alert('Success', 'You have joined the tournament!');
-      refetch();
-    } catch (error: any) {
-      Alert.alert('Error', error?.data?.message || 'Failed to join tournament');
-    }
-  };
-
-  const handleLeave = () => {
-    Alert.alert(
-      'Leave Tournament',
-      'Are you sure you want to leave this tournament?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Leave',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await leaveTournament(tournamentId).unwrap();
-              Alert.alert('Success', 'You have left the tournament');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to leave tournament');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Tournament',
-      'Are you sure you want to delete this tournament? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteTournament(tournamentId).unwrap();
-              Alert.alert('Success', 'Tournament deleted successfully');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to delete tournament');
-            }
-          },
-        },
-      ]
-    );
-  };
+  const isFull = tournament?.maxParticipants ? tournament.participants.length >= tournament.maxParticipants : false;
 
   const handleStart = () => {
-    Alert.alert(
-      'Start Tournament',
-      'Are you sure you want to start this tournament? No more participants can join after it starts.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Start',
-          onPress: async () => {
-            try {
-              await startTournament(tournamentId).unwrap();
-              Alert.alert('Success', 'Tournament started!');
-              refetch();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to start tournament');
-            }
-          },
-        },
-      ]
+    showConfirmation(
+      {
+        title: 'Start Tournament',
+        message: 'Are you sure you want to start this tournament? No more participants can join after it starts.',
+        confirmText: 'Start',
+      },
+      async () => {
+        try {
+          await startTournament(tournamentId).unwrap();
+          Alert.alert('Success', 'Tournament started!');
+          refetch();
+        } catch (error: any) {
+          Alert.alert('Error', error?.data?.message || 'Failed to start tournament');
+        }
+      }
     );
   };
 
@@ -129,111 +79,225 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
 
   if (!tournament) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Tournament not found</Text>
+      <View style={[styles.errorContainer, { backgroundColor: theme.colors.background }]}>
+        <Icon name="trophy-outline" size={64} color={theme.colors.textSecondary} />
+        <Text style={[styles.errorText, { color: theme.colors.textSecondary }]}>Tournament not found</Text>
       </View>
     );
   }
 
   const startDate = tournament.schedule?.startDate ? new Date(tournament.schedule.startDate) : null;
-  const isFull = tournament.maxParticipants ? tournament.participants.length >= tournament.maxParticipants : false;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={[styles.statusBadge, { backgroundColor: STATUS_COLORS[tournament.status] || '#999' }]}>
-          <Text style={styles.statusText}>{tournament.status.toUpperCase()}</Text>
-        </View>
-        <Text style={styles.title}>{tournament.name}</Text>
-        <Text style={styles.sport}>{tournament.sport}</Text>
-        <Text style={styles.format}>Format: {tournament.format}</Text>
-        {tournament.description && (
-          <Text style={styles.description}>{tournament.description}</Text>
-        )}
-      </View>
+    <ScrollView 
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      refreshControl={
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={refetch}
+          colors={[theme.colors.primary]}
+          tintColor={theme.colors.primary}
+        />
+      }
+    >
+      {/* Header Card */}
+      <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+        <Card style={styles.headerCard}>
+          <Badge 
+            label={tournament.status.toUpperCase().replace('_', ' ')}
+            variant={TOURNAMENT_STATUS_COLORS[tournament.status] as any}
+            style={styles.statusBadge}
+          />
+          {isFull && (
+            <Chip 
+              label="Full"
+              variant="outlined"
+              style={styles.fullChip}
+            />
+          )}
+          <Text style={[styles.tournamentName, theme.typography.headlineMedium, { color: theme.colors.text }]}>
+            {tournament.name}
+          </Text>
+          <Chip 
+            label={tournament.sport}
+            icon="soccer"
+            selected
+            style={styles.sportChip}
+          />
+          <Chip 
+            label={tournament.format.replace('-', ' ')}
+            icon="trophy-variant"
+            variant="outlined"
+            style={styles.formatChip}
+          />
+          {tournament.description && (
+            <Text style={[styles.description, theme.typography.bodyMedium, { color: theme.colors.textSecondary }]}>
+              {tournament.description}
+            </Text>
+          )}
+        </Card>
+      </Animated.View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Details</Text>
-        {startDate && (
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Start Date:</Text>
-            <Text style={styles.detailValue}>
-              {format(startDate, 'MMM dd, yyyy')}
+      {/* Details Card */}
+      <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+        <Card style={styles.detailsCard}>
+          <View style={styles.sectionHeader}>
+            <Icon name="information" size={24} color={theme.colors.primary} />
+            <Text style={[styles.sectionTitle, theme.typography.titleLarge, { color: theme.colors.text }]}>
+              Tournament Details
             </Text>
           </View>
-        )}
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Format:</Text>
-          <Text style={styles.detailValue}>{tournament.format}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Participants:</Text>
-          <Text style={styles.detailValue}>
-            {tournament.participants.length}{tournament.maxParticipants ? ` / ${tournament.maxParticipants}` : ''}
-          </Text>
-        </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Participants ({tournament.participants.length})
-        </Text>
-        {tournament.participants.map((participant, index) => (
-          <View key={participant.userId || index} style={styles.participantItem}>
-            <View style={styles.participantAvatar}>
-              <Text style={styles.participantAvatarText}>
-                {participant.name.charAt(0).toUpperCase()}
+          {startDate && (
+            <View style={styles.detailRow}>
+              <View style={[styles.detailIconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
+                <Icon name="calendar-clock" size={20} color={theme.colors.primary} />
+              </View>
+              <View style={styles.detailContent}>
+                <Text style={[styles.detailLabel, theme.typography.labelMedium, { color: theme.colors.textSecondary }]}>
+                  Start Date
+                </Text>
+                <Text style={[styles.detailValue, theme.typography.bodyLarge, { color: theme.colors.text }]}>
+                  {format(startDate, 'MMM dd, yyyy')}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          <View style={styles.detailRow}>
+            <View style={[styles.detailIconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
+              <Icon name="trophy-variant" size={20} color={theme.colors.primary} />
+            </View>
+            <View style={styles.detailContent}>
+              <Text style={[styles.detailLabel, theme.typography.labelMedium, { color: theme.colors.textSecondary }]}>
+                Format
+              </Text>
+              <Text style={[styles.detailValue, theme.typography.bodyLarge, { color: theme.colors.text }]}>
+                {tournament.format.replace('-', ' ')}
               </Text>
             </View>
-            <View style={styles.participantInfo}>
-              <Text style={styles.participantName}>{participant.name}</Text>
-              {participant.seed && (
-                <Text style={styles.participantSeed}>Seed: {participant.seed}</Text>
-              )}
-            </View>
-            {participant.userId === tournament.createdBy && (
-              <View style={styles.organizerBadge}>
-                <Text style={styles.organizerText}>Organizer</Text>
-              </View>
-            )}
           </View>
-        ))}
-      </View>
 
-      {tournament.bracket && tournament.bracket.rounds && tournament.bracket.rounds.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Bracket</Text>
-          {tournament.bracket.rounds.map((round, roundIndex) => (
-            <View key={roundIndex} style={styles.roundContainer}>
-              <Text style={styles.roundTitle}>Round {round.roundNumber}</Text>
-              {round.matches.map((match, matchIndex) => (
-                <View key={match.id || matchIndex} style={styles.bracketMatch}>
-                  <View style={styles.matchupRow}>
-                    <Text style={styles.playerName}>
-                      {match.participant1 || 'TBD'}
+          <View style={styles.detailRow}>
+            <View style={[styles.detailIconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
+              <Icon name="account-multiple" size={20} color={theme.colors.primary} />
+            </View>
+            <View style={styles.detailContent}>
+              <Text style={[styles.detailLabel, theme.typography.labelMedium, { color: theme.colors.textSecondary }]}>
+                Participants
+              </Text>
+              <Text style={[styles.detailValue, theme.typography.bodyLarge, { color: theme.colors.text }]}>
+                {tournament.participants.length}{tournament.maxParticipants ? ` / ${tournament.maxParticipants}` : ''}
+              </Text>
+            </View>
+          </View>
+        </Card>
+      </Animated.View>
+
+      {/* Participants Card */}
+      <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+        <Card style={styles.participantsCard}>
+          <View style={styles.sectionHeader}>
+            <Icon name="account-group" size={24} color={theme.colors.primary} />
+            <Text style={[styles.sectionTitle, theme.typography.titleLarge, { color: theme.colors.text }]}>
+              Participants ({tournament.participants.length})
+            </Text>
+          </View>
+
+          {tournament.participants.map((participant, index) => (
+            <Animated.View 
+              key={participant.userId || index} 
+              entering={FadeInDown.duration(300).delay(400 + index * 50)}
+            >
+              <Card variant="outlined" style={styles.participantItem}>
+                <Avatar 
+                  name={participant.name}
+                  size="small"
+                />
+                <View style={styles.participantInfo}>
+                  <Text style={[styles.participantName, theme.typography.titleMedium, { color: theme.colors.text }]}>
+                    {participant.name}
+                  </Text>
+                  {participant.seed && (
+                    <Text style={[styles.participantSeed, theme.typography.labelSmall, { color: theme.colors.textSecondary }]}>
+                      Seed: {participant.seed}
                     </Text>
-                    <Text style={styles.score}>{match.score?.participant1 || '-'}</Text>
-                  </View>
-                  <View style={styles.matchupRow}>
-                    <Text style={styles.playerName}>
-                      {match.participant2 || 'TBD'}
-                    </Text>
-                    <Text style={styles.score}>{match.score?.participant2 || '-'}</Text>
-                  </View>
-                  {match.winner && (
-                    <Text style={styles.winner}>Winner: {match.winner}</Text>
                   )}
                 </View>
-              ))}
-            </View>
+                {participant.userId === tournament.createdBy && (
+                  <Chip 
+                    label="Organizer"
+                    icon="crown"
+                    selected
+                    size="small"
+                  />
+                )}
+              </Card>
+            </Animated.View>
           ))}
-        </View>
+        </Card>
+      </Animated.View>
+
+      {/* Bracket Card */}
+      {tournament.bracket && tournament.bracket.rounds && tournament.bracket.rounds.length > 0 && (
+        <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+          <Card style={styles.bracketCard}>
+            <View style={styles.sectionHeader}>
+              <Icon name="tournament" size={24} color={theme.colors.primary} />
+              <Text style={[styles.sectionTitle, theme.typography.titleLarge, { color: theme.colors.text }]}>
+                Tournament Bracket
+              </Text>
+            </View>
+
+            {tournament.bracket.rounds.map((round, roundIndex) => (
+              <View key={roundIndex} style={styles.roundContainer}>
+                <Text style={[styles.roundTitle, theme.typography.titleMedium, { color: theme.colors.text }]}>
+                  Round {round.roundNumber}
+                </Text>
+                {round.matches.map((match, matchIndex) => (
+                  <Card 
+                    key={match.id || matchIndex} 
+                    variant="outlined"
+                    style={styles.bracketMatch}
+                  >
+                    <View style={styles.matchupRow}>
+                      <Text style={[styles.playerName, theme.typography.bodyMedium, { color: theme.colors.text }]}>
+                        {match.participant1 || 'TBD'}
+                      </Text>
+                      <Text style={[styles.score, theme.typography.titleSmall, { color: theme.colors.primary }]}>
+                        {match.score?.participant1 || '-'}
+                      </Text>
+                    </View>
+                    <View style={styles.matchupRow}>
+                      <Text style={[styles.playerName, theme.typography.bodyMedium, { color: theme.colors.text }]}>
+                        {match.participant2 || 'TBD'}
+                      </Text>
+                      <Text style={[styles.score, theme.typography.titleSmall, { color: theme.colors.primary }]}>
+                        {match.score?.participant2 || '-'}
+                      </Text>
+                    </View>
+                    {match.winner && (
+                      <View style={styles.winnerContainer}>
+                        <Icon name="trophy" size={16} color={theme.colors.success} />
+                        <Text style={[styles.winner, theme.typography.labelMedium, { color: theme.colors.success }]}>
+                          Winner: {match.winner}
+                        </Text>
+                      </View>
+                    )}
+                  </Card>
+                ))}
+              </View>
+            ))}
+          </Card>
+        </Animated.View>
       )}
 
-      <View style={styles.actions}>
+      {/* Action Buttons */}
+      <Animated.View entering={FadeInDown.duration(300).delay(500)} style={styles.actions}>
         {!isParticipant && tournament.status === 'upcoming' && (
           <Button
             title="Join Tournament"
+            icon="account-plus"
             onPress={handleJoin}
             loading={isJoining}
             disabled={isFull}
@@ -243,6 +307,7 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
         {isParticipant && !isOrganizer && tournament.status === 'upcoming' && (
           <Button
             title="Leave Tournament"
+            icon="account-minus"
             onPress={handleLeave}
             loading={isLeaving}
             variant="outline"
@@ -254,13 +319,14 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
             {tournament.status === 'upcoming' && (
               <Button
                 title="Start Tournament"
+                icon="play"
                 onPress={handleStart}
                 loading={isStarting}
-                style={styles.actionButton}
               />
             )}
             <Button
               title="Delete Tournament"
+              icon="delete"
               onPress={handleDelete}
               loading={isDeleting}
               variant="outline"
@@ -276,134 +342,100 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
-  header: {
-    backgroundColor: '#fff',
-    padding: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  headerCard: {
+    margin: 16,
+    marginBottom: 8,
+    alignItems: 'center',
+    padding: 8,
   },
   statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    marginBottom: 8,
+  },
+  fullChip: {
+    marginBottom: 8,
+  },
+  tournamentName: {
+    marginTop: 8,
     marginBottom: 12,
+    textAlign: 'center',
   },
-  statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#fff',
+  sportChip: {
+    marginVertical: 4,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  sport: {
-    fontSize: 16,
-    color: '#007AFF',
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  format: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+  formatChip: {
+    marginVertical: 4,
   },
   description: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 8,
+    textAlign: 'center',
+    marginTop: 12,
   },
-  section: {
-    backgroundColor: '#fff',
-    marginTop: 16,
-    padding: 16,
+  detailsCard: {
+    marginHorizontal: 16,
+    marginVertical: 8,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
+    flex: 1,
   },
   detailRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    marginBottom: 8,
+  },
+  detailIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  detailContent: {
+    flex: 1,
   },
   detailLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
+    marginBottom: 2,
   },
   detailValue: {
-    fontSize: 14,
-    color: '#333',
-    flex: 1,
-    textAlign: 'right',
+    fontWeight: '600',
+  },
+  participantsCard: {
+    marginHorizontal: 16,
+    marginVertical: 8,
   },
   participantItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  participantAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  participantAvatarText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
+    padding: 12,
+    marginBottom: 8,
+    gap: 12,
   },
   participantInfo: {
     flex: 1,
   },
   participantName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
     marginBottom: 2,
   },
   participantSeed: {
-    fontSize: 12,
-    color: '#666',
   },
-  organizerBadge: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  organizerText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
+  bracketCard: {
+    marginHorizontal: 16,
+    marginVertical: 8,
   },
   roundContainer: {
     marginBottom: 16,
   },
   roundTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
     marginBottom: 12,
   },
   bracketMatch: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
     padding: 12,
     marginBottom: 8,
   },
@@ -411,38 +443,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 4,
+    alignItems: 'center',
   },
   playerName: {
-    fontSize: 14,
-    color: '#333',
     flex: 1,
   },
   score: {
-    fontSize: 14,
     fontWeight: 'bold',
-    color: '#007AFF',
     marginLeft: 8,
+    minWidth: 24,
+    textAlign: 'center',
+  },
+  winnerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 4,
   },
   winner: {
-    fontSize: 12,
-    color: '#34C759',
     fontWeight: '600',
-    marginTop: 4,
   },
   actions: {
     padding: 16,
+    gap: 12,
   },
   actionButton: {
-    marginTop: 12,
+    marginTop: 0,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 24,
   },
   errorText: {
+    marginTop: 16,
     fontSize: 16,
-    color: '#666',
   },
 });
 

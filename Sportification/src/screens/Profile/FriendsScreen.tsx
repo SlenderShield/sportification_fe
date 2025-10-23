@@ -4,10 +4,8 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   RefreshControl,
   Alert,
-  TextInput,
 } from 'react-native';
 import {
   useGetFriendsQuery,
@@ -18,12 +16,18 @@ import {
 import { useAppSelector } from '../../store/hooks';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
+import Input from '../../components/common/Input';
+import { Card, Avatar, Badge, IconButton } from '../../components/ui';
+import { useTheme } from '../../theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FadeInDown } from 'react-native-reanimated';
 
 interface FriendsScreenProps {
   navigation: any;
 }
 
 const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const user = useAppSelector((state) => state.auth.user);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchMode, setSearchMode] = useState(false);
@@ -38,6 +42,8 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
 
   const friends = friendsData?.data?.friends || [];
   const searchResults = searchData?.data?.items || [];
+  
+  const styles = createStyles(theme);
 
   const handleAddFriend = async (userId: string, username: string) => {
     try {
@@ -72,57 +78,63 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
     );
   };
 
-  const renderFriend = ({ item }: any) => (
-    <View style={styles.friendCard}>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>
-          {item.username.charAt(0).toUpperCase()}
-        </Text>
-      </View>
-      <View style={styles.friendInfo}>
-        <Text style={styles.friendName}>{item.username}</Text>
-        <Text style={styles.friendEmail}>{item.email}</Text>
-      </View>
-      <Button
-        title="Remove"
-        onPress={() => handleRemoveFriend(item.id, item.username)}
-        variant="outline"
-        style={styles.removeButton}
-        textStyle={styles.removeButtonText}
-      />
-    </View>
+  const renderFriend = ({ item, index }: any) => (
+    <FadeInDown delay={index * 50} duration={400}>
+      <Card style={styles.friendCard}>
+        <Avatar
+          name={item.username}
+          size="medium"
+          source={item.profilePicture ? { uri: item.profilePicture } : undefined}
+        />
+        <View style={styles.friendInfo}>
+          <Text style={theme.typography.titleMedium}>{item.username}</Text>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.onSurfaceVariant }]}>
+            {item.email}
+          </Text>
+        </View>
+        <IconButton
+          icon="account-minus"
+          onPress={() => handleRemoveFriend(item.id, item.username)}
+          variant="outlined"
+          size="small"
+          color={theme.colors.error}
+        />
+      </Card>
+    </FadeInDown>
   );
 
-  const renderSearchResult = ({ item }: any) => {
+  const renderSearchResult = ({ item, index }: any) => {
     const isFriend = friends.some((f: any) => f.id === item.id);
     const isMe = item.id === user?.id;
 
     if (isMe) return null;
 
     return (
-      <View style={styles.friendCard}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {item.username.charAt(0).toUpperCase()}
-          </Text>
-        </View>
-        <View style={styles.friendInfo}>
-          <Text style={styles.friendName}>{item.username}</Text>
-          <Text style={styles.friendEmail}>{item.email}</Text>
-        </View>
-        {!isFriend ? (
-          <Button
-            title="Add"
-            onPress={() => handleAddFriend(item.id, item.username)}
-            style={styles.addButton}
-            textStyle={styles.addButtonText}
+      <FadeInDown delay={index * 50} duration={400}>
+        <Card style={styles.friendCard}>
+          <Avatar
+            name={item.username}
+            size="medium"
+            source={item.profilePicture ? { uri: item.profilePicture } : undefined}
           />
-        ) : (
-          <View style={styles.friendBadge}>
-            <Text style={styles.friendBadgeText}>Friend</Text>
+          <View style={styles.friendInfo}>
+            <Text style={theme.typography.titleMedium}>{item.username}</Text>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.onSurfaceVariant }]}>
+              {item.email}
+            </Text>
           </View>
-        )}
-      </View>
+          {!isFriend ? (
+            <IconButton
+              icon="account-plus"
+              onPress={() => handleAddFriend(item.id, item.username)}
+              variant="filled"
+              size="small"
+            />
+          ) : (
+            <Badge label="Friend" variant="success" />
+          )}
+        </Card>
+      </FadeInDown>
     );
   };
 
@@ -133,15 +145,16 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
+        <Input
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholder="Search users by username or email..."
+          placeholder="Search users..."
+          leftIcon="account-search"
           onFocus={() => setSearchMode(true)}
           onBlur={() => {
             if (!searchQuery) setSearchMode(false);
           }}
+          style={styles.searchInput}
         />
         {searchMode && (
           <Button
@@ -150,12 +163,29 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
               setSearchQuery('');
               setSearchMode(false);
             }}
-            variant="outline"
-            style={styles.cancelButton}
-            textStyle={styles.cancelButtonText}
+            variant="text"
+            size="small"
           />
         )}
       </View>
+
+      {!searchMode && (
+        <View style={styles.statsContainer}>
+          <Card variant="filled" style={styles.statsCard}>
+            <MaterialCommunityIcons
+              name="account-group"
+              size={24}
+              color={theme.colors.primary}
+            />
+            <Text style={[theme.typography.titleLarge, styles.statsNumber]}>
+              {friends.length}
+            </Text>
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.onSurfaceVariant }]}>
+              Friends
+            </Text>
+          </Card>
+        </View>
+      )}
 
       {searchMode ? (
         <>
@@ -168,9 +198,32 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
             ListEmptyComponent={
               searchQuery.length >= 2 ? (
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>No users found</Text>
+                  <MaterialCommunityIcons
+                    name="account-search"
+                    size={64}
+                    color={theme.colors.onSurfaceVariant}
+                    style={{ opacity: 0.5 }}
+                  />
+                  <Text style={[theme.typography.titleMedium, styles.emptyText]}>
+                    No users found
+                  </Text>
+                  <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
+                    Try a different search term
+                  </Text>
                 </View>
-              ) : null
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <MaterialCommunityIcons
+                    name="magnify"
+                    size={64}
+                    color={theme.colors.onSurfaceVariant}
+                    style={{ opacity: 0.5 }}
+                  />
+                  <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
+                    Search for users to add friends
+                  </Text>
+                </View>
+              )
             }
           />
         </>
@@ -181,12 +234,27 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={loadingFriends} onRefresh={refetchFriends} />
+            <RefreshControl
+              refreshing={loadingFriends}
+              onRefresh={refetchFriends}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No friends yet</Text>
-              <Text style={styles.emptySubtext}>Search for users to add friends</Text>
+              <MaterialCommunityIcons
+                name="account-group-outline"
+                size={64}
+                color={theme.colors.onSurfaceVariant}
+                style={{ opacity: 0.5 }}
+              />
+              <Text style={[theme.typography.titleMedium, styles.emptyText]}>
+                No friends yet
+              </Text>
+              <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
+                Search for users to add friends
+              </Text>
             </View>
           }
         />
@@ -195,121 +263,63 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  searchContainer: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  cancelButton: {
-    marginLeft: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 36,
-  },
-  cancelButtonText: {
-    fontSize: 14,
-  },
-  list: {
-    padding: 16,
-  },
-  friendCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  friendInfo: {
-    flex: 1,
-  },
-  friendName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  friendEmail: {
-    fontSize: 14,
-    color: '#666',
-  },
-  removeButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    minHeight: 32,
-  },
-  removeButtonText: {
-    fontSize: 14,
-  },
-  addButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    minHeight: 32,
-  },
-  addButtonText: {
-    fontSize: 14,
-  },
-  friendBadge: {
-    backgroundColor: '#34C759',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  friendBadgeText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: '#666',
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    searchContainer: {
+      backgroundColor: theme.colors.surface,
+      padding: theme.spacing.base,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+      ...theme.elevation.level1,
+    },
+    searchInput: {
+      flex: 1,
+    },
+    statsContainer: {
+      padding: theme.spacing.base,
+      paddingBottom: theme.spacing.sm,
+    },
+    statsCard: {
+      alignItems: 'center',
+      padding: theme.spacing.lg,
+      gap: theme.spacing.xs,
+    },
+    statsNumber: {
+      color: theme.colors.primary,
+      marginTop: theme.spacing.xs,
+    },
+    list: {
+      padding: theme.spacing.base,
+      paddingTop: theme.spacing.sm,
+    },
+    friendCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
+    },
+    friendInfo: {
+      flex: 1,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: theme.spacing.xl,
+      gap: theme.spacing.sm,
+    },
+    emptyText: {
+      color: theme.colors.onSurface,
+      marginTop: theme.spacing.sm,
+    },
+    emptySubtext: {
+      color: theme.colors.onSurfaceVariant,
+      textAlign: 'center',
+    },
+  });
 
 export default FriendsScreen;

@@ -9,26 +9,21 @@ import {
   Alert,
 } from 'react-native';
 import { useCreateTeamMutation } from '../../store/api/teamApi';
+import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import { Card, SportSelector, SectionHeader } from '../../components/ui';
+import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { SPORTS } from '../../constants/sports';
+import { validateName, validateNumber, validateSelection } from '../../utils/validation';
 
 interface CreateTeamScreenProps {
   navigation: any;
 }
 
-const SPORTS = [
-  'Football',
-  'Basketball',
-  'Tennis',
-  'Volleyball',
-  'Cricket',
-  'Baseball',
-  'Badminton',
-  'Table Tennis',
-  'Other',
-];
-
 const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     name: '',
     sport: '',
@@ -44,35 +39,33 @@ const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
   const [createTeam, { isLoading }] = useCreateTeamMutation();
 
   const validate = (): boolean => {
-    let valid = true;
     const newErrors = { name: '', sport: '', maxMembers: '' };
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Team name is required';
-      valid = false;
-    } else if (formData.name.length < 3) {
-      newErrors.name = 'Team name must be at least 3 characters';
-      valid = false;
+    // Use validation utilities
+    const nameValidation = validateName(formData.name, 'Team name', 3);
+    if (!nameValidation.isValid) {
+      newErrors.name = nameValidation.error || '';
     }
 
-    if (!formData.sport.trim()) {
-      newErrors.sport = 'Sport is required';
-      valid = false;
+    const sportValidation = validateSelection(formData.sport, 'Sport');
+    if (!sportValidation.isValid) {
+      newErrors.sport = sportValidation.error || '';
     }
 
     if (formData.maxMembers) {
-      const max = parseInt(formData.maxMembers, 10);
-      if (isNaN(max) || max < 2) {
-        newErrors.maxMembers = 'Maximum members must be at least 2';
-        valid = false;
-      } else if (max > 100) {
-        newErrors.maxMembers = 'Maximum members cannot exceed 100';
-        valid = false;
+      const maxMembersValidation = validateNumber(
+        formData.maxMembers,
+        'Maximum members',
+        2,
+        100
+      );
+      if (!maxMembersValidation.isValid) {
+        newErrors.maxMembers = maxMembersValidation.error || '';
       }
     }
 
     setErrors(newErrors);
-    return valid;
+    return Object.values(newErrors).every(error => !error);
   };
 
   const handleCreate = async () => {
@@ -114,74 +107,122 @@ const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Text style={styles.title}>Create Your Team</Text>
-          <Text style={styles.subtitle}>
-            Start building your sports team community
-          </Text>
-
-          <Input
-            label="Team Name *"
-            value={formData.name}
-            onChangeText={(text) => updateField('name', text)}
-            placeholder="Enter team name"
-            error={errors.name}
-          />
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Sport *</Text>
-            <View style={styles.sportGrid}>
-              {SPORTS.map((sport) => (
-                <Button
-                  key={sport}
-                  title={sport}
-                  onPress={() => updateField('sport', sport)}
-                  variant={formData.sport === sport ? 'primary' : 'outline'}
-                  style={styles.sportButton}
-                  textStyle={styles.sportButtonText}
-                />
-              ))}
+          {/* Header */}
+          <Animated.View entering={FadeInDown.duration(300).delay(100)} style={styles.header}>
+            <View style={[styles.iconContainer, { backgroundColor: theme.colors.primary + '20' }]}>
+              <Icon name="account-group-plus" size={48} color={theme.colors.primary} />
             </View>
-            {errors.sport ? (
-              <Text style={styles.error}>{errors.sport}</Text>
-            ) : null}
-          </View>
+            <Text style={[styles.title, theme.typography.displaySmall, { color: theme.colors.text }]}>
+              Create Your Team
+            </Text>
+            <Text style={[styles.subtitle, theme.typography.bodyMedium, { color: theme.colors.textSecondary }]}>
+              Start building your sports team community
+            </Text>
+          </Animated.View>
 
-          <Input
-            label="Description (Optional)"
-            value={formData.description}
-            onChangeText={(text) => updateField('description', text)}
-            placeholder="Tell us about your team"
-            multiline
-            numberOfLines={4}
-            style={styles.textArea}
-          />
+          {/* Team Details Card */}
+          <Animated.View entering={FadeInDown.duration(300).delay(200)}>
+            <Card style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Icon name="information" size={20} color={theme.colors.primary} />
+                <Text style={[styles.cardTitle, theme.typography.titleMedium, { color: theme.colors.text }]}>
+                  Team Details
+                </Text>
+              </View>
 
-          <Input
-            label="Maximum Members (Optional)"
-            value={formData.maxMembers}
-            onChangeText={(text) => updateField('maxMembers', text)}
-            placeholder="e.g., 15"
-            keyboardType="numeric"
-            error={errors.maxMembers}
-          />
+              <Input
+                label="Team Name *"
+                value={formData.name}
+                onChangeText={(text) => updateField('name', text)}
+                placeholder="Enter team name"
+                error={errors.name}
+                leftIcon="shield-account"
+              />
 
-          <Button
-            title="Create Team"
-            onPress={handleCreate}
-            loading={isLoading}
-            style={styles.createButton}
-          />
+              <Input
+                label="Description (Optional)"
+                value={formData.description}
+                onChangeText={(text) => updateField('description', text)}
+                placeholder="Tell us about your team"
+                multiline
+                numberOfLines={4}
+                leftIcon="text"
+              />
+            </Card>
+          </Animated.View>
 
-          <Button
-            title="Cancel"
-            onPress={() => navigation.goBack()}
-            variant="outline"
-          />
+          {/* Sport Selection Card */}
+          <Animated.View entering={FadeInDown.duration(300).delay(300)}>
+            <Card style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Icon name="soccer" size={20} color={theme.colors.primary} />
+                <Text style={[styles.cardTitle, theme.typography.titleMedium, { color: theme.colors.text }]}>
+                  Sport *
+                </Text>
+              </View>
+
+              <View style={styles.sportsGrid}>
+                {SPORTS.map((sport) => (
+                  <Chip
+                    key={sport.name}
+                    label={sport.name}
+                    icon={sport.icon}
+                    selected={formData.sport === sport.name}
+                    onPress={() => updateField('sport', sport.name)}
+                    style={styles.sportChip}
+                  />
+                ))}
+              </View>
+              {errors.sport ? (
+                <Text style={[styles.error, { color: theme.colors.error }]}>{errors.sport}</Text>
+              ) : null}
+            </Card>
+          </Animated.View>
+
+          {/* Participants Card */}
+          <Animated.View entering={FadeInDown.duration(300).delay(400)}>
+            <Card style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Icon name="account-multiple" size={20} color={theme.colors.primary} />
+                <Text style={[styles.cardTitle, theme.typography.titleMedium, { color: theme.colors.text }]}>
+                  Team Size
+                </Text>
+              </View>
+
+              <Input
+                label="Maximum Members (Optional)"
+                value={formData.maxMembers}
+                onChangeText={(text) => updateField('maxMembers', text)}
+                placeholder="e.g., 15"
+                keyboardType="numeric"
+                error={errors.maxMembers}
+                helperText="Leave empty for unlimited members"
+                leftIcon="account-multiple"
+              />
+            </Card>
+          </Animated.View>
+
+          {/* Action Buttons */}
+          <Animated.View entering={FadeInDown.duration(300).delay(500)} style={styles.actions}>
+            <Button
+              title="Create Team"
+              icon="check"
+              onPress={handleCreate}
+              loading={isLoading}
+            />
+
+            <Button
+              title="Cancel"
+              icon="close"
+              onPress={() => navigation.goBack()}
+              variant="outline"
+            />
+          </Animated.View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -191,59 +232,58 @@ const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
   },
   content: {
-    padding: 24,
+    padding: 16,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  iconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
+    textAlign: 'center',
   },
-  inputContainer: {
+  card: {
     marginBottom: 16,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
   },
-  sportGrid: {
+  cardTitle: {
+    flex: 1,
+  },
+  sportsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -4,
+    gap: 8,
   },
-  sportButton: {
-    margin: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 36,
+  sportChip: {
   },
-  sportButtonText: {
-    fontSize: 14,
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  createButton: {
-    marginBottom: 12,
+  actions: {
+    gap: 12,
+    marginTop: 8,
   },
   error: {
-    color: '#FF3B30',
+    marginTop: 8,
     fontSize: 12,
-    marginTop: 4,
   },
 });
 

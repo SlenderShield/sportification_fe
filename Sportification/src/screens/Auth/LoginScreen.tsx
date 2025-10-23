@@ -7,14 +7,17 @@ import {
   Platform,
   ScrollView,
   Alert,
-  TouchableOpacity,
+  Pressable,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useLoginMutation, useLoginWithGoogleMutation, useLoginWithAppleMutation, useLoginWithFacebookMutation } from '../../store/api/authApi';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../store/slices/authSlice';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { googleAuthService } from '../../services/googleAuthService';
 import { appleAuthService } from '../../services/appleAuthService';
 import { facebookAuthService } from '../../services/facebookAuthService';
@@ -27,8 +30,10 @@ interface LoginScreenProps {
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [biometricType, setBiometricType] = useState<string>('');
@@ -161,93 +166,205 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Welcome to Sportification</Text>
-          <Text style={styles.subtitle}>{t('auth.login')}</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.content, { paddingHorizontal: theme.spacing.xl }]}>
+          {/* Header */}
+          <Animated.View
+            entering={FadeInDown.delay(100).springify()}
+            style={[styles.header, { marginBottom: theme.spacing['2xl'] }]}
+          >
+            <View
+              style={[
+                styles.logoContainer,
+                {
+                  backgroundColor: theme.colors.primary,
+                  marginBottom: theme.spacing.xl,
+                },
+              ]}
+            >
+              <Icon name="soccer" size={48} color={theme.colors.onPrimary} />
+            </View>
+            <Text
+              style={[
+                theme.typography.displaySmall,
+                { color: theme.colors.text, marginBottom: theme.spacing.xs },
+              ]}
+            >
+              Welcome Back
+            </Text>
+            <Text
+              style={[
+                theme.typography.bodyLarge,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Sign in to continue your sports journey
+            </Text>
+          </Animated.View>
 
-          <Input
-            label={t('auth.email')}
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              setErrors({ ...errors, email: '' });
-            }}
-            placeholder="Enter your email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            error={errors.email}
-          />
-
-          <Input
-            label={t('auth.password')}
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              setErrors({ ...errors, password: '' });
-            }}
-            placeholder="Enter your password"
-            secureTextEntry
-            error={errors.password}
-          />
-
-          <Button
-            title={t('auth.login')}
-            onPress={handleLogin}
-            loading={isLoading}
-            style={styles.loginButton}
-          />
-
-          {biometricAvailable && (
-            <Button
-              title={t('auth.biometricLogin', { type: biometricType })}
-              onPress={handleBiometricLogin}
-              variant="outline"
-              style={styles.biometricButton}
+          {/* Login Form */}
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Input
+              label={t('auth.email')}
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setErrors({ ...errors, email: '' });
+              }}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              leftIcon="email"
+              variant="outlined"
+              error={errors.email}
             />
-          )}
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <Button
-            title={t('auth.loginWithGoogle')}
-            onPress={handleGoogleLogin}
-            loading={isGoogleLoading}
-            variant="outline"
-            style={styles.socialButton}
-          />
-
-          {Platform.OS === 'ios' && appleAuthService.isSupported() && (
-            <Button
-              title={t('auth.loginWithApple')}
-              onPress={handleAppleLogin}
-              loading={isAppleLoading}
-              variant="outline"
-              style={styles.socialButton}
+            <Input
+              label={t('auth.password')}
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setErrors({ ...errors, password: '' });
+              }}
+              placeholder="Enter your password"
+              secureTextEntry={!showPassword}
+              leftIcon="lock"
+              rightIcon={showPassword ? 'eye-off' : 'eye'}
+              onRightIconPress={() => setShowPassword(!showPassword)}
+              variant="outlined"
+              error={errors.password}
             />
-          )}
 
-          <Button
-            title={t('auth.loginWithFacebook')}
-            onPress={handleFacebookLogin}
-            loading={isFacebookLoading}
-            variant="outline"
-            style={styles.socialButton}
-          />
+            <Pressable
+              onPress={() => {}}
+              style={{ alignSelf: 'flex-end', marginBottom: theme.spacing.base }}
+            >
+              <Text
+                style={[
+                  theme.typography.labelMedium,
+                  { color: theme.colors.primary },
+                ]}
+              >
+                Forgot Password?
+              </Text>
+            </Pressable>
 
-          <Button
-            title={t('auth.register')}
-            onPress={() => navigation.navigate('Register')}
-            variant="outline"
-            style={styles.registerButton}
-          />
+            <Button
+              title={t('auth.login')}
+              onPress={handleLogin}
+              loading={isLoading}
+              icon="login"
+              fullWidth
+              style={{ marginBottom: theme.spacing.md }}
+            />
+
+            {biometricAvailable && (
+              <Button
+                title={t('auth.biometricLogin', { type: biometricType })}
+                onPress={handleBiometricLogin}
+                variant="outline"
+                icon="fingerprint"
+                fullWidth
+                style={{ marginBottom: theme.spacing.base }}
+              />
+            )}
+          </Animated.View>
+
+          {/* Divider */}
+          <Animated.View
+            entering={FadeInDown.delay(300).springify()}
+            style={[styles.divider, { marginVertical: theme.spacing.xl }]}
+          >
+            <View
+              style={[
+                styles.dividerLine,
+                { backgroundColor: theme.colors.outline },
+              ]}
+            />
+            <Text
+              style={[
+                theme.typography.labelMedium,
+                {
+                  color: theme.colors.textSecondary,
+                  marginHorizontal: theme.spacing.base,
+                },
+              ]}
+            >
+              OR CONTINUE WITH
+            </Text>
+            <View
+              style={[
+                styles.dividerLine,
+                { backgroundColor: theme.colors.outline },
+              ]}
+            />
+          </Animated.View>
+
+          {/* Social Login */}
+          <Animated.View entering={FadeInDown.delay(400).springify()}>
+            <Button
+              title={t('auth.loginWithGoogle')}
+              onPress={handleGoogleLogin}
+              loading={isGoogleLoading}
+              variant="outline"
+              icon="google"
+              fullWidth
+              style={{ marginBottom: theme.spacing.sm }}
+            />
+
+            {Platform.OS === 'ios' && appleAuthService.isSupported() && (
+              <Button
+                title={t('auth.loginWithApple')}
+                onPress={handleAppleLogin}
+                loading={isAppleLoading}
+                variant="outline"
+                icon="apple"
+                fullWidth
+                style={{ marginBottom: theme.spacing.sm }}
+              />
+            )}
+
+            <Button
+              title={t('auth.loginWithFacebook')}
+              onPress={handleFacebookLogin}
+              loading={isFacebookLoading}
+              variant="outline"
+              icon="facebook"
+              fullWidth
+              style={{ marginBottom: theme.spacing.xl }}
+            />
+          </Animated.View>
+
+          {/* Register Link */}
+          <Animated.View
+            entering={FadeInUp.delay(500).springify()}
+            style={styles.registerContainer}
+          >
+            <Text
+              style={[
+                theme.typography.bodyMedium,
+                { color: theme.colors.textSecondary },
+              ]}
+            >
+              Don't have an account?{' '}
+            </Text>
+            <Pressable onPress={() => navigation.navigate('Register')}>
+              <Text
+                style={[
+                  theme.typography.bodyMedium,
+                  { color: theme.colors.primary, fontWeight: '600' },
+                ]}
+              >
+                Sign Up
+              </Text>
+            </Pressable>
+          </Animated.View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -257,54 +374,38 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
+    paddingVertical: 32,
   },
   content: {
-    padding: 24,
+    flex: 1,
+    justifyContent: 'center',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
+  header: {
+    alignItems: 'center',
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
-    textAlign: 'center',
-  },
-  loginButton: {
-    marginBottom: 12,
-  },
-  biometricButton: {
-    marginBottom: 16,
+  logoContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 16,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#ddd',
   },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#999',
-    fontSize: 14,
-  },
-  socialButton: {
-    marginBottom: 8,
-  },
-  registerButton: {
-    marginTop: 8,
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
