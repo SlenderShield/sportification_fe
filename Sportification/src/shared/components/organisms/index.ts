@@ -15,3 +15,8 @@ export { default as ParticipantList } from './ParticipantList';
 export { default as SortFilter } from './SortFilter';
 export { default as SportSelector } from './SportSelector';
 export { default as SwipeableCard } from './SwipeableCard';
+
+// Error boundaries
+export { ErrorBoundary } from './ErrorBoundary';
+export { FeatureErrorBoundary } from './FeatureErrorBoundary';
+export { ScreenErrorBoundary } from './ScreenErrorBoundary';
