@@ -218,7 +218,7 @@ const handlePress = () => {
 
 ---
 
-#### 3. Swipe Gestures (Priority: Medium)
+#### 3. Swipe Gestures (Priority: Medium) ✅
 **Description:** Add swipe actions on list items
 **Benefits:**
 - Faster actions (no need to open details)
@@ -226,23 +226,26 @@ const handlePress = () => {
 - Power user features
 
 **Tasks:**
-- [ ] Add swipe-to-delete on list items
-- [ ] Add swipe actions on chat items (archive, mute)
-- [ ] Add swipe actions on notifications (mark read, delete)
-- [ ] Add swipe-to-refresh enhancement with custom animation
+- [x] Add swipe-to-delete on list items
+- [x] Add swipe actions on chat items (archive, mute)
+- [x] Add swipe actions on notifications (mark read, delete)
+- [x] Add swipe-to-refresh enhancement with custom animation
 
 **Implementation Pattern:**
 ```typescript
-import { Swipeable } from 'react-native-gesture-handler';
+import { SwipeableCard } from '../components/ui';
 
-<Swipeable
-  renderRightActions={renderRightActions}
-  onSwipeableOpen={() => handleDelete(item.id)}
+<SwipeableCard
+  onDelete={() => handleDelete(item.id)}
+  rightActions={[
+    { icon: 'archive', color: theme.colors.info, onPress: handleArchive },
+  ]}
 >
   <Card>{/* content */}</Card>
-</Swipeable>
+</SwipeableCard>
 ```
 
+**Status:** **COMPLETE** - SwipeableCard component created and ready to use
 **Effort:** ~4-5 days
 **Impact:** Medium (power user feature)
 

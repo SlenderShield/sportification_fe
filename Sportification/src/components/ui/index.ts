@@ -17,3 +17,4 @@ export { default as ParticipantList } from './ParticipantList';
 export { default as SearchBar } from './SearchBar';
 export { default as FilterChips } from './FilterChips';
 export { default as AnimatedToast } from './AnimatedToast';
+export { default as SwipeableCard } from './SwipeableCard';
