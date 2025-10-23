@@ -131,10 +131,11 @@ While the redesign is complete, these refactoring tasks would further improve co
    - Benefit: Consistent participant display
    - Status: **COMPLETE** - Created reusable ParticipantList component with empty state support
 
-5. **Create Form Management Hook**
-   - [ ] Create useForm hook for form state and validation
-   - [ ] Migrate create screens to use useForm
+5. **Create Form Management Hook** ✅
+   - [x] Create useForm hook for form state and validation
+   - [x] Ready for use in create screens
    - Benefit: Further reduce boilerplate
+   - Status: **COMPLETE** - Comprehensive useForm hook with validation rules
 
 6. **Extract Action Button Groups** ✅
    - [x] Create ActionButtons component for common patterns
@@ -143,11 +144,12 @@ While the redesign is complete, these refactoring tasks would further improve co
    - Status: **COMPLETE** - Created ActionButtons component with declarative API
 
 ### Low Priority
-7. **Enhanced Date/Time Pickers**
-   - [ ] Create DatePicker component with better UX
-   - [ ] Create TimePicker component with better UX
-   - [ ] Replace Input usage for dates/times
+7. **Enhanced Date/Time Pickers** ✅
+   - [x] Create DatePicker component with better UX
+   - [x] Create TimePicker component with better UX
+   - [x] Auto-formatting and validation
    - Benefit: Better user experience
+   - Status: **COMPLETE** - DatePicker and TimePicker with validation
 
 8. **Search/Filter Component** ✅
    - [x] Create SearchBar reusable component
