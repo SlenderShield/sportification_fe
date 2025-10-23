@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerLightImpact } from '../../utils/hapticFeedback';
 
 interface ButtonProps {
   title: string;
@@ -60,6 +61,7 @@ const Button: React.FC<ButtonProps> = ({
     if (!isDisabled) {
       scale.value = withSpring(0.96, theme.animations.spring.snappy);
       opacity.value = withTiming(0.8, { duration: theme.animations.duration.fast });
+      triggerLightImpact();
     }
   };
 

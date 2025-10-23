@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerLightImpact } from '../../utils/hapticFeedback';
 
 interface FABProps {
   icon?: string;
@@ -38,6 +39,7 @@ const FAB: React.FC<FABProps> = ({
 
   const handlePressIn = () => {
     scale.value = withSpring(0.9, theme.animations.spring.snappy);
+    triggerLightImpact();
   };
 
   const handlePressOut = () => {

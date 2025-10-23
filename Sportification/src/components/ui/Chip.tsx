@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerSelection } from '../../utils/hapticFeedback';
 
 interface ChipProps {
   label: string;
@@ -40,6 +41,7 @@ const Chip: React.FC<ChipProps> = ({
 
   const handlePressIn = () => {
     scale.value = withSpring(0.95, theme.animations.spring.snappy);
+    triggerSelection();
   };
 
   const handlePressOut = () => {

@@ -8,6 +8,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useTheme } from '../../theme';
 import LottieLoader from '../common/LottieLoader';
+import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '../../utils/hapticFeedback';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -34,6 +35,15 @@ const AnimatedToast: React.FC<AnimatedToastProps> = ({
 
   useEffect(() => {
     if (visible) {
+      // Trigger haptic feedback based on toast type
+      if (type === 'success') {
+        triggerSuccessNotification();
+      } else if (type === 'error') {
+        triggerErrorNotification();
+      } else if (type === 'warning') {
+        triggerWarningNotification();
+      }
+
       Animated.parallel([
         Animated.timing(opacity, {
           toValue: 1,

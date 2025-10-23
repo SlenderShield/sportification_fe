@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerLightImpact } from '../../utils/hapticFeedback';
 
 interface IconButtonProps {
   icon: string;
@@ -41,6 +42,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   const handlePressIn = () => {
     if (!disabled) {
       scale.value = withSpring(0.9, theme.animations.spring.snappy);
+      triggerLightImpact();
     }
   };
 

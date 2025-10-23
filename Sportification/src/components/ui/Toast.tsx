@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '../../utils/hapticFeedback';
 
 export interface ToastProps {
   message: string;
@@ -28,6 +29,15 @@ const Toast: React.FC<ToastProps> = ({
   const opacity = useSharedValue(0);
 
   useEffect(() => {
+    // Trigger haptic feedback based on toast type
+    if (type === 'success') {
+      triggerSuccessNotification();
+    } else if (type === 'error') {
+      triggerErrorNotification();
+    } else if (type === 'warning') {
+      triggerWarningNotification();
+    }
+
     // Show toast
     translateY.value = withSpring(0, theme.animations.spring.smooth);
     opacity.value = withTiming(1, { duration: theme.animations.duration.normal });

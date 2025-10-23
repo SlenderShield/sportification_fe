@@ -13,6 +13,7 @@
     "hermes:profile": "react-native run-android --variant=release && adb shell am start -n com.sportification/.MainActivity"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
     "@hookform/resolvers": "^5.2.2",
     "@invertase/react-native-apple-authentication": "^2.3.0",
     "@notifee/react-native": "^9.1.8",
@@ -31,6 +32,7 @@
     "axios": "^1.12.2",
     "date-fns": "^4.1.0",
     "i18next": "^25.6.0",
+    "lottie-react-native": "^7.3.4",
     "react": "^19.1.1",
     "react-hook-form": "^7.65.0",
     "react-i18next": "^15.2.0",
@@ -39,11 +41,10 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-fbsdk-next": "^13.2.1",
     "react-native-gesture-handler": "^2.28.0",
+    "react-native-haptic-feedback": "^2.3.3",
     "react-native-keychain": "^10.0.0",
     "react-native-maps": "^1.18.0",
     "react-native-reanimated": "^4.1.3",
-    "lottie-react-native": "^7.3.4",
-    "@expo/vector-icons": "^15.0.3",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-screens": "^4.17.1",
     "react-native-vector-icons": "^10.3.0",
