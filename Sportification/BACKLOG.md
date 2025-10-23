@@ -136,10 +136,11 @@ While the redesign is complete, these refactoring tasks would further improve co
    - [ ] Migrate create screens to use useForm
    - Benefit: Further reduce boilerplate
 
-6. **Extract Action Button Groups**
-   - [ ] Create ActionButtons component for common patterns
-   - [ ] Handle loading states automatically
+6. **Extract Action Button Groups** ✅
+   - [x] Create ActionButtons component for common patterns
+   - [x] Handle loading states automatically
    - Benefit: Consistent action button layouts
+   - Status: **COMPLETE** - Created ActionButtons component with declarative API
 
 ### Low Priority
 7. **Enhanced Date/Time Pickers**
