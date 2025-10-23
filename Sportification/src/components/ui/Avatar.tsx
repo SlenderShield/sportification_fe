@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../../theme';
+import OptimizedImage from './OptimizedImage';
 
 interface AvatarProps {
   source?: { uri: string } | number;
@@ -58,7 +59,7 @@ const Avatar: React.FC<AvatarProps> = ({
       ]}
     >
       {source ? (
-        <Image
+        <OptimizedImage
           source={source}
           style={[
             {
@@ -67,6 +68,10 @@ const Avatar: React.FC<AvatarProps> = ({
             },
             variantStyles[variant],
           ]}
+          placeholder
+          placeholderColor={bgColor}
+          cacheEnabled
+          resizeMode="cover"
         />
       ) : (
         <Text
@@ -77,6 +82,7 @@ const Avatar: React.FC<AvatarProps> = ({
               color: theme.colors.onPrimary,
             },
           ]}
+          allowFontScaling
         >
           {name ? getInitials(name) : '?'}
         </Text>

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Theme, lightTheme, darkTheme } from './theme';
+import { Theme, lightTheme, darkTheme, highContrastLightTheme, highContrastDarkTheme } from './theme';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -10,6 +10,8 @@ interface ThemeContextType {
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
+  highContrastMode: boolean;
+  setHighContrastMode: (enabled: boolean) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -18,11 +20,16 @@ const THEME_STORAGE_KEY = '@sportification_theme_mode';
 
 interface ThemeProviderProps {
   children: ReactNode;
+  highContrastMode?: boolean;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ 
+  children, 
+  highContrastMode: externalHighContrast = false 
+}) => {
   const systemColorScheme = useColorScheme();
   const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
+  const [highContrastMode, setHighContrastModeState] = useState(externalHighContrast);
   const [currentTheme, setCurrentTheme] = useState<Theme>(
     systemColorScheme === 'dark' ? darkTheme : lightTheme
   );
@@ -32,11 +39,25 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     loadThemePreference();
   }, []);
 
-  // Update theme when mode or system preference changes
+  // Update theme when mode, system preference, or high contrast changes
   useEffect(() => {
     const isDark = themeMode === 'dark' || (themeMode === 'system' && systemColorScheme === 'dark');
-    setCurrentTheme(isDark ? darkTheme : lightTheme);
-  }, [themeMode, systemColorScheme]);
+    
+    // Select appropriate theme based on dark mode and high contrast
+    let selectedTheme: Theme;
+    if (highContrastMode) {
+      selectedTheme = isDark ? highContrastDarkTheme : highContrastLightTheme;
+    } else {
+      selectedTheme = isDark ? darkTheme : lightTheme;
+    }
+    
+    setCurrentTheme(selectedTheme);
+  }, [themeMode, systemColorScheme, highContrastMode]);
+
+  // Sync with external high contrast mode prop (from AccessibilityContext)
+  useEffect(() => {
+    setHighContrastModeState(externalHighContrast);
+  }, [externalHighContrast]);
 
   const loadThemePreference = async () => {
     try {
@@ -63,6 +84,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setThemeMode(newMode);
   };
 
+  const setHighContrastMode = (enabled: boolean) => {
+    setHighContrastModeState(enabled);
+  };
+
   return (
     <ThemeContext.Provider
       value={{
@@ -70,6 +95,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         themeMode,
         setThemeMode,
         toggleTheme,
+        highContrastMode,
+        setHighContrastMode,
       }}
     >
       {children}

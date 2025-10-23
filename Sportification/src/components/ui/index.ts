@@ -26,3 +26,4 @@ export { default as OfflineIndicator } from './OfflineIndicator';
 export { default as NotificationCard } from './NotificationCard';
 export { default as AdvancedSearch } from './AdvancedSearch';
 export { default as SortFilter } from './SortFilter';
+export { default as OptimizedImage } from './OptimizedImage';

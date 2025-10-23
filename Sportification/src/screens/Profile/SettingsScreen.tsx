@@ -126,6 +126,29 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
                   ios_backgroundColor={theme.colors.surfaceVariant}
                 />
               </View>
+              
+              <Divider style={{ marginVertical: theme.spacing.md }} />
+              
+              <Card
+                onPress={() => navigation.navigate('AccessibilitySettings')}
+                variant="outlined"
+                style={{ marginTop: theme.spacing.xs }}
+              >
+                <View style={{ padding: theme.spacing.md, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Icon name="human-handsup" size={20} color={theme.colors.primary} />
+                      <Text style={[theme.typography.titleMedium, { color: theme.colors.text, marginLeft: theme.spacing.sm }]}>
+                        Accessibility Settings
+                      </Text>
+                    </View>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginTop: theme.spacing.xs }]}>
+                      Text size, high contrast, motion settings
+                    </Text>
+                  </View>
+                  <Icon name="chevron-right" size={24} color={theme.colors.textSecondary} />
+                </View>
+              </Card>
             </View>
           </Card>
         </Animated.View>
