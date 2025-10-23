@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import ChatsScreen from '../screens/Chat/ChatsScreen';
-import ChatDetailScreen from '../screens/Chat/ChatDetailScreen';
+import ChatsScreen from '@features/chat/screens/ChatsScreen';
+import ChatDetailScreen from '@features/chat/screens/ChatDetailScreen';
 
 const Stack = createStackNavigator();
 
