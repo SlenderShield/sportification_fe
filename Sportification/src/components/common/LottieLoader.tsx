@@ -7,6 +7,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import LottieView from 'lottie-react-native';
+import { loadingAnimation, successAnimation, errorAnimation } from '../../assets/animations';
 
 type AnimationType = 'loading' | 'success' | 'error';
 
@@ -27,20 +28,15 @@ const LottieLoader: React.FC<LottieLoaderProps> = ({
   style,
   onAnimationFinish,
 }) => {
-  // Note: In a real implementation, you would include actual Lottie JSON files
-  // For now, we'll use a placeholder that gracefully falls back
-  
   const getAnimationSource = () => {
-    // These would be actual Lottie animation JSON files
-    // Example: require('./animations/loading.json')
     switch (type) {
       case 'success':
-        return null; // require('./animations/success.json')
+        return successAnimation;
       case 'error':
-        return null; // require('./animations/error.json')
+        return errorAnimation;
       case 'loading':
       default:
-        return null; // require('./animations/loading.json')
+        return loadingAnimation;
     }
   };
 

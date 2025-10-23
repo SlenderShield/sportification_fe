@@ -7,6 +7,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerLightImpact } from '../../utils/hapticFeedback';
 
 interface IconButtonProps {
   icon: string;
@@ -17,6 +18,10 @@ interface IconButtonProps {
   backgroundColor?: string;
   disabled?: boolean;
   style?: ViewStyle;
+  // Accessibility props
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  testID?: string;
 }
 
 const IconButton: React.FC<IconButtonProps> = ({
@@ -28,6 +33,9 @@ const IconButton: React.FC<IconButtonProps> = ({
   backgroundColor,
   disabled = false,
   style,
+  accessibilityLabel,
+  accessibilityHint,
+  testID,
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -41,6 +49,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   const handlePressIn = () => {
     if (!disabled) {
       scale.value = withSpring(0.9, theme.animations.spring.snappy);
+      triggerLightImpact();
     }
   };
 
@@ -90,6 +99,12 @@ const IconButton: React.FC<IconButtonProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || `${icon} button`}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{ disabled }}
+        testID={testID}
         style={[
           styles.button,
           {

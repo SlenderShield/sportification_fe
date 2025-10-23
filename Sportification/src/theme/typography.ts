@@ -1,4 +1,5 @@
 import { TextStyle } from 'react-native';
+import { getFontFamily } from './fonts';
 
 // Typography scale following Material Design 3 and iOS HIG
 export const fontSizes = {
@@ -42,16 +43,19 @@ export const typography = {
     fontSize: fontSizes['6xl'],
     lineHeight: lineHeights['6xl'],
     fontWeight: fontWeights.bold,
+    fontFamily: getFontFamily('heading', 'bold'),
   },
   displayMedium: {
     fontSize: fontSizes['5xl'],
     lineHeight: lineHeights['5xl'],
     fontWeight: fontWeights.bold,
+    fontFamily: getFontFamily('heading', 'bold'),
   },
   displaySmall: {
     fontSize: fontSizes['4xl'],
     lineHeight: lineHeights['4xl'],
     fontWeight: fontWeights.bold,
+    fontFamily: getFontFamily('heading', 'bold'),
   },
 
   // Headline styles
@@ -59,16 +63,19 @@ export const typography = {
     fontSize: fontSizes['3xl'],
     lineHeight: lineHeights['3xl'],
     fontWeight: fontWeights.bold,
+    fontFamily: getFontFamily('heading', 'bold'),
   },
   headlineMedium: {
     fontSize: fontSizes['2xl'],
     lineHeight: lineHeights['2xl'],
     fontWeight: fontWeights.semibold,
+    fontFamily: getFontFamily('heading', 'semibold'),
   },
   headlineSmall: {
     fontSize: fontSizes.xl,
     lineHeight: lineHeights.xl,
     fontWeight: fontWeights.semibold,
+    fontFamily: getFontFamily('heading', 'semibold'),
   },
 
   // Title styles
@@ -76,16 +83,19 @@ export const typography = {
     fontSize: fontSizes.lg,
     lineHeight: lineHeights.lg,
     fontWeight: fontWeights.semibold,
+    fontFamily: getFontFamily('heading', 'semibold'),
   },
   titleMedium: {
     fontSize: fontSizes.base,
     lineHeight: lineHeights.base,
     fontWeight: fontWeights.semibold,
+    fontFamily: getFontFamily('heading', 'semibold'),
   },
   titleSmall: {
     fontSize: fontSizes.sm,
     lineHeight: lineHeights.sm,
     fontWeight: fontWeights.semibold,
+    fontFamily: getFontFamily('heading', 'semibold'),
   },
 
   // Body styles
@@ -93,16 +103,19 @@ export const typography = {
     fontSize: fontSizes.base,
     lineHeight: lineHeights.base,
     fontWeight: fontWeights.normal,
+    fontFamily: getFontFamily('body', 'regular'),
   },
   bodyMedium: {
     fontSize: fontSizes.sm,
     lineHeight: lineHeights.sm,
     fontWeight: fontWeights.normal,
+    fontFamily: getFontFamily('body', 'regular'),
   },
   bodySmall: {
     fontSize: fontSizes.xs,
     lineHeight: lineHeights.xs,
     fontWeight: fontWeights.normal,
+    fontFamily: getFontFamily('body', 'regular'),
   },
 
   // Label styles
@@ -110,16 +123,19 @@ export const typography = {
     fontSize: fontSizes.sm,
     lineHeight: lineHeights.sm,
     fontWeight: fontWeights.medium,
+    fontFamily: getFontFamily('body', 'medium'),
   },
   labelMedium: {
     fontSize: fontSizes.xs,
     lineHeight: lineHeights.xs,
     fontWeight: fontWeights.medium,
+    fontFamily: getFontFamily('body', 'medium'),
   },
   labelSmall: {
     fontSize: 11,
     lineHeight: 14,
     fontWeight: fontWeights.medium,
+    fontFamily: getFontFamily('body', 'medium'),
   },
 };
 

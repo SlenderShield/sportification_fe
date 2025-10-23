@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { triggerLightImpact } from '../../utils/hapticFeedback';
 
 interface ButtonProps {
   title: string;
@@ -28,6 +29,10 @@ interface ButtonProps {
   fullWidth?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  // Accessibility props
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  testID?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -42,6 +47,9 @@ const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   style,
   textStyle,
+  accessibilityLabel,
+  accessibilityHint,
+  testID,
 }) => {
   const { theme } = useTheme();
   const scale = useSharedValue(1);
@@ -60,6 +68,7 @@ const Button: React.FC<ButtonProps> = ({
     if (!isDisabled) {
       scale.value = withSpring(0.96, theme.animations.spring.snappy);
       opacity.value = withTiming(0.8, { duration: theme.animations.duration.fast });
+      triggerLightImpact();
     }
   };
 
@@ -128,6 +137,15 @@ const Button: React.FC<ButtonProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={isDisabled}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || title}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{
+          disabled: isDisabled,
+          busy: loading,
+        }}
+        testID={testID}
         style={[
           styles.button,
           sizeStyles[size],
