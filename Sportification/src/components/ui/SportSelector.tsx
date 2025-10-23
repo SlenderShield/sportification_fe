@@ -8,7 +8,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Chip } from './';
 import { useTheme } from '../../theme';
-import { SPORTS } from '../../constants/sports';
+import { SPORTS } from '@core/constants';
 
 interface SportSelectorProps {
   selectedSport: string;

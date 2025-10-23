@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import * as Keychain from 'react-native-keychain';
-import { API_CONFIG, getApiUrl } from '../config/api';
+import { API_CONFIG, getApiUrl } from '@core/config';
 
 const KEYCHAIN_SERVICE = 'com.sportification.app';
 

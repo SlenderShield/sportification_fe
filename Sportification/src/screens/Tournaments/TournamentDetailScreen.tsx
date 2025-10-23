@@ -22,7 +22,7 @@ import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState, Partic
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { format } from 'date-fns';
-import { TOURNAMENT_STATUS_COLORS } from '../../constants/statusColors';
+import { TOURNAMENT_STATUS_COLORS } from '@core/constants';
 import { useEntityActions, useConfirmation } from '../../hooks';
 
 interface TournamentDetailScreenProps {

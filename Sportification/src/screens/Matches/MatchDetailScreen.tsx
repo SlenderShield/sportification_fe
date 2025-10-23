@@ -21,7 +21,7 @@ import Button from '../../components/common/Button';
 import { Card, Badge, Avatar, Divider, Chip, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
-import { MATCH_STATUS_COLORS } from '../../constants/statusColors';
+import { MATCH_STATUS_COLORS } from '@core/constants';
 import { useEntityActions, useConfirmation } from '../../hooks';
 
 interface MatchDetailScreenProps {

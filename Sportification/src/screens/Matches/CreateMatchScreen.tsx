@@ -16,7 +16,7 @@ import { Card, Chip, SportSelector, SectionHeader } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FadeInDown } from 'react-native-reanimated';
-import { SPORTS } from '../../constants/sports';
+import { SPORTS } from '@core/constants';
 import { validateName, validateDate, validateTime, validateNumber, validateSelection } from '../../utils/validation';
 
 interface CreateMatchScreenProps {
