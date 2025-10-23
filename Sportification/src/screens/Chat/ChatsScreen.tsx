@@ -10,7 +10,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetChatsQuery } from '../../store/api/chatApi';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { Card, Avatar, Badge } from '../../components/ui';
+import { Card, Avatar, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
@@ -156,34 +156,11 @@ const ChatsScreen: React.FC<ChatsScreenProps> = ({ navigation }) => {
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon
-              name="message-outline"
-              size={64}
-              color={theme.colors.textTertiary}
-              style={{ marginBottom: theme.spacing.base }}
-            />
-            <Text
-              style={[
-                theme.typography.titleMedium,
-                { color: theme.colors.textSecondary, textAlign: 'center' },
-              ]}
-            >
-              No chats yet
-            </Text>
-            <Text
-              style={[
-                theme.typography.bodySmall,
-                {
-                  color: theme.colors.textTertiary,
-                  textAlign: 'center',
-                  marginTop: theme.spacing.sm,
-                },
-              ]}
-            >
-              Start a conversation with your team
-            </Text>
-          </View>
+          <EmptyState
+            icon="message-outline"
+            title="No chats yet"
+            message="Start a conversation with your team"
+          />
         }
       />
     </View>
@@ -225,13 +202,6 @@ const styles = StyleSheet.create({
   lastMessageRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    minHeight: 400,
   },
 });
 

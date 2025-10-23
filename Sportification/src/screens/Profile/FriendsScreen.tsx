@@ -17,7 +17,7 @@ import { useAppSelector } from '../../store/hooks';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import { Card, Avatar, Badge, IconButton } from '../../components/ui';
+import { Card, Avatar, Badge, IconButton, EmptyState } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FadeInDown } from 'react-native-reanimated';
@@ -197,32 +197,17 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
             contentContainerStyle={styles.list}
             ListEmptyComponent={
               searchQuery.length >= 2 ? (
-                <View style={styles.emptyContainer}>
-                  <MaterialCommunityIcons
-                    name="account-search"
-                    size={64}
-                    color={theme.colors.onSurfaceVariant}
-                    style={{ opacity: 0.5 }}
-                  />
-                  <Text style={[theme.typography.titleMedium, styles.emptyText]}>
-                    No users found
-                  </Text>
-                  <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-                    Try a different search term
-                  </Text>
-                </View>
+                <EmptyState
+                  icon="account-search"
+                  title="No users found"
+                  message="Try a different search term"
+                />
               ) : (
-                <View style={styles.emptyContainer}>
-                  <MaterialCommunityIcons
-                    name="magnify"
-                    size={64}
-                    color={theme.colors.onSurfaceVariant}
-                    style={{ opacity: 0.5 }}
-                  />
-                  <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-                    Search for users to add friends
-                  </Text>
-                </View>
+                <EmptyState
+                  icon="magnify"
+                  title=""
+                  message="Search for users to add friends"
+                />
               )
             }
           />
@@ -242,20 +227,11 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <MaterialCommunityIcons
-                name="account-group-outline"
-                size={64}
-                color={theme.colors.onSurfaceVariant}
-                style={{ opacity: 0.5 }}
-              />
-              <Text style={[theme.typography.titleMedium, styles.emptyText]}>
-                No friends yet
-              </Text>
-              <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-                Search for users to add friends
-              </Text>
-            </View>
+            <EmptyState
+              icon="account-group-outline"
+              title="No friends yet"
+              message="Search for users to add friends"
+            />
           }
         />
       )}
@@ -305,20 +281,6 @@ const createStyles = (theme: any) =>
     },
     friendInfo: {
       flex: 1,
-    },
-    emptyContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: theme.spacing.xl,
-      gap: theme.spacing.sm,
-    },
-    emptyText: {
-      color: theme.colors.onSurface,
-      marginTop: theme.spacing.sm,
-    },
-    emptySubtext: {
-      color: theme.colors.onSurfaceVariant,
-      textAlign: 'center',
     },
   });
 

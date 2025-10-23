@@ -15,7 +15,7 @@ import {
 } from '../../store/api/chatApi';
 import { useAppSelector } from '../../store/hooks';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { IconButton } from '../../components/ui';
+import { IconButton, EmptyState } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { format } from 'date-fns';
@@ -140,20 +140,11 @@ const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }
           }
         }}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons
-              name="message-text-outline"
-              size={64}
-              color={theme.colors.onSurfaceVariant}
-              style={{ opacity: 0.5 }}
-            />
-            <Text style={[theme.typography.titleMedium, styles.emptyText]}>
-              No messages yet
-            </Text>
-            <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-              Start the conversation!
-            </Text>
-          </View>
+          <EmptyState
+            icon="message-text-outline"
+            title="No messages yet"
+            message="Start the conversation!"
+          />
         }
       />
 
@@ -244,20 +235,6 @@ const createStyles = (theme: any) =>
       paddingVertical: theme.spacing.sm,
       color: theme.colors.onSurface,
       maxHeight: 100,
-    },
-    emptyContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingVertical: theme.spacing.xl,
-      gap: theme.spacing.sm,
-    },
-    emptyText: {
-      color: theme.colors.onSurface,
-      marginTop: theme.spacing.sm,
-    },
-    emptySubtext: {
-      color: theme.colors.onSurfaceVariant,
     },
   });
 
