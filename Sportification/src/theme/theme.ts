@@ -1,4 +1,4 @@
-import { lightColors, darkColors, ColorScheme } from './colors';
+import { lightColors, darkColors, highContrastLightColors, highContrastDarkColors, ColorScheme } from './colors';
 import { typography, Typography } from './typography';
 import { spacing, Spacing } from './spacing';
 import { elevation, Elevation } from './elevation';
@@ -13,6 +13,7 @@ export interface Theme {
   animations: Animations;
   borderRadius: BorderRadius;
   isDark: boolean;
+  isHighContrast?: boolean;
 }
 
 export const lightTheme: Theme = {
@@ -23,6 +24,7 @@ export const lightTheme: Theme = {
   animations,
   borderRadius,
   isDark: false,
+  isHighContrast: false,
 };
 
 export const darkTheme: Theme = {
@@ -33,4 +35,27 @@ export const darkTheme: Theme = {
   animations,
   borderRadius,
   isDark: true,
+  isHighContrast: false,
+};
+
+export const highContrastLightTheme: Theme = {
+  colors: highContrastLightColors,
+  typography,
+  spacing,
+  elevation,
+  animations,
+  borderRadius,
+  isDark: false,
+  isHighContrast: true,
+};
+
+export const highContrastDarkTheme: Theme = {
+  colors: highContrastDarkColors,
+  typography,
+  spacing,
+  elevation,
+  animations,
+  borderRadius,
+  isDark: true,
+  isHighContrast: true,
 };
