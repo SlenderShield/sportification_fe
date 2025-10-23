@@ -15,9 +15,7 @@ import {
 } from '../../store/api/userApi';
 import { useAppSelector } from '../../store/hooks';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
-import { Card, Avatar, Badge, IconButton, EmptyState } from '../../components/ui';
+import { Card, Avatar, Badge, IconButton, EmptyState, SearchBar } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FadeInDown } from 'react-native-reanimated';
@@ -144,30 +142,18 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Input
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search users..."
-          leftIcon="account-search"
-          onFocus={() => setSearchMode(true)}
-          onBlur={() => {
-            if (!searchQuery) setSearchMode(false);
-          }}
-          style={styles.searchInput}
-        />
-        {searchMode && (
-          <Button
-            title="Cancel"
-            onPress={() => {
-              setSearchQuery('');
-              setSearchMode(false);
-            }}
-            variant="text"
-            size="small"
-          />
-        )}
-      </View>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder="Search users..."
+        leftIcon="account-search"
+        showCancel={searchMode}
+        onCancel={() => setSearchMode(false)}
+        onFocus={() => setSearchMode(true)}
+        onBlur={() => {
+          if (!searchQuery) setSearchMode(false);
+        }}
+      />
 
       {!searchMode && (
         <View style={styles.statsContainer}>
@@ -244,17 +230,6 @@ const createStyles = (theme: any) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-    },
-    searchContainer: {
-      backgroundColor: theme.colors.surface,
-      padding: theme.spacing.base,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing.sm,
-      ...theme.elevation.level1,
-    },
-    searchInput: {
-      flex: 1,
     },
     statsContainer: {
       padding: theme.spacing.base,

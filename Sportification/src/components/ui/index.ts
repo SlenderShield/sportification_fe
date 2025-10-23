@@ -14,3 +14,5 @@ export { default as DetailRow } from './DetailRow';
 export { default as SectionHeader } from './SectionHeader';
 export { default as EmptyState } from './EmptyState';
 export { default as ParticipantList } from './ParticipantList';
+export { default as SearchBar } from './SearchBar';
+export { default as FilterChips } from './FilterChips';

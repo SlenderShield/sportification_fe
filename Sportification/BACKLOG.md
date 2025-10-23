@@ -148,11 +148,12 @@ While the redesign is complete, these refactoring tasks would further improve co
    - [ ] Replace Input usage for dates/times
    - Benefit: Better user experience
 
-8. **Search/Filter Component**
-   - [ ] Create SearchBar reusable component
-   - [ ] Create FilterChips reusable component
-   - [ ] Use in list screens
+8. **Search/Filter Component** ✅
+   - [x] Create SearchBar reusable component
+   - [x] Create FilterChips reusable component
+   - [x] Use in list screens (FriendsScreen refactored)
    - Benefit: Consistent search/filter UX
+   - Status: **COMPLETE** - Created SearchBar and FilterChips components
 
 ---
 
