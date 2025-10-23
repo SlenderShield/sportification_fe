@@ -4,21 +4,25 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Switch,
   Alert,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { localizationService } from '../../services/localizationService';
 import { biometricService } from '../../services/biometricService';
 import { analyticsService } from '../../services/analyticsService';
+import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
+import { Card, Divider } from '../../components/ui';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface SettingsScreenProps {
   navigation: any;
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
+  const { theme, toggleTheme, isDark } = useTheme();
   const { t, i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
   const [biometricsEnabled, setBiometricsEnabled] = useState(false);
@@ -83,125 +87,258 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const availableLanguages = localizationService.getAvailableLanguages();
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('profile.language')}</Text>
-        {availableLanguages.map((lang) => (
-          <TouchableOpacity
-            key={lang.code}
-            style={[
-              styles.languageOption,
-              currentLanguage === lang.code && styles.languageOptionSelected,
-            ]}
-            onPress={() => handleLanguageChange(lang.code)}
-          >
-            <View>
-              <Text style={styles.languageName}>{lang.name}</Text>
-              <Text style={styles.languageNative}>{lang.nativeName}</Text>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={{ padding: theme.spacing.base }}>
+        {/* Appearance Section */}
+        <Animated.View entering={FadeInDown.delay(100).springify()}>
+          <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+            <View style={{ padding: theme.spacing.base }}>
+              <View style={styles.sectionHeader}>
+                <Icon name="palette" size={24} color={theme.colors.primary} />
+                <Text
+                  style={[
+                    theme.typography.titleLarge,
+                    { color: theme.colors.text, marginLeft: theme.spacing.sm },
+                  ]}
+                >
+                  Appearance
+                </Text>
+              </View>
+              <Divider style={{ marginVertical: theme.spacing.md }} />
+              
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={[theme.typography.titleMedium, { color: theme.colors.text }]}>
+                    Dark Mode
+                  </Text>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                    {isDark ? 'Currently using dark theme' : 'Currently using light theme'}
+                  </Text>
+                </View>
+                <Switch
+                  value={isDark}
+                  onValueChange={toggleTheme}
+                  trackColor={{ false: theme.colors.surfaceVariant, true: theme.colors.primary }}
+                  thumbColor={theme.colors.surface}
+                  ios_backgroundColor={theme.colors.surfaceVariant}
+                />
+              </View>
             </View>
-            {currentLanguage === lang.code && (
-              <Text style={styles.checkmark}>✓</Text>
-            )}
-          </TouchableOpacity>
-        ))}
-      </View>
+          </Card>
+        </Animated.View>
 
-      {biometricsAvailable && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('profile.settings')}</Text>
-          <View style={styles.settingRow}>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>
-                {t('auth.enableBiometric')}
-              </Text>
-              <Text style={styles.settingDescription}>
-                Use {biometricType} for quick login
-              </Text>
+        {/* Language Section */}
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+            <View style={{ padding: theme.spacing.base }}>
+              <View style={styles.sectionHeader}>
+                <Icon name="translate" size={24} color={theme.colors.primary} />
+                <Text
+                  style={[
+                    theme.typography.titleLarge,
+                    { color: theme.colors.text, marginLeft: theme.spacing.sm },
+                  ]}
+                >
+                  {t('profile.language')}
+                </Text>
+              </View>
+              <Divider style={{ marginVertical: theme.spacing.md }} />
+              
+              {availableLanguages.map((lang, index) => (
+                <Card
+                  key={lang.code}
+                  onPress={() => handleLanguageChange(lang.code)}
+                  variant={currentLanguage === lang.code ? 'filled' : 'outlined'}
+                  style={{ marginBottom: theme.spacing.sm }}
+                >
+                  <View style={{ padding: theme.spacing.md, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <View>
+                      <Text style={[theme.typography.titleMedium, { color: theme.colors.text }]}>
+                        {lang.name}
+                      </Text>
+                      <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                        {lang.nativeName}
+                      </Text>
+                    </View>
+                    {currentLanguage === lang.code && (
+                      <Icon name="check-circle" size={24} color={theme.colors.primary} />
+                    )}
+                  </View>
+                </Card>
+              ))}
             </View>
-            <Switch
-              value={biometricsEnabled}
-              onValueChange={handleBiometricToggle}
-              trackColor={{ false: '#767577', true: '#1E3A8A' }}
-              thumbColor={biometricsEnabled ? '#10B981' : '#f4f3f4'}
-            />
-          </View>
-        </View>
-      )}
+          </Card>
+        </Animated.View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Privacy & Data</Text>
-        
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Analytics</Text>
-            <Text style={styles.settingDescription}>
-              Help us improve by sharing anonymous usage data
-            </Text>
-          </View>
-          <Switch
-            value={analyticsEnabled}
-            onValueChange={handleAnalyticsToggle}
-            trackColor={{ false: '#767577', true: '#1E3A8A' }}
-            thumbColor={analyticsEnabled ? '#10B981' : '#f4f3f4'}
+        {/* Security Section */}
+        {biometricsAvailable && (
+          <Animated.View entering={FadeInDown.delay(300).springify()}>
+            <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+              <View style={{ padding: theme.spacing.base }}>
+                <View style={styles.sectionHeader}>
+                  <Icon name="shield-lock" size={24} color={theme.colors.primary} />
+                  <Text
+                    style={[
+                      theme.typography.titleLarge,
+                      { color: theme.colors.text, marginLeft: theme.spacing.sm },
+                    ]}
+                  >
+                    Security
+                  </Text>
+                </View>
+                <Divider style={{ marginVertical: theme.spacing.md }} />
+                
+                <View style={styles.settingRow}>
+                  <View style={styles.settingInfo}>
+                    <Text style={[theme.typography.titleMedium, { color: theme.colors.text }]}>
+                      {t('auth.enableBiometric')}
+                    </Text>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                      Use {biometricType} for quick login
+                    </Text>
+                  </View>
+                  <Switch
+                    value={biometricsEnabled}
+                    onValueChange={handleBiometricToggle}
+                    trackColor={{ false: theme.colors.surfaceVariant, true: theme.colors.primary }}
+                    thumbColor={theme.colors.surface}
+                    ios_backgroundColor={theme.colors.surfaceVariant}
+                  />
+                </View>
+              </View>
+            </Card>
+          </Animated.View>
+        )}
+
+        {/* Privacy Section */}
+        <Animated.View entering={FadeInDown.delay(400).springify()}>
+          <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+            <View style={{ padding: theme.spacing.base }}>
+              <View style={styles.sectionHeader}>
+                <Icon name="lock" size={24} color={theme.colors.primary} />
+                <Text
+                  style={[
+                    theme.typography.titleLarge,
+                    { color: theme.colors.text, marginLeft: theme.spacing.sm },
+                  ]}
+                >
+                  Privacy & Data
+                </Text>
+              </View>
+              <Divider style={{ marginVertical: theme.spacing.md }} />
+              
+              <View style={[styles.settingRow, { marginBottom: theme.spacing.md }]}>
+                <View style={styles.settingInfo}>
+                  <Text style={[theme.typography.titleMedium, { color: theme.colors.text }]}>
+                    Analytics
+                  </Text>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                    Help us improve by sharing anonymous usage data
+                  </Text>
+                </View>
+                <Switch
+                  value={analyticsEnabled}
+                  onValueChange={handleAnalyticsToggle}
+                  trackColor={{ false: theme.colors.surfaceVariant, true: theme.colors.primary }}
+                  thumbColor={theme.colors.surface}
+                  ios_backgroundColor={theme.colors.surfaceVariant}
+                />
+              </View>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={[theme.typography.titleMedium, { color: theme.colors.text }]}>
+                    Crash Reporting
+                  </Text>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                    Send crash reports to help us fix bugs
+                  </Text>
+                </View>
+                <Switch
+                  value={crashReportingEnabled}
+                  onValueChange={handleCrashReportingToggle}
+                  trackColor={{ false: theme.colors.surfaceVariant, true: theme.colors.primary }}
+                  thumbColor={theme.colors.surface}
+                  ios_backgroundColor={theme.colors.surfaceVariant}
+                />
+              </View>
+            </View>
+          </Card>
+        </Animated.View>
+
+        {/* Account Section */}
+        <Animated.View entering={FadeInDown.delay(500).springify()}>
+          <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+            <View style={{ padding: theme.spacing.base }}>
+              <View style={styles.sectionHeader}>
+                <Icon name="account-cog" size={24} color={theme.colors.primary} />
+                <Text
+                  style={[
+                    theme.typography.titleLarge,
+                    { color: theme.colors.text, marginLeft: theme.spacing.sm },
+                  ]}
+                >
+                  Account
+                </Text>
+              </View>
+              <Divider style={{ marginVertical: theme.spacing.md }} />
+              
+              <Button
+                title="Change Password"
+                icon="lock-reset"
+                onPress={() => navigation.navigate('ChangePassword')}
+                variant="outline"
+                fullWidth
+                style={{ marginBottom: theme.spacing.sm }}
+              />
+
+              <Button
+                title={t('auth.logout')}
+                icon="logout"
+                onPress={() => {
+                  Alert.alert(
+                    'Logout',
+                    'Are you sure you want to logout?',
+                    [
+                      { text: t('common.cancel'), style: 'cancel' },
+                      {
+                        text: 'Logout',
+                        style: 'destructive',
+                        onPress: () => {
+                          navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Auth' }],
+                          });
+                        },
+                      },
+                    ]
+                  );
+                }}
+                variant="outline"
+                fullWidth
+              />
+            </View>
+          </Card>
+        </Animated.View>
+
+        {/* Version Info */}
+        <View style={styles.versionContainer}>
+          <Icon
+            name="information-outline"
+            size={16}
+            color={theme.colors.textTertiary}
+            style={{ marginBottom: theme.spacing.xs }}
           />
+          <Text style={[theme.typography.labelSmall, { color: theme.colors.textTertiary }]}>
+            Version 2.0.0
+          </Text>
+          <Text style={[theme.typography.labelSmall, { color: theme.colors.textTertiary }]}>
+            © 2025 Sportification
+          </Text>
         </View>
-
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Crash Reporting</Text>
-            <Text style={styles.settingDescription}>
-              Send crash reports to help us fix bugs
-            </Text>
-          </View>
-          <Switch
-            value={crashReportingEnabled}
-            onValueChange={handleCrashReportingToggle}
-            trackColor={{ false: '#767577', true: '#1E3A8A' }}
-            thumbColor={crashReportingEnabled ? '#10B981' : '#f4f3f4'}
-          />
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        
-        <Button
-          title="Change Password"
-          onPress={() => navigation.navigate('ChangePassword')}
-          variant="outline"
-          style={styles.button}
-        />
-
-        <Button
-          title={t('auth.logout')}
-          onPress={() => {
-            Alert.alert(
-              'Logout',
-              'Are you sure you want to logout?',
-              [
-                { text: t('common.cancel'), style: 'cancel' },
-                {
-                  text: 'Logout',
-                  style: 'destructive',
-                  onPress: () => {
-                    // Handle logout
-                    navigation.reset({
-                      index: 0,
-                      routes: [{ name: 'Auth' }],
-                    });
-                  },
-                },
-              ]
-            );
-          }}
-          variant="outline"
-          style={styles.logoutButton}
-        />
-      </View>
-
-      <View style={styles.versionContainer}>
-        <Text style={styles.versionText}>Version 2.0.0</Text>
-        <Text style={styles.versionText}>© 2025 Sportification</Text>
       </View>
     </ScrollView>
   );
@@ -210,87 +347,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
-  section: {
-    backgroundColor: '#fff',
-    marginTop: 16,
-    paddingVertical: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  languageOption: {
+  sectionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  languageOptionSelected: {
-    backgroundColor: '#f8f9fa',
-  },
-  languageName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  languageNative: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  checkmark: {
-    fontSize: 20,
-    color: '#1E3A8A',
-    fontWeight: 'bold',
   },
   settingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   settingInfo: {
     flex: 1,
     marginRight: 16,
   },
-  settingLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  settingDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  button: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-  },
-  logoutButton: {
-    marginHorizontal: 16,
-    marginVertical: 8,
-    borderColor: '#dc2626',
-  },
   versionContainer: {
     padding: 24,
     alignItems: 'center',
-  },
-  versionText: {
-    fontSize: 12,
-    color: '#999',
-    marginVertical: 2,
   },
 });
 

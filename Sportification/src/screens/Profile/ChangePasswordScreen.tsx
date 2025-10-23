@@ -8,15 +8,20 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useChangePasswordMutation } from '../../store/api/authApi';
+import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import { Card } from '../../components/ui';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ChangePasswordScreenProps {
   navigation: any;
 }
 
 const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -27,6 +32,9 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({ navigation 
     newPassword: '',
     confirmPassword: '',
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [changePassword, { isLoading }] = useChangePasswordMutation();
 
@@ -88,53 +96,137 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({ navigation 
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Change Password</Text>
-          <Text style={styles.subtitle}>Update your account password</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.content, { padding: theme.spacing.base }]}>
+          {/* Header */}
+          <Animated.View
+            entering={FadeInDown.delay(100).springify()}
+            style={{ marginBottom: theme.spacing.xl }}
+          >
+            <View style={styles.iconContainer}>
+              <View
+                style={[
+                  styles.iconCircle,
+                  {
+                    backgroundColor: theme.colors.warning + '20',
+                    padding: theme.spacing.lg,
+                    borderRadius: 60,
+                  },
+                ]}
+              >
+                <Icon name="lock-reset" size={48} color={theme.colors.warning} />
+              </View>
+            </View>
+            <Text
+              style={[
+                theme.typography.displaySmall,
+                { color: theme.colors.text, textAlign: 'center', marginTop: theme.spacing.md },
+              ]}
+            >
+              Change Password
+            </Text>
+            <Text
+              style={[
+                theme.typography.bodyMedium,
+                { color: theme.colors.textSecondary, textAlign: 'center', marginTop: theme.spacing.xs },
+              ]}
+            >
+              Update your account password
+            </Text>
+          </Animated.View>
 
-          <Input
-            label="Current Password"
-            value={formData.currentPassword}
-            onChangeText={(text) => updateField('currentPassword', text)}
-            placeholder="Enter current password"
-            secureTextEntry
-            error={errors.currentPassword}
-          />
+          {/* Password Form */}
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
+              <View style={{ padding: theme.spacing.base }}>
+                <Input
+                  label="Current Password"
+                  value={formData.currentPassword}
+                  onChangeText={(text) => updateField('currentPassword', text)}
+                  placeholder="Enter current password"
+                  secureTextEntry={!showCurrentPassword}
+                  leftIcon="lock"
+                  rightIcon={showCurrentPassword ? 'eye-off' : 'eye'}
+                  onRightIconPress={() => setShowCurrentPassword(!showCurrentPassword)}
+                  variant="outlined"
+                  error={errors.currentPassword}
+                />
 
-          <Input
-            label="New Password"
-            value={formData.newPassword}
-            onChangeText={(text) => updateField('newPassword', text)}
-            placeholder="Enter new password"
-            secureTextEntry
-            error={errors.newPassword}
-          />
+                <Input
+                  label="New Password"
+                  value={formData.newPassword}
+                  onChangeText={(text) => updateField('newPassword', text)}
+                  placeholder="Enter new password"
+                  secureTextEntry={!showNewPassword}
+                  leftIcon="lock-plus"
+                  rightIcon={showNewPassword ? 'eye-off' : 'eye'}
+                  onRightIconPress={() => setShowNewPassword(!showNewPassword)}
+                  variant="outlined"
+                  error={errors.newPassword}
+                  helperText="At least 6 characters"
+                />
 
-          <Input
-            label="Confirm New Password"
-            value={formData.confirmPassword}
-            onChangeText={(text) => updateField('confirmPassword', text)}
-            placeholder="Confirm new password"
-            secureTextEntry
-            error={errors.confirmPassword}
-          />
+                <Input
+                  label="Confirm New Password"
+                  value={formData.confirmPassword}
+                  onChangeText={(text) => updateField('confirmPassword', text)}
+                  placeholder="Confirm new password"
+                  secureTextEntry={!showConfirmPassword}
+                  leftIcon="lock-check"
+                  rightIcon={showConfirmPassword ? 'eye-off' : 'eye'}
+                  onRightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  variant="outlined"
+                  error={errors.confirmPassword}
+                />
+              </View>
+            </Card>
+          </Animated.View>
 
-          <Button
-            title="Change Password"
-            onPress={handleChangePassword}
-            loading={isLoading}
-            style={styles.changeButton}
-          />
+          {/* Info Card */}
+          <Animated.View entering={FadeInDown.delay(300).springify()}>
+            <Card
+              variant="outlined"
+              style={{ marginBottom: theme.spacing.xl, backgroundColor: theme.colors.info + '10' }}
+            >
+              <View style={{ padding: theme.spacing.md, flexDirection: 'row' }}>
+                <Icon
+                  name="information"
+                  size={20}
+                  color={theme.colors.info}
+                  style={{ marginRight: theme.spacing.sm }}
+                />
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, flex: 1 }]}>
+                  Choose a strong password that you haven't used before. A good password has a mix of letters, numbers, and symbols.
+                </Text>
+              </View>
+            </Card>
+          </Animated.View>
 
-          <Button
-            title="Cancel"
-            onPress={() => navigation.goBack()}
-            variant="outline"
-          />
+          {/* Action Buttons */}
+          <Animated.View entering={FadeInDown.delay(400).springify()}>
+            <Button
+              title="Update Password"
+              icon="content-save"
+              onPress={handleChangePassword}
+              loading={isLoading}
+              fullWidth
+              style={{ marginBottom: theme.spacing.sm }}
+            />
+
+            <Button
+              title="Cancel"
+              icon="close"
+              onPress={() => navigation.goBack()}
+              variant="outline"
+              fullWidth
+            />
+          </Animated.View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -144,27 +236,21 @@ const ChangePasswordScreen: React.FC<ChangePasswordScreenProps> = ({ navigation 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
+    paddingVertical: 24,
   },
   content: {
-    padding: 24,
+    flex: 1,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+  iconContainer: {
+    alignItems: 'center',
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
-  },
-  changeButton: {
-    marginBottom: 12,
+  iconCircle: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
