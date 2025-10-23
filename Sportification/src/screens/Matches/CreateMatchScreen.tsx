@@ -12,24 +12,29 @@ import { useCreateMatchMutation } from '../../store/api/matchApi';
 import { useGetVenuesQuery } from '../../store/api/venueApi';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import { Card, Chip } from '../../components/ui';
+import { useTheme } from '../../theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FadeInDown } from 'react-native-reanimated';
 
 interface CreateMatchScreenProps {
   navigation: any;
 }
 
 const SPORTS = [
-  'Football',
-  'Basketball',
-  'Tennis',
-  'Volleyball',
-  'Cricket',
-  'Baseball',
-  'Badminton',
-  'Table Tennis',
-  'Other',
+  { name: 'Football', icon: 'soccer' },
+  { name: 'Basketball', icon: 'basketball' },
+  { name: 'Tennis', icon: 'tennis' },
+  { name: 'Volleyball', icon: 'volleyball' },
+  { name: 'Cricket', icon: 'cricket' },
+  { name: 'Baseball', icon: 'baseball' },
+  { name: 'Badminton', icon: 'badminton' },
+  { name: 'Table Tennis', icon: 'table-tennis' },
+  { name: 'Other', icon: 'dots-horizontal' },
 ];
 
 const CreateMatchScreen: React.FC<CreateMatchScreenProps> = ({ navigation }) => {
+  const { theme } = useTheme();
   const [formData, setFormData] = useState({
     title: '',
     sport: '',
@@ -50,6 +55,8 @@ const CreateMatchScreen: React.FC<CreateMatchScreenProps> = ({ navigation }) => 
   const [createMatch, { isLoading }] = useCreateMatchMutation();
   const { data: venuesData } = useGetVenuesQuery({ page: 1, limit: 50 });
   const venues = venuesData?.data?.items || [];
+
+  const styles = createStyles(theme);
 
   const validate = (): boolean => {
     let valid = true;
@@ -157,189 +164,256 @@ const CreateMatchScreen: React.FC<CreateMatchScreenProps> = ({ navigation }) => 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Create New Match</Text>
-          <Text style={styles.subtitle}>
-            Organize a sports match and invite players
-          </Text>
-
-          <Input
-            label="Match Title *"
-            value={formData.title}
-            onChangeText={(text) => updateField('title', text)}
-            placeholder="e.g., Weekend Basketball Game"
-            error={errors.title}
-          />
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Sport *</Text>
-            <View style={styles.sportGrid}>
-              {SPORTS.map((sport) => (
-                <Button
-                  key={sport}
-                  title={sport}
-                  onPress={() => updateField('sport', sport)}
-                  variant={formData.sport === sport ? 'primary' : 'outline'}
-                  style={styles.sportButton}
-                  textStyle={styles.sportButtonText}
-                />
-              ))}
-            </View>
-            {errors.sport ? (
-              <Text style={styles.error}>{errors.sport}</Text>
-            ) : null}
-          </View>
-
-          <View style={styles.row}>
-            <View style={styles.halfWidth}>
-              <Input
-                label="Date *"
-                value={formData.date}
-                onChangeText={(text) => updateField('date', text)}
-                placeholder="YYYY-MM-DD"
-                error={errors.date}
+        <FadeInDown delay={100} duration={400}>
+          <View style={styles.headerContainer}>
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons
+                name="plus-circle"
+                size={48}
+                color={theme.colors.primary}
               />
             </View>
-            <View style={styles.halfWidth}>
-              <Input
-                label="Time *"
-                value={formData.time}
-                onChangeText={(text) => updateField('time', text)}
-                placeholder="HH:MM (24h)"
-                error={errors.time}
-              />
-            </View>
+            <Text style={[theme.typography.displaySmall, styles.title]}>
+              Create New Match
+            </Text>
+            <Text style={[theme.typography.bodyLarge, styles.subtitle]}>
+              Organize a sports match and invite players
+            </Text>
           </View>
+        </FadeInDown>
 
-          <Input
-            label="Description (Optional)"
-            value={formData.description}
-            onChangeText={(text) => updateField('description', text)}
-            placeholder="Tell players about this match"
-            multiline
-            numberOfLines={4}
-            style={styles.textArea}
-          />
+        <FadeInDown delay={200} duration={400}>
+          <Card style={styles.card}>
+            <Text style={[theme.typography.titleMedium, styles.sectionTitle]}>
+              <MaterialCommunityIcons name="information" size={20} /> Match Details
+            </Text>
+            
+            <Input
+              label="Match Title"
+              value={formData.title}
+              onChangeText={(text) => updateField('title', text)}
+              placeholder="e.g., Weekend Basketball Game"
+              leftIcon="trophy"
+              error={errors.title}
+            />
 
-          {venues.length > 0 && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Select Venue (Optional)</Text>
-              <View style={styles.venueList}>
-                {venues.slice(0, 5).map((venue) => (
-                  <Button
-                    key={venue.id}
-                    title={venue.name}
-                    onPress={() => updateField('venueId', venue.id)}
-                    variant={formData.venueId === venue.id ? 'primary' : 'outline'}
-                    style={styles.venueButton}
-                    textStyle={styles.venueButtonText}
+              <Text style={[theme.typography.labelLarge, styles.label]}>
+                Sport *
+              </Text>
+              <View style={styles.sportGrid}>
+                {SPORTS.map((sport) => (
+                  <Chip
+                    key={sport.name}
+                    label={sport.name}
+                    icon={sport.icon}
+                    selected={formData.sport === sport.name}
+                    onPress={() => updateField('sport', sport.name)}
+                    variant={formData.sport === sport.name ? 'filled' : 'outlined'}
+                    style={styles.sportChip}
                   />
                 ))}
               </View>
+              {errors.sport ? (
+                <Text style={[theme.typography.bodySmall, styles.error]}>
+                  {errors.sport}
+                </Text>
+              ) : null}
             </View>
-          )}
 
-          <Input
-            label="Maximum Participants *"
-            value={formData.maxParticipants}
-            onChangeText={(text) => updateField('maxParticipants', text)}
-            placeholder="e.g., 10"
-            keyboardType="numeric"
-            error={errors.maxParticipants}
-          />
+            <Input
+              label="Description (Optional)"
+              value={formData.description}
+              onChangeText={(text) => updateField('description', text)}
+              placeholder="Tell players about this match"
+              leftIcon="text"
+              multiline
+              numberOfLines={4}
+              style={styles.textArea}
+            />
+          </Card>
+        </FadeInDown>
 
-          <Button
-            title="Create Match"
-            onPress={handleCreate}
-            loading={isLoading}
-            style={styles.createButton}
-          />
+        <FadeInDown delay={300} duration={400}>
+          <Card style={styles.card}>
+            <Text style={[theme.typography.titleMedium, styles.sectionTitle]}>
+              <MaterialCommunityIcons name="calendar-clock" size={20} /> Schedule
+            </Text>
 
-          <Button
-            title="Cancel"
-            onPress={() => navigation.goBack()}
-            variant="outline"
-          />
-        </View>
+            <View style={styles.row}>
+              <View style={styles.halfWidth}>
+                <Input
+                  label="Date"
+                  value={formData.date}
+                  onChangeText={(text) => updateField('date', text)}
+                  placeholder="YYYY-MM-DD"
+                  leftIcon="calendar"
+                  error={errors.date}
+                  helperText="Format: YYYY-MM-DD"
+                />
+              </View>
+              <View style={styles.halfWidth}>
+                <Input
+                  label="Time"
+                  value={formData.time}
+                  onChangeText={(text) => updateField('time', text)}
+                  placeholder="HH:MM"
+                  leftIcon="clock-outline"
+                  error={errors.time}
+                  helperText="24h format"
+                />
+              </View>
+            </View>
+          </Card>
+        </FadeInDown>
+
+        <FadeInDown delay={400} duration={400}>
+          <Card style={styles.card}>
+            <Text style={[theme.typography.titleMedium, styles.sectionTitle]}>
+              <MaterialCommunityIcons name="account-group" size={20} /> Participants
+            </Text>
+
+            <Input
+              label="Maximum Participants"
+              value={formData.maxParticipants}
+              onChangeText={(text) => updateField('maxParticipants', text)}
+              placeholder="e.g., 10"
+              leftIcon="account-multiple"
+              keyboardType="numeric"
+              error={errors.maxParticipants}
+              helperText="Min: 2, Max: 100"
+            />
+          </Card>
+        </FadeInDown>
+
+        {venues.length > 0 && (
+          <FadeInDown delay={500} duration={400}>
+            <Card style={styles.card}>
+              <Text style={[theme.typography.titleMedium, styles.sectionTitle]}>
+                <MaterialCommunityIcons name="map-marker" size={20} /> Venue (Optional)
+              </Text>
+              <View style={styles.venueList}>
+                {venues.slice(0, 5).map((venue) => (
+                  <Chip
+                    key={venue.id}
+                    label={venue.name}
+                    icon="map-marker"
+                    selected={formData.venueId === venue.id}
+                    onPress={() => updateField('venueId', venue.id)}
+                    variant={formData.venueId === venue.id ? 'filled' : 'outlined'}
+                    style={styles.venueChip}
+                  />
+                ))}
+              </View>
+            </Card>
+          </FadeInDown>
+        )}
+
+        <FadeInDown delay={600} duration={400}>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Create Match"
+              onPress={handleCreate}
+              loading={isLoading}
+              leftIcon="check"
+              style={styles.createButton}
+            />
+
+            <Button
+              title="Cancel"
+              onPress={() => navigation.goBack()}
+              variant="outline"
+              leftIcon="close"
+            />
+          </View>
+        </FadeInDown>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    padding: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
-  },
-  sportGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -4,
-  },
-  sportButton: {
-    margin: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 36,
-  },
-  sportButtonText: {
-    fontSize: 14,
-  },
-  row: {
-    flexDirection: 'row',
-    marginHorizontal: -8,
-  },
-  halfWidth: {
-    flex: 1,
-    paddingHorizontal: 8,
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  venueList: {
-    marginTop: 8,
-  },
-  venueButton: {
-    marginBottom: 8,
-  },
-  venueButtonText: {
-    fontSize: 14,
-  },
-  createButton: {
-    marginBottom: 12,
-  },
-  error: {
-    color: '#FF3B30',
-    fontSize: 12,
-    marginTop: 4,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      padding: theme.spacing.base,
+      paddingBottom: theme.spacing.xl,
+    },
+    headerContainer: {
+      alignItems: 'center',
+      marginBottom: theme.spacing.lg,
+    },
+    iconContainer: {
+      marginBottom: theme.spacing.sm,
+    },
+    title: {
+      color: theme.colors.onBackground,
+      marginBottom: theme.spacing.xs,
+      textAlign: 'center',
+    },
+    subtitle: {
+      color: theme.colors.onSurfaceVariant,
+      textAlign: 'center',
+    },
+    card: {
+      marginBottom: theme.spacing.base,
+      padding: theme.spacing.base,
+    },
+    sectionTitle: {
+      color: theme.colors.onSurface,
+      marginBottom: theme.spacing.base,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: theme.spacing.xs,
+    },
+    inputContainer: {
+      marginBottom: theme.spacing.base,
+    },
+    label: {
+      color: theme.colors.onSurface,
+      marginBottom: theme.spacing.sm,
+    },
+    sportGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.sm,
+    },
+    sportChip: {
+      marginBottom: theme.spacing.xs,
+    },
+    row: {
+      flexDirection: 'row',
+      gap: theme.spacing.sm,
+    },
+    halfWidth: {
+      flex: 1,
+    },
+    textArea: {
+      height: 100,
+      textAlignVertical: 'top',
+    },
+    venueList: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: theme.spacing.sm,
+    },
+    venueChip: {
+      marginBottom: theme.spacing.xs,
+    },
+    buttonContainer: {
+      gap: theme.spacing.sm,
+    },
+    createButton: {
+      marginBottom: theme.spacing.xs,
+    },
+    error: {
+      color: theme.colors.error,
+      marginTop: theme.spacing.xs,
+    },
+  });
 
 export default CreateMatchScreen;
