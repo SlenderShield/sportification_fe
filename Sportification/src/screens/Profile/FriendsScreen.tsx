@@ -15,9 +15,7 @@ import {
 } from '../../store/api/userApi';
 import { useAppSelector } from '../../store/hooks';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
-import { Card, Avatar, Badge, IconButton } from '../../components/ui';
+import { Card, Avatar, Badge, IconButton, EmptyState, SearchBar } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FadeInDown } from 'react-native-reanimated';
@@ -144,30 +142,18 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Input
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search users..."
-          leftIcon="account-search"
-          onFocus={() => setSearchMode(true)}
-          onBlur={() => {
-            if (!searchQuery) setSearchMode(false);
-          }}
-          style={styles.searchInput}
-        />
-        {searchMode && (
-          <Button
-            title="Cancel"
-            onPress={() => {
-              setSearchQuery('');
-              setSearchMode(false);
-            }}
-            variant="text"
-            size="small"
-          />
-        )}
-      </View>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder="Search users..."
+        leftIcon="account-search"
+        showCancel={searchMode}
+        onCancel={() => setSearchMode(false)}
+        onFocus={() => setSearchMode(true)}
+        onBlur={() => {
+          if (!searchQuery) setSearchMode(false);
+        }}
+      />
 
       {!searchMode && (
         <View style={styles.statsContainer}>
@@ -197,32 +183,17 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
             contentContainerStyle={styles.list}
             ListEmptyComponent={
               searchQuery.length >= 2 ? (
-                <View style={styles.emptyContainer}>
-                  <MaterialCommunityIcons
-                    name="account-search"
-                    size={64}
-                    color={theme.colors.onSurfaceVariant}
-                    style={{ opacity: 0.5 }}
-                  />
-                  <Text style={[theme.typography.titleMedium, styles.emptyText]}>
-                    No users found
-                  </Text>
-                  <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-                    Try a different search term
-                  </Text>
-                </View>
+                <EmptyState
+                  icon="account-search"
+                  title="No users found"
+                  message="Try a different search term"
+                />
               ) : (
-                <View style={styles.emptyContainer}>
-                  <MaterialCommunityIcons
-                    name="magnify"
-                    size={64}
-                    color={theme.colors.onSurfaceVariant}
-                    style={{ opacity: 0.5 }}
-                  />
-                  <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-                    Search for users to add friends
-                  </Text>
-                </View>
+                <EmptyState
+                  icon="magnify"
+                  title=""
+                  message="Search for users to add friends"
+                />
               )
             }
           />
@@ -242,20 +213,11 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ navigation }) => {
             />
           }
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <MaterialCommunityIcons
-                name="account-group-outline"
-                size={64}
-                color={theme.colors.onSurfaceVariant}
-                style={{ opacity: 0.5 }}
-              />
-              <Text style={[theme.typography.titleMedium, styles.emptyText]}>
-                No friends yet
-              </Text>
-              <Text style={[theme.typography.bodyMedium, styles.emptySubtext]}>
-                Search for users to add friends
-              </Text>
-            </View>
+            <EmptyState
+              icon="account-group-outline"
+              title="No friends yet"
+              message="Search for users to add friends"
+            />
           }
         />
       )}
@@ -268,17 +230,6 @@ const createStyles = (theme: any) =>
     container: {
       flex: 1,
       backgroundColor: theme.colors.background,
-    },
-    searchContainer: {
-      backgroundColor: theme.colors.surface,
-      padding: theme.spacing.base,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: theme.spacing.sm,
-      ...theme.elevation.level1,
-    },
-    searchInput: {
-      flex: 1,
     },
     statsContainer: {
       padding: theme.spacing.base,
@@ -305,20 +256,6 @@ const createStyles = (theme: any) =>
     },
     friendInfo: {
       flex: 1,
-    },
-    emptyContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: theme.spacing.xl,
-      gap: theme.spacing.sm,
-    },
-    emptyText: {
-      color: theme.colors.onSurface,
-      marginTop: theme.spacing.sm,
-    },
-    emptySubtext: {
-      color: theme.colors.onSurfaceVariant,
-      textAlign: 'center',
     },
   });
 

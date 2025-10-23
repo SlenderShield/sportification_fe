@@ -18,7 +18,7 @@ import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Badge, Avatar, Divider, Chip, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
+import { Card, Badge, Avatar, Divider, Chip, DetailRow, SectionHeader, EmptyState, ParticipantList } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 import { MATCH_STATUS_COLORS } from '../../constants/statusColors';
@@ -194,33 +194,14 @@ const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route
         {/* Participants Card */}
         <Animated.View entering={FadeInDown.delay(400).springify()}>
           <Card variant="elevated" style={{ marginBottom: theme.spacing.base }}>
-            <View style={{ padding: theme.spacing.base }}>
-              <Text style={[theme.typography.titleLarge, { color: theme.colors.text, marginBottom: theme.spacing.md }]}>
-                Participants ({match.participants.length})
-              </Text>
-              <Divider style={{ marginBottom: theme.spacing.md }} />
-              
-              {match.participants.map((participant, index) => (
-                <View key={participant.userId} style={[styles.participantRow, { marginBottom: theme.spacing.md }]}>
-                  <Avatar
-                    name={participant.username}
-                    size="medium"
-                    variant="circular"
-                  />
-                  <View style={{ marginLeft: theme.spacing.md, flex: 1 }}>
-                    <Text style={[theme.typography.titleMedium, { color: theme.colors.text }]}>
-                      {participant.username}
-                    </Text>
-                    <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                      Joined: {format(new Date(participant.joinedAt), 'MMM dd, yyyy')}
-                    </Text>
-                  </View>
-                  {participant.userId === match.createdBy && (
-                    <Chip label="Organizer" icon="crown" size="small" selected />
-                  )}
-                </View>
-              ))}
-            </View>
+            <ParticipantList
+              participants={match.participants}
+              title="Participants"
+              organizerId={match.createdBy}
+              emptyIcon="account-group-outline"
+              emptyTitle="No participants yet"
+              emptyMessage="Be the first to join this match!"
+            />
           </Card>
         </Animated.View>
 
@@ -315,10 +296,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-  },
-  participantRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });
 

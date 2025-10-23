@@ -12,6 +12,18 @@ This document provides practical examples of how to use each component in the re
 7. [Toast](#toast)
 8. [BottomSheet](#bottomsheet)
 9. [SkeletonLoader](#skeletonloader)
+10. [ParticipantList](#participantlist)
+11. [EmptyState](#emptystate)
+12. [SportSelector](#sportselector)
+13. [DetailRow](#detailrow)
+14. [SectionHeader](#sectionheader)
+15. [SearchBar](#searchbar)
+16. [FilterChips](#filterchips)
+17. [SwipeableCard](#swipeablecard)
+18. [AnimatedToast](#animatedtoast)
+19. [DatePicker](#datepicker)
+20. [TimePicker](#timepicker)
+21. [useForm Hook](#useform-hook)
 
 ---
 
@@ -832,6 +844,581 @@ backgroundColor: theme.colors.primary
 // Use variant, size, and other props instead of custom styles
 <Button variant="outline" size="large" fullWidth />
 ```
+
+---
+
+## ParticipantList
+
+The `ParticipantList` component provides a reusable interface for displaying participants, members, or team rosters with consistent styling.
+
+### Basic Usage
+```tsx
+import { ParticipantList } from '../components/ui';
+
+<ParticipantList
+  participants={match.participants}
+  title="Participants"
+  organizerId={match.createdBy}
+/>
+```
+
+### With Empty State
+```tsx
+<ParticipantList
+  participants={tournament.participants}
+  title="Participants"
+  organizerId={tournament.createdBy}
+  emptyIcon="account-group-outline"
+  emptyTitle="No participants yet"
+  emptyMessage="Be the first to join this tournament!"
+/>
+```
+
+### With Seed Display (Tournaments)
+```tsx
+<ParticipantList
+  participants={tournament.participants}
+  title="Tournament Bracket"
+  organizerId={tournament.createdBy}
+  showSeed={true}
+/>
+```
+
+### Props
+- `participants`: Array of participant objects with `userId`, `username`/`name`, `joinedAt`, `role`, `seed`
+- `title`: Header title (default: "Participants")
+- `organizerId`: ID to mark organizer with crown badge
+- `emptyIcon`: Icon for empty state
+- `emptyTitle`: Title for empty state
+- `emptyMessage`: Message for empty state
+- `showSeed`: Display tournament seeds (default: false)
+
+---
+
+## EmptyState
+
+The `EmptyState` component displays a consistent empty state across all list views.
+
+### Basic Usage
+```tsx
+import { EmptyState } from '../components/ui';
+
+<EmptyState
+  icon="soccer-field"
+  title="No matches found"
+  message="Create your first match to get started"
+/>
+```
+
+### In FlatList
+```tsx
+<FlatList
+  data={items}
+  renderItem={renderItem}
+  ListEmptyComponent={
+    <EmptyState
+      icon="account-group-outline"
+      title="No teams yet"
+      message="Create your first team"
+    />
+  }
+/>
+```
+
+### Props
+- `icon`: Material Community Icon name
+- `title`: Main heading text
+- `message`: Optional descriptive text
+- `iconSize`: Icon size in pixels (default: 64)
+
+---
+
+## SportSelector
+
+The `SportSelector` component provides a chip-based interface for selecting sports.
+
+### Basic Usage
+```tsx
+import { SportSelector } from '../components/ui';
+
+<SportSelector
+  selectedSport={formData.sport}
+  onSelect={(sport) => setFormData({...formData, sport})}
+  error={errors.sport}
+/>
+```
+
+### Features
+- Displays all available sports from `SPORTS` constant
+- Chip-based selection with icons
+- Selected state highlighting
+- Error message display
+- Wraps automatically for responsive layout
+
+---
+
+## DetailRow
+
+The `DetailRow` component displays key-value pairs with icons in detail screens.
+
+### Basic Usage
+```tsx
+import { DetailRow } from '../components/ui';
+
+<DetailRow
+  icon="calendar"
+  label="Date"
+  value={format(new Date(match.date), 'MMM dd, yyyy')}
+/>
+```
+
+### Multiple Details
+```tsx
+<View>
+  <DetailRow
+    icon="map-marker"
+    label="Location"
+    value={venue.address}
+  />
+  <DetailRow
+    icon="clock-outline"
+    label="Time"
+    value={format(new Date(match.time), 'HH:mm')}
+  />
+  <DetailRow
+    icon="account-group"
+    label="Participants"
+    value={`${match.participants.length} / ${match.maxParticipants}`}
+  />
+</View>
+```
+
+### Props
+- `icon`: Material Community Icon name
+- `label`: Field label text
+- `value`: Field value text or React node
+
+---
+
+## SectionHeader
+
+The `SectionHeader` component provides consistent section titles with optional actions.
+
+### Basic Usage
+```tsx
+import { SectionHeader } from '../components/ui';
+
+<SectionHeader title="Match Details" />
+```
+
+### With Icon
+```tsx
+<SectionHeader
+  title="Team Members"
+  icon="account-group"
+/>
+```
+
+### With Action Button
+```tsx
+<SectionHeader
+  title="Participants"
+  rightElement={
+    <Button
+      title="Invite"
+      size="small"
+      variant="text"
+      onPress={handleInvite}
+    />
+  }
+/>
+```
+
+---
+
+## SearchBar
+
+The `SearchBar` component provides a reusable search interface with optional cancel functionality.
+
+### Basic Usage
+```tsx
+import { SearchBar } from '../components/ui';
+
+<SearchBar
+  value={searchQuery}
+  onChangeText={setSearchQuery}
+  placeholder="Search users..."
+/>
+```
+
+### With Cancel Button
+```tsx
+<SearchBar
+  value={searchQuery}
+  onChangeText={setSearchQuery}
+  placeholder="Search..."
+  leftIcon="account-search"
+  showCancel={isSearching}
+  onCancel={() => {
+    setSearchQuery('');
+    setIsSearching(false);
+  }}
+/>
+```
+
+### Props
+- `value`: Current search text
+- `onChangeText`: Callback when text changes
+- `placeholder`: Placeholder text (default: "Search...")
+- `leftIcon`: Icon name (default: "magnify")
+- `showCancel`: Show cancel button
+- `onCancel`: Cancel button callback
+- `onFocus/onBlur`: Focus event handlers
+- `autoFocus`: Auto-focus input
+
+---
+
+## FilterChips
+
+The `FilterChips` component provides filterable chip selection for list filtering.
+
+### Basic Usage
+```tsx
+import { FilterChips } from '../components/ui';
+
+<FilterChips
+  options={[
+    { id: 'all', label: 'All' },
+    { id: 'active', label: 'Active' },
+    { id: 'completed', label: 'Completed' },
+  ]}
+  selectedFilters={['active']}
+  onFilterChange={(filterId) => handleFilter(filterId)}
+/>
+```
+
+### With Icons
+```tsx
+<FilterChips
+  options={[
+    { id: 'football', label: 'Football', icon: 'soccer' },
+    { id: 'basketball', label: 'Basketball', icon: 'basketball' },
+    { id: 'tennis', label: 'Tennis', icon: 'tennis' },
+  ]}
+  selectedFilters={selectedSports}
+  onFilterChange={toggleSport}
+  scrollable={true}
+/>
+```
+
+### Props
+- `options`: Array of filter options with id, label, icon
+- `selectedFilters`: Array of selected filter IDs
+- `onFilterChange`: Callback when filter is toggled
+- `multiSelect`: Allow multiple selections (default: true)
+- `scrollable`: Enable horizontal scrolling (default: true)
+
+---
+
+## SwipeableCard
+
+The `SwipeableCard` component adds swipe gestures to any content for quick actions.
+
+### Basic Swipe to Delete
+```tsx
+import { SwipeableCard } from '../components/ui';
+
+<SwipeableCard onDelete={() => handleDelete(item.id)}>
+  <Card>{/* Your content */}</Card>
+</SwipeableCard>
+```
+
+### With Custom Actions
+```tsx
+<SwipeableCard
+  rightActions={[
+    {
+      icon: 'archive',
+      color: theme.colors.info,
+      onPress: () => handleArchive(item.id),
+      label: 'Archive',
+    },
+    {
+      icon: 'bell-off',
+      color: theme.colors.warning,
+      onPress: () => handleMute(item.id),
+      label: 'Mute',
+    },
+  ]}
+  onDelete={() => handleDelete(item.id)}
+>
+  <Card>{/* Your content */}</Card>
+</SwipeableCard>
+```
+
+### Left Actions
+```tsx
+<SwipeableCard
+  leftActions={[
+    {
+      icon: 'check',
+      color: theme.colors.success,
+      onPress: () => handleComplete(item.id),
+      label: 'Done',
+    },
+  ]}
+>
+  <Card>{/* Your content */}</Card>
+</SwipeableCard>
+```
+
+### Props
+- `children`: Content to wrap with swipe actions
+- `onDelete`: Delete action callback (creates red delete button)
+- `leftActions`: Array of actions for left swipe
+- `rightActions`: Array of actions for right swipe
+- `deleteThreshold`: Swipe distance for delete (default: 80)
+
+---
+
+## AnimatedToast
+
+The `AnimatedToast` component displays animated toast notifications with optional Lottie animations.
+
+### Basic Usage
+```tsx
+import { AnimatedToast } from '../components/ui';
+
+const [showToast, setShowToast] = useState(false);
+
+<AnimatedToast
+  visible={showToast}
+  type="success"
+  message="Match created successfully!"
+  onHide={() => setShowToast(false)}
+/>
+```
+
+### Different Types
+```tsx
+// Success
+<AnimatedToast
+  visible={showSuccess}
+  type="success"
+  message="Action completed!"
+  duration={3000}
+/>
+
+// Error
+<AnimatedToast
+  visible={showError}
+  type="error"
+  message="Something went wrong"
+  duration={4000}
+/>
+
+// Warning
+<AnimatedToast
+  visible={showWarning}
+  type="warning"
+  message="Please review your input"
+/>
+
+// Info
+<AnimatedToast
+  visible={showInfo}
+  type="info"
+  message="New features available"
+/>
+```
+
+### Props
+- `visible`: Show/hide toast
+- `type`: 'success' | 'error' | 'warning' | 'info'
+- `message`: Toast message text
+- `duration`: Auto-hide duration (default: 3000ms)
+- `onHide`: Callback when toast hides
+- `showAnimation`: Show Lottie animation (default: true)
+
+---
+
+## DatePicker
+
+The `DatePicker` component provides an enhanced date input with auto-formatting and validation.
+
+### Basic Usage
+```tsx
+import { DatePicker } from '../components/ui';
+
+<DatePicker
+  value={formData.date}
+  onChange={(date) => setFormData({ ...formData, date })}
+  label="Match Date"
+/>
+```
+
+### With Validation
+```tsx
+<DatePicker
+  value={formData.date}
+  onChange={(date) => setFormData({ ...formData, date })}
+  label="Event Date"
+  placeholder="YYYY-MM-DD"
+  minDate={new Date()}
+  maxDate={new Date('2025-12-31')}
+  required={true}
+  error={errors.date}
+/>
+```
+
+### Props
+- `value`: Date string in YYYY-MM-DD format
+- `onChange`: Callback when date changes
+- `label`: Field label
+- `placeholder`: Placeholder text (default: "YYYY-MM-DD")
+- `error`: Error message to display
+- `minDate`: Minimum allowed date
+- `maxDate`: Maximum allowed date
+- `disabled`: Disable input
+- `required`: Mark as required field
+
+---
+
+## TimePicker
+
+The `TimePicker` component provides an enhanced time input with auto-formatting and validation.
+
+### Basic Usage
+```tsx
+import { TimePicker } from '../components/ui';
+
+<TimePicker
+  value={formData.time}
+  onChange={(time) => setFormData({ ...formData, time })}
+  label="Start Time"
+/>
+```
+
+### 24-Hour Format
+```tsx
+<TimePicker
+  value={formData.time}
+  onChange={(time) => setFormData({ ...formData, time })}
+  label="Match Time"
+  placeholder="HH:MM"
+  format24h={true}
+  required={true}
+  error={errors.time}
+/>
+```
+
+### Props
+- `value`: Time string in HH:MM format
+- `onChange`: Callback when time changes
+- `label`: Field label
+- `placeholder`: Placeholder text (default: "HH:MM")
+- `error`: Error message to display
+- `format24h`: Use 24-hour format (default: true)
+- `disabled`: Disable input
+- `required`: Mark as required field
+
+---
+
+## useForm Hook
+
+The `useForm` hook provides comprehensive form state management with built-in validation.
+
+### Basic Usage
+```tsx
+import { useForm } from '../hooks';
+
+const { values, errors, handleChange, handleSubmit } = useForm({
+  initialValues: {
+    name: '',
+    email: '',
+    age: '',
+  },
+  validationRules: {
+    name: { required: true, minLength: 3 },
+    email: { required: true, pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ },
+    age: { required: true, min: 18, max: 100 },
+  },
+  onSubmit: async (values) => {
+    await createUser(values);
+  },
+});
+
+return (
+  <View>
+    <Input
+      value={values.name}
+      onChangeText={(text) => handleChange('name', text)}
+      error={errors.name}
+    />
+    <Button title="Submit" onPress={handleSubmit} loading={isSubmitting} />
+  </View>
+);
+```
+
+### Validation Rules
+```tsx
+const { values, errors, handleChange } = useForm({
+  initialValues: formData,
+  validationRules: {
+    title: {
+      required: true,
+      minLength: 3,
+      maxLength: 100,
+    },
+    description: {
+      minLength: 10,
+      maxLength: 500,
+    },
+    maxParticipants: {
+      required: true,
+      min: 2,
+      max: 100,
+    },
+    email: {
+      required: true,
+      pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+    },
+    password: {
+      required: true,
+      custom: (value) => {
+        if (value.length < 8) return 'Password must be at least 8 characters';
+        if (!/[A-Z]/.test(value)) return 'Password must contain uppercase';
+        if (!/[0-9]/.test(value)) return 'Password must contain number';
+        return null;
+      },
+    },
+  },
+  onSubmit: handleFormSubmit,
+});
+```
+
+### Available Validation Rules
+- `required`: Field is required
+- `minLength`: Minimum string length
+- `maxLength`: Maximum string length
+- `min`: Minimum numeric value
+- `max`: Maximum numeric value
+- `pattern`: RegExp pattern to match
+- `custom`: Custom validation function
+
+### Return Values
+- `values`: Current form values
+- `errors`: Current validation errors
+- `touched`: Fields that have been touched
+- `isSubmitting`: Submission loading state
+- `handleChange`: Update field value
+- `handleBlur`: Mark field as touched
+- `handleSubmit`: Submit form with validation
+- `setFieldValue`: Programmatically set field value
+- `setFieldError`: Programmatically set field error
+- `resetForm`: Reset to initial values
+- `validateField`: Validate single field
+- `validateForm`: Validate entire form
 
 ---
 

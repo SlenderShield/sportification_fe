@@ -10,9 +10,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetMatchesQuery } from '../../store/api/matchApi';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Card from '../../components/ui/Card';
-import FAB from '../../components/ui/FAB';
-import Badge from '../../components/ui/Badge';
+import { Card, FAB, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
@@ -163,34 +161,11 @@ const MatchesScreen: React.FC<MatchesScreenProps> = ({ navigation }) => {
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon
-              name="soccer-field"
-              size={64}
-              color={theme.colors.textTertiary}
-              style={{ marginBottom: theme.spacing.base }}
-            />
-            <Text
-              style={[
-                theme.typography.titleMedium,
-                { color: theme.colors.textSecondary, textAlign: 'center' },
-              ]}
-            >
-              No matches found
-            </Text>
-            <Text
-              style={[
-                theme.typography.bodySmall,
-                {
-                  color: theme.colors.textTertiary,
-                  textAlign: 'center',
-                  marginTop: theme.spacing.sm,
-                },
-              ]}
-            >
-              Create your first match to get started
-            </Text>
-          </View>
+          <EmptyState
+            icon="soccer-field"
+            title="No matches found"
+            message="Create your first match to get started"
+          />
         }
       />
       <FAB
@@ -217,13 +192,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    minHeight: 400,
   },
 });
 

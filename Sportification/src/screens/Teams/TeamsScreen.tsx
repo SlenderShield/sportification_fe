@@ -10,7 +10,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetTeamsQuery } from '../../store/api/teamApi';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { Card, FAB, Avatar, Badge } from '../../components/ui';
+import { Card, FAB, Avatar, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface TeamsScreenProps {
@@ -162,34 +162,11 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon
-              name="account-group-outline"
-              size={64}
-              color={theme.colors.textTertiary}
-              style={{ marginBottom: theme.spacing.base }}
-            />
-            <Text
-              style={[
-                theme.typography.titleMedium,
-                { color: theme.colors.textSecondary, textAlign: 'center' },
-              ]}
-            >
-              No teams found
-            </Text>
-            <Text
-              style={[
-                theme.typography.bodySmall,
-                {
-                  color: theme.colors.textTertiary,
-                  textAlign: 'center',
-                  marginTop: theme.spacing.sm,
-                },
-              ]}
-            >
-              Create your first team to get started
-            </Text>
-          </View>
+          <EmptyState
+            icon="account-group-outline"
+            title="No teams found"
+            message="Create your first team to get started"
+          />
         }
       />
       <FAB
@@ -224,13 +201,6 @@ const styles = StyleSheet.create({
   footerItem: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    minHeight: 400,
   },
 });
 

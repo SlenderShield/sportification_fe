@@ -10,7 +10,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetTournamentsQuery } from '../../store/api/tournamentApi';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { Card, FAB, Badge } from '../../components/ui';
+import { Card, FAB, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
@@ -174,34 +174,11 @@ const TournamentsScreen: React.FC<TournamentsScreenProps> = ({ navigation }) => 
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon
-              name="trophy-outline"
-              size={64}
-              color={theme.colors.textTertiary}
-              style={{ marginBottom: theme.spacing.base }}
-            />
-            <Text
-              style={[
-                theme.typography.titleMedium,
-                { color: theme.colors.textSecondary, textAlign: 'center' },
-              ]}
-            >
-              No tournaments found
-            </Text>
-            <Text
-              style={[
-                theme.typography.bodySmall,
-                {
-                  color: theme.colors.textTertiary,
-                  textAlign: 'center',
-                  marginTop: theme.spacing.sm,
-                },
-              ]}
-            >
-              Create your first tournament to get started
-            </Text>
-          </View>
+          <EmptyState
+            icon="trophy-outline"
+            title="No tournaments found"
+            message="Create your first tournament to get started"
+          />
         }
       />
       <FAB
@@ -234,13 +211,6 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    minHeight: 400,
   },
 });
 

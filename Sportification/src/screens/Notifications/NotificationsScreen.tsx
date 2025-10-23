@@ -16,7 +16,7 @@ import {
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Badge } from '../../components/ui';
+import { Card, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
@@ -288,34 +288,11 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon
-              name="bell-check"
-              size={64}
-              color={theme.colors.success}
-              style={{ marginBottom: theme.spacing.base }}
-            />
-            <Text
-              style={[
-                theme.typography.titleLarge,
-                { color: theme.colors.text, textAlign: 'center' },
-              ]}
-            >
-              All Caught Up!
-            </Text>
-            <Text
-              style={[
-                theme.typography.bodyMedium,
-                {
-                  color: theme.colors.textSecondary,
-                  textAlign: 'center',
-                  marginTop: theme.spacing.sm,
-                },
-              ]}
-            >
-              You have no notifications
-            </Text>
-          </View>
+          <EmptyState
+            icon="bell-check"
+            title="All Caught Up!"
+            message="You have no notifications"
+          />
         }
       />
     </View>
@@ -362,13 +339,6 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     marginLeft: 8,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    minHeight: 400,
   },
 });
 
