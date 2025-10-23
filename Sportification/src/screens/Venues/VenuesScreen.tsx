@@ -10,7 +10,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useGetVenuesQuery } from '../../store/api/venueApi';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { Card, Badge } from '../../components/ui';
+import { Card, Badge, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface VenuesScreenProps {
@@ -161,34 +161,11 @@ const VenuesScreen: React.FC<VenuesScreenProps> = ({ navigation }) => {
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon
-              name="map-marker-off-outline"
-              size={64}
-              color={theme.colors.textTertiary}
-              style={{ marginBottom: theme.spacing.base }}
-            />
-            <Text
-              style={[
-                theme.typography.titleMedium,
-                { color: theme.colors.textSecondary, textAlign: 'center' },
-              ]}
-            >
-              No venues found
-            </Text>
-            <Text
-              style={[
-                theme.typography.bodySmall,
-                {
-                  color: theme.colors.textTertiary,
-                  textAlign: 'center',
-                  marginTop: theme.spacing.sm,
-                },
-              ]}
-            >
-              Search for venues in your area
-            </Text>
-          </View>
+          <EmptyState
+            icon="map-marker-off-outline"
+            title="No venues found"
+            message="Search for venues in your area"
+          />
         }
       />
     </View>
@@ -225,13 +202,6 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    minHeight: 400,
   },
 });
 
