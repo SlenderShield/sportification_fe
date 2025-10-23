@@ -9,6 +9,7 @@ import { I18nextProvider } from 'react-i18next';
 import { store, persistor } from './src/store';
 import RootNavigator from './src/navigation/RootNavigator';
 import { ThemeProvider } from './src/theme';
+import { AccessibilityProvider } from './src/contexts/AccessibilityContext';
 import { notificationService } from './src/services/notificationService';
 import { localizationService, i18n } from './src/services/localizationService';
 import { paymentService } from './src/services/paymentService';
@@ -17,6 +18,45 @@ import LoadingSpinner from './src/components/common/LoadingSpinner';
 
 // Stripe publishable key - should be loaded from env
 const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
+
+/**
+ * ThemedApp Component
+ * Wraps the app content with ThemeProvider that responds to accessibility settings
+ */
+const ThemedApp = () => {
+  return (
+    <AccessibilityProvider>
+      <ThemeProviderWithAccessibility>
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        <Provider store={store}>
+          <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
+            <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+              <I18nextProvider i18n={i18n}>
+                <RootNavigator />
+              </I18nextProvider>
+            </StripeProvider>
+          </PersistGate>
+        </Provider>
+      </ThemeProviderWithAccessibility>
+    </AccessibilityProvider>
+  );
+};
+
+/**
+ * ThemeProviderWithAccessibility Component
+ * Connects AccessibilityContext with ThemeProvider
+ */
+const ThemeProviderWithAccessibility: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Import within component to access the context
+  const { useAccessibility } = require('./src/contexts/AccessibilityContext');
+  const { settings } = useAccessibility();
+
+  return (
+    <ThemeProvider highContrastMode={settings.highContrastMode}>
+      {children}
+    </ThemeProvider>
+  );
+};
 
 const App = () => {
   useEffect(() => {
@@ -76,18 +116,7 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <ThemeProvider>
-          <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-          <Provider store={store}>
-            <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
-              <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-                <I18nextProvider i18n={i18n}>
-                  <RootNavigator />
-                </I18nextProvider>
-              </StripeProvider>
-            </PersistGate>
-          </Provider>
-        </ThemeProvider>
+        <ThemedApp />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

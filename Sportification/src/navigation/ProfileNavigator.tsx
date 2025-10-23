@@ -5,6 +5,7 @@ import EditProfileScreen from '../screens/Profile/EditProfileScreen';
 import ChangePasswordScreen from '../screens/Profile/ChangePasswordScreen';
 import FriendsScreen from '../screens/Profile/FriendsScreen';
 import NotificationsScreen from '../screens/Notifications/NotificationsScreen';
+import AccessibilitySettingsScreen from '../screens/Profile/AccessibilitySettingsScreen';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,11 @@ const ProfileNavigator = () => {
         name="Notifications" 
         component={NotificationsScreen}
         options={{ title: 'Notifications' }}
+      />
+      <Stack.Screen 
+        name="AccessibilitySettings" 
+        component={AccessibilitySettingsScreen}
+        options={{ title: 'Accessibility' }}
       />
     </Stack.Navigator>
   );
