@@ -17,6 +17,10 @@ This document provides practical examples of how to use each component in the re
 12. [SportSelector](#sportselector)
 13. [DetailRow](#detailrow)
 14. [SectionHeader](#sectionheader)
+15. [SearchBar](#searchbar)
+16. [FilterChips](#filterchips)
+17. [SwipeableCard](#swipeablecard)
+18. [AnimatedToast](#animatedtoast)
 
 ---
 
@@ -1026,6 +1030,212 @@ import { SectionHeader } from '../components/ui';
   }
 />
 ```
+
+---
+
+## SearchBar
+
+The `SearchBar` component provides a reusable search interface with optional cancel functionality.
+
+### Basic Usage
+```tsx
+import { SearchBar } from '../components/ui';
+
+<SearchBar
+  value={searchQuery}
+  onChangeText={setSearchQuery}
+  placeholder="Search users..."
+/>
+```
+
+### With Cancel Button
+```tsx
+<SearchBar
+  value={searchQuery}
+  onChangeText={setSearchQuery}
+  placeholder="Search..."
+  leftIcon="account-search"
+  showCancel={isSearching}
+  onCancel={() => {
+    setSearchQuery('');
+    setIsSearching(false);
+  }}
+/>
+```
+
+### Props
+- `value`: Current search text
+- `onChangeText`: Callback when text changes
+- `placeholder`: Placeholder text (default: "Search...")
+- `leftIcon`: Icon name (default: "magnify")
+- `showCancel`: Show cancel button
+- `onCancel`: Cancel button callback
+- `onFocus/onBlur`: Focus event handlers
+- `autoFocus`: Auto-focus input
+
+---
+
+## FilterChips
+
+The `FilterChips` component provides filterable chip selection for list filtering.
+
+### Basic Usage
+```tsx
+import { FilterChips } from '../components/ui';
+
+<FilterChips
+  options={[
+    { id: 'all', label: 'All' },
+    { id: 'active', label: 'Active' },
+    { id: 'completed', label: 'Completed' },
+  ]}
+  selectedFilters={['active']}
+  onFilterChange={(filterId) => handleFilter(filterId)}
+/>
+```
+
+### With Icons
+```tsx
+<FilterChips
+  options={[
+    { id: 'football', label: 'Football', icon: 'soccer' },
+    { id: 'basketball', label: 'Basketball', icon: 'basketball' },
+    { id: 'tennis', label: 'Tennis', icon: 'tennis' },
+  ]}
+  selectedFilters={selectedSports}
+  onFilterChange={toggleSport}
+  scrollable={true}
+/>
+```
+
+### Props
+- `options`: Array of filter options with id, label, icon
+- `selectedFilters`: Array of selected filter IDs
+- `onFilterChange`: Callback when filter is toggled
+- `multiSelect`: Allow multiple selections (default: true)
+- `scrollable`: Enable horizontal scrolling (default: true)
+
+---
+
+## SwipeableCard
+
+The `SwipeableCard` component adds swipe gestures to any content for quick actions.
+
+### Basic Swipe to Delete
+```tsx
+import { SwipeableCard } from '../components/ui';
+
+<SwipeableCard onDelete={() => handleDelete(item.id)}>
+  <Card>{/* Your content */}</Card>
+</SwipeableCard>
+```
+
+### With Custom Actions
+```tsx
+<SwipeableCard
+  rightActions={[
+    {
+      icon: 'archive',
+      color: theme.colors.info,
+      onPress: () => handleArchive(item.id),
+      label: 'Archive',
+    },
+    {
+      icon: 'bell-off',
+      color: theme.colors.warning,
+      onPress: () => handleMute(item.id),
+      label: 'Mute',
+    },
+  ]}
+  onDelete={() => handleDelete(item.id)}
+>
+  <Card>{/* Your content */}</Card>
+</SwipeableCard>
+```
+
+### Left Actions
+```tsx
+<SwipeableCard
+  leftActions={[
+    {
+      icon: 'check',
+      color: theme.colors.success,
+      onPress: () => handleComplete(item.id),
+      label: 'Done',
+    },
+  ]}
+>
+  <Card>{/* Your content */}</Card>
+</SwipeableCard>
+```
+
+### Props
+- `children`: Content to wrap with swipe actions
+- `onDelete`: Delete action callback (creates red delete button)
+- `leftActions`: Array of actions for left swipe
+- `rightActions`: Array of actions for right swipe
+- `deleteThreshold`: Swipe distance for delete (default: 80)
+
+---
+
+## AnimatedToast
+
+The `AnimatedToast` component displays animated toast notifications with optional Lottie animations.
+
+### Basic Usage
+```tsx
+import { AnimatedToast } from '../components/ui';
+
+const [showToast, setShowToast] = useState(false);
+
+<AnimatedToast
+  visible={showToast}
+  type="success"
+  message="Match created successfully!"
+  onHide={() => setShowToast(false)}
+/>
+```
+
+### Different Types
+```tsx
+// Success
+<AnimatedToast
+  visible={showSuccess}
+  type="success"
+  message="Action completed!"
+  duration={3000}
+/>
+
+// Error
+<AnimatedToast
+  visible={showError}
+  type="error"
+  message="Something went wrong"
+  duration={4000}
+/>
+
+// Warning
+<AnimatedToast
+  visible={showWarning}
+  type="warning"
+  message="Please review your input"
+/>
+
+// Info
+<AnimatedToast
+  visible={showInfo}
+  type="info"
+  message="New features available"
+/>
+```
+
+### Props
+- `visible`: Show/hide toast
+- `type`: 'success' | 'error' | 'warning' | 'info'
+- `message`: Toast message text
+- `duration`: Auto-hide duration (default: 3000ms)
+- `onHide`: Callback when toast hides
+- `showAnimation`: Show Lottie animation (default: true)
 
 ---
 
