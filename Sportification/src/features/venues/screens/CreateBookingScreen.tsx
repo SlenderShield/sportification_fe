@@ -18,7 +18,7 @@ import { Card } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import PaymentForm from '../../components/payment/PaymentForm';
-import { analyticsService } from '../../services/analyticsService';
+import { analyticsService } from '@shared/services/analyticsService';
 
 interface CreateBookingScreenProps {
   navigation: any;

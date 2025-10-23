@@ -8,7 +8,7 @@ import {
   CheckAvailabilityResponse 
 } from '@features/venues/types';
 import { ApiResponse } from '../../types/api';
-import { apiService } from '../../services/api';
+import { apiService } from '@shared/services/api';
 import { unwrapApiResponse, unwrapNestedData } from '../../utils/apiHelpers';
 
 export const venueApi = createApi({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
-import { mapService, Coordinates } from '../../services/mapService';
+import { mapService, Coordinates } from '@features/venues/services/mapService';
 
 interface MapComponentProps {
   markers?: Array<{

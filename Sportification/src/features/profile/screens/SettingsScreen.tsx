@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { localizationService } from '../../services/localizationService';
-import { biometricService } from '../../services/biometricService';
-import { analyticsService } from '../../services/analyticsService';
+import { localizationService } from '@shared/services/localizationService';
+import { biometricService } from '@features/auth/services/biometricService';
+import { analyticsService } from '@shared/services/analyticsService';
 import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';
 import { Card, Divider } from '../../components/ui';

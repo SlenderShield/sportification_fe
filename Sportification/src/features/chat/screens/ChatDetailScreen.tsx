@@ -19,7 +19,7 @@ import { IconButton, EmptyState } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { format } from 'date-fns';
-import { socketService } from '../../services/socketService';
+import { socketService } from '@shared/services/socketService';
 import { FadeIn } from 'react-native-reanimated';
 
 interface ChatDetailScreenProps {

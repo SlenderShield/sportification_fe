@@ -18,11 +18,11 @@ import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';
 import { Input } from '@shared/components/atoms';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { googleAuthService } from '../../services/googleAuthService';
-import { appleAuthService } from '../../services/appleAuthService';
-import { facebookAuthService } from '../../services/facebookAuthService';
-import { biometricService } from '../../services/biometricService';
-import { analyticsService } from '../../services/analyticsService';
+import { googleAuthService } from '@features/auth/services/googleAuthService';
+import { appleAuthService } from '@features/auth/services/appleAuthService';
+import { facebookAuthService } from '@features/auth/services/facebookAuthService';
+import { biometricService } from '@features/auth/services/biometricService';
+import { analyticsService } from '@shared/services/analyticsService';
 
 interface LoginScreenProps {
   navigation: any;

@@ -11,10 +11,10 @@ import RootNavigator from './src/navigation/RootNavigator';
 import { ThemeProvider } from './src/theme';
 import { AccessibilityProvider } from './src/contexts/AccessibilityContext';
 import { ContainerProvider } from './src/core/di';
-import { notificationService } from './src/services/notificationService';
-import { localizationService, i18n } from './src/services/localizationService';
-import { paymentService } from './src/services/paymentService';
-import { analyticsService } from './src/services/analyticsService';
+import { notificationService } from './src/shared/services/notificationService';
+import { localizationService, i18n } from './src/shared/services/localizationService';
+import { paymentService } from './src/features/profile/services/paymentService';
+import { analyticsService } from './src/shared/services/analyticsService';
 import { LoadingSpinner } from './src/shared/components/atoms';
 
 // Stripe publishable key - should be loaded from env
