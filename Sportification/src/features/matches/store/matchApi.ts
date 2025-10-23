@@ -61,6 +61,20 @@ export const matchApi = createApi({
         method: 'POST',
       }),
       transformResponse: (response: ApiResponse<{ match: Match }>) => unwrapNestedData(response, 'match'),
+      // Optimistic update
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          matchApi.util.updateQueryData('getMatch', id, (draft) => {
+            // Optimistically increment participant count
+            draft.currentParticipants += 1;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
       invalidatesTags: (result, error, id) => [{ type: 'Match', id }, 'Matches'],
     }),
     leaveMatch: builder.mutation<void, string>({
@@ -69,6 +83,20 @@ export const matchApi = createApi({
         method: 'POST',
       }),
       transformResponse: (response: ApiResponse<void>) => unwrapApiResponse(response),
+      // Optimistic update
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          matchApi.util.updateQueryData('getMatch', id, (draft) => {
+            // Optimistically decrement participant count
+            draft.currentParticipants -= 1;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
       invalidatesTags: (result, error, id) => [{ type: 'Match', id }, 'Matches'],
     }),
     updateScore: builder.mutation<Match, { id: string; score: UpdateScoreRequest }>({

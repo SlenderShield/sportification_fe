@@ -11,14 +11,14 @@ import {
   REGISTER,
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import authReducer from './slices/authSlice';
+import { authReducer } from '@features/auth/store';
 import { authApi } from '@features/auth/store';
 import { userApi } from '@features/auth/store';
-import { matchApi } from '@features/matches/store';
+import { matchApi, matchesReducer } from '@features/matches/store';
 import { recommendationApi } from '@features/matches/store';
-import { tournamentApi } from '@features/tournaments/store';
-import { teamApi } from '@features/teams/store';
-import { venueApi } from '@features/venues/store';
+import { tournamentApi, tournamentsReducer } from '@features/tournaments/store';
+import { teamApi, teamsReducer } from '@features/teams/store';
+import { venueApi, venuesReducer } from '@features/venues/store';
 import { chatApi } from '@features/chat/store';
 import { notificationApi } from '@features/notifications/store';
 import { paymentApi } from '@features/profile/store';
@@ -32,6 +32,10 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  matches: matchesReducer,
+  teams: teamsReducer,
+  tournaments: tournamentsReducer,
+  venues: venuesReducer,
   [authApi.reducerPath]: authApi.reducer,
   [matchApi.reducerPath]: matchApi.reducer,
   [tournamentApi.reducerPath]: tournamentApi.reducer,
