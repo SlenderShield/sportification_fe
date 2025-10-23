@@ -16,3 +16,4 @@ export { default as EmptyState } from './EmptyState';
 export { default as ParticipantList } from './ParticipantList';
 export { default as SearchBar } from './SearchBar';
 export { default as FilterChips } from './FilterChips';
+export { default as AnimatedToast } from './AnimatedToast';
