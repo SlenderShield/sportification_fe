@@ -8,3 +8,4 @@ export { default as SkeletonLoader, SkeletonCard } from './SkeletonLoader';
 export { default as Divider } from './Divider';
 export { default as ProgressBar } from './ProgressBar';
 export { default as IconButton } from './IconButton';
+export { default as Chip } from './Chip';
