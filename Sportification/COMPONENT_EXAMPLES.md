@@ -12,6 +12,11 @@ This document provides practical examples of how to use each component in the re
 7. [Toast](#toast)
 8. [BottomSheet](#bottomsheet)
 9. [SkeletonLoader](#skeletonloader)
+10. [ParticipantList](#participantlist)
+11. [EmptyState](#emptystate)
+12. [SportSelector](#sportselector)
+13. [DetailRow](#detailrow)
+14. [SectionHeader](#sectionheader)
 
 ---
 
@@ -831,6 +836,195 @@ backgroundColor: theme.colors.primary
 ```tsx
 // Use variant, size, and other props instead of custom styles
 <Button variant="outline" size="large" fullWidth />
+```
+
+---
+
+## ParticipantList
+
+The `ParticipantList` component provides a reusable interface for displaying participants, members, or team rosters with consistent styling.
+
+### Basic Usage
+```tsx
+import { ParticipantList } from '../components/ui';
+
+<ParticipantList
+  participants={match.participants}
+  title="Participants"
+  organizerId={match.createdBy}
+/>
+```
+
+### With Empty State
+```tsx
+<ParticipantList
+  participants={tournament.participants}
+  title="Participants"
+  organizerId={tournament.createdBy}
+  emptyIcon="account-group-outline"
+  emptyTitle="No participants yet"
+  emptyMessage="Be the first to join this tournament!"
+/>
+```
+
+### With Seed Display (Tournaments)
+```tsx
+<ParticipantList
+  participants={tournament.participants}
+  title="Tournament Bracket"
+  organizerId={tournament.createdBy}
+  showSeed={true}
+/>
+```
+
+### Props
+- `participants`: Array of participant objects with `userId`, `username`/`name`, `joinedAt`, `role`, `seed`
+- `title`: Header title (default: "Participants")
+- `organizerId`: ID to mark organizer with crown badge
+- `emptyIcon`: Icon for empty state
+- `emptyTitle`: Title for empty state
+- `emptyMessage`: Message for empty state
+- `showSeed`: Display tournament seeds (default: false)
+
+---
+
+## EmptyState
+
+The `EmptyState` component displays a consistent empty state across all list views.
+
+### Basic Usage
+```tsx
+import { EmptyState } from '../components/ui';
+
+<EmptyState
+  icon="soccer-field"
+  title="No matches found"
+  message="Create your first match to get started"
+/>
+```
+
+### In FlatList
+```tsx
+<FlatList
+  data={items}
+  renderItem={renderItem}
+  ListEmptyComponent={
+    <EmptyState
+      icon="account-group-outline"
+      title="No teams yet"
+      message="Create your first team"
+    />
+  }
+/>
+```
+
+### Props
+- `icon`: Material Community Icon name
+- `title`: Main heading text
+- `message`: Optional descriptive text
+- `iconSize`: Icon size in pixels (default: 64)
+
+---
+
+## SportSelector
+
+The `SportSelector` component provides a chip-based interface for selecting sports.
+
+### Basic Usage
+```tsx
+import { SportSelector } from '../components/ui';
+
+<SportSelector
+  selectedSport={formData.sport}
+  onSelect={(sport) => setFormData({...formData, sport})}
+  error={errors.sport}
+/>
+```
+
+### Features
+- Displays all available sports from `SPORTS` constant
+- Chip-based selection with icons
+- Selected state highlighting
+- Error message display
+- Wraps automatically for responsive layout
+
+---
+
+## DetailRow
+
+The `DetailRow` component displays key-value pairs with icons in detail screens.
+
+### Basic Usage
+```tsx
+import { DetailRow } from '../components/ui';
+
+<DetailRow
+  icon="calendar"
+  label="Date"
+  value={format(new Date(match.date), 'MMM dd, yyyy')}
+/>
+```
+
+### Multiple Details
+```tsx
+<View>
+  <DetailRow
+    icon="map-marker"
+    label="Location"
+    value={venue.address}
+  />
+  <DetailRow
+    icon="clock-outline"
+    label="Time"
+    value={format(new Date(match.time), 'HH:mm')}
+  />
+  <DetailRow
+    icon="account-group"
+    label="Participants"
+    value={`${match.participants.length} / ${match.maxParticipants}`}
+  />
+</View>
+```
+
+### Props
+- `icon`: Material Community Icon name
+- `label`: Field label text
+- `value`: Field value text or React node
+
+---
+
+## SectionHeader
+
+The `SectionHeader` component provides consistent section titles with optional actions.
+
+### Basic Usage
+```tsx
+import { SectionHeader } from '../components/ui';
+
+<SectionHeader title="Match Details" />
+```
+
+### With Icon
+```tsx
+<SectionHeader
+  title="Team Members"
+  icon="account-group"
+/>
+```
+
+### With Action Button
+```tsx
+<SectionHeader
+  title="Participants"
+  rightElement={
+    <Button
+      title="Invite"
+      size="small"
+      variant="text"
+      onPress={handleInvite}
+    />
+  }
+/>
 ```
 
 ---
