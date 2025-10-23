@@ -18,23 +18,17 @@ import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Avatar, Chip, Badge } from '../../components/ui';
+import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { format } from 'date-fns';
+import { TOURNAMENT_STATUS_COLORS } from '../../constants/statusColors';
+import { useEntityActions, useConfirmation } from '../../hooks';
 
 interface TournamentDetailScreenProps {
   navigation: any;
   route: any;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  upcoming: 'info',
-  registration: 'warning',
-  in_progress: 'warning',
-  completed: 'success',
-  cancelled: 'error',
-};
 
 const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigation, route }) => {
   const { theme } = useTheme();
@@ -45,6 +39,14 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
   const [leaveTournament, { isLoading: isLeaving }] = useLeaveTournamentMutation();
   const [deleteTournament, { isLoading: isDeleting }] = useDeleteTournamentMutation();
   const [startTournament, { isLoading: isStarting }] = useStartTournamentMutation();
+  
+  // Use reusable hooks for common actions
+  const { handleJoin, handleLeave, handleDelete } = useEntityActions({
+    entityType: 'tournament',
+    navigation,
+    refetch,
+  });
+  const { showConfirmation } = useConfirmation();
 
   const tournament = data?.data;
 
@@ -52,81 +54,22 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
   const isOrganizer = tournament?.createdBy === user?.id;
   const isFull = tournament?.maxParticipants ? tournament.participants.length >= tournament.maxParticipants : false;
 
-  const handleJoin = async () => {
-    try {
-      await joinTournament(tournamentId).unwrap();
-      Alert.alert('Success', 'You have joined the tournament!');
-      refetch();
-    } catch (error: any) {
-      Alert.alert('Error', error?.data?.message || 'Failed to join tournament');
-    }
-  };
-
-  const handleLeave = () => {
-    Alert.alert(
-      'Leave Tournament',
-      'Are you sure you want to leave this tournament?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Leave',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await leaveTournament(tournamentId).unwrap();
-              Alert.alert('Success', 'You have left the tournament');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to leave tournament');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Tournament',
-      'Are you sure you want to delete this tournament? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteTournament(tournamentId).unwrap();
-              Alert.alert('Success', 'Tournament deleted successfully');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to delete tournament');
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const handleStart = () => {
-    Alert.alert(
-      'Start Tournament',
-      'Are you sure you want to start this tournament? No more participants can join after it starts.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Start',
-          onPress: async () => {
-            try {
-              await startTournament(tournamentId).unwrap();
-              Alert.alert('Success', 'Tournament started!');
-              refetch();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to start tournament');
-            }
-          },
-        },
-      ]
+    showConfirmation(
+      {
+        title: 'Start Tournament',
+        message: 'Are you sure you want to start this tournament? No more participants can join after it starts.',
+        confirmText: 'Start',
+      },
+      async () => {
+        try {
+          await startTournament(tournamentId).unwrap();
+          Alert.alert('Success', 'Tournament started!');
+          refetch();
+        } catch (error: any) {
+          Alert.alert('Error', error?.data?.message || 'Failed to start tournament');
+        }
+      }
     );
   };
 
@@ -162,7 +105,7 @@ const TournamentDetailScreen: React.FC<TournamentDetailScreenProps> = ({ navigat
         <Card style={styles.headerCard}>
           <Badge 
             label={tournament.status.toUpperCase().replace('_', ' ')}
-            variant={STATUS_COLORS[tournament.status] as any}
+            variant={TOURNAMENT_STATUS_COLORS[tournament.status] as any}
             style={styles.statusBadge}
           />
           {isFull && (

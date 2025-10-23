@@ -17,9 +17,10 @@ import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Avatar, Chip, Badge } from '../../components/ui';
+import { Card, Avatar, Chip, Badge, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useEntityActions } from '../../hooks';
 
 interface TeamDetailScreenProps {
   navigation: any;
@@ -34,68 +35,19 @@ const TeamDetailScreen: React.FC<TeamDetailScreenProps> = ({ navigation, route }
   const [joinTeam, { isLoading: isJoining }] = useJoinTeamMutation();
   const [leaveTeam, { isLoading: isLeaving }] = useLeaveTeamMutation();
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation();
+  
+  // Use reusable hook for common actions
+  const { handleJoin, handleLeave, handleDelete } = useEntityActions({
+    entityType: 'team',
+    navigation,
+    refetch,
+  });
 
   const team = data?.data;
 
   const isMember = team?.members.some((m) => m.userId === user?.id);
   const isCaptain = team?.captain === user?.id;
   const isFull = team?.maxMembers ? team.members.length >= team.maxMembers : false;
-
-  const handleJoin = async () => {
-    try {
-      await joinTeam(teamId).unwrap();
-      Alert.alert('Success', 'You have joined the team!');
-      refetch();
-    } catch (error: any) {
-      Alert.alert('Error', error?.data?.message || 'Failed to join team');
-    }
-  };
-
-  const handleLeave = () => {
-    Alert.alert(
-      'Leave Team',
-      'Are you sure you want to leave this team?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Leave',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await leaveTeam(teamId).unwrap();
-              Alert.alert('Success', 'You have left the team');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to leave team');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Team',
-      'Are you sure you want to delete this team? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteTeam(teamId).unwrap();
-              Alert.alert('Success', 'Team deleted successfully');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to delete team');
-            }
-          },
-        },
-      ]
-    );
-  };
 
   if (isLoading) {
     return <LoadingSpinner />;

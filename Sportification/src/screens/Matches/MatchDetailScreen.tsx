@@ -18,21 +18,16 @@ import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../theme';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Button from '../../components/common/Button';
-import { Card, Badge, Avatar, Divider, Chip } from '../../components/ui';
+import { Card, Badge, Avatar, Divider, Chip, DetailRow, SectionHeader, EmptyState } from '../../components/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
+import { MATCH_STATUS_COLORS } from '../../constants/statusColors';
+import { useEntityActions, useConfirmation } from '../../hooks';
 
 interface MatchDetailScreenProps {
   navigation: any;
   route: any;
 }
-
-const STATUS_COLORS: Record<string, string> = {
-  scheduled: 'info',
-  in_progress: 'warning',
-  completed: 'success',
-  cancelled: 'error',
-};
 
 const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route }) => {
   const { theme } = useTheme();
@@ -43,87 +38,36 @@ const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route
   const [leaveMatch, { isLoading: isLeaving }] = useLeaveMatchMutation();
   const [deleteMatch, { isLoading: isDeleting }] = useDeleteMatchMutation();
   const [updateStatus, { isLoading: isUpdating }] = useUpdateStatusMutation();
+  
+  // Use reusable hooks for common actions
+  const { handleJoin, handleLeave, handleDelete } = useEntityActions({
+    entityType: 'match',
+    navigation,
+    refetch,
+  });
+  const { showConfirmation } = useConfirmation();
 
   const match = data?.data;
 
   const isParticipant = match?.participants.some((p) => p.userId === user?.id);
   const isOrganizer = match?.createdBy === user?.id;
 
-  const handleJoin = async () => {
-    try {
-      await joinMatch(matchId).unwrap();
-      Alert.alert('Success', 'You have joined the match!');
-      refetch();
-    } catch (error: any) {
-      Alert.alert('Error', error?.data?.message || 'Failed to join match');
-    }
-  };
-
-  const handleLeave = () => {
-    Alert.alert(
-      'Leave Match',
-      'Are you sure you want to leave this match?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Leave',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await leaveMatch(matchId).unwrap();
-              Alert.alert('Success', 'You have left the match');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to leave match');
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Match',
-      'Are you sure you want to delete this match? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteMatch(matchId).unwrap();
-              Alert.alert('Success', 'Match deleted successfully');
-              navigation.goBack();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to delete match');
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const handleStatusChange = (newStatus: string) => {
-    Alert.alert(
-      'Update Status',
-      `Change match status to ${newStatus}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: async () => {
-            try {
-              await updateStatus({ id: matchId, status: newStatus }).unwrap();
-              Alert.alert('Success', 'Match status updated');
-              refetch();
-            } catch (error: any) {
-              Alert.alert('Error', error?.data?.message || 'Failed to update status');
-            }
-          },
-        },
-      ]
+    showConfirmation(
+      {
+        title: 'Update Status',
+        message: `Change match status to ${newStatus}?`,
+        confirmText: 'Confirm',
+      },
+      async () => {
+        try {
+          await updateStatus({ id: matchId, status: newStatus }).unwrap();
+          Alert.alert('Success', 'Match status updated');
+          refetch();
+        } catch (error: any) {
+          Alert.alert('Error', error?.data?.message || 'Failed to update status');
+        }
+      }
     );
   };
 
@@ -155,7 +99,7 @@ const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.md }}>
                 <Badge
                   label={match.status.replace('_', ' ').toUpperCase()}
-                  variant={STATUS_COLORS[match.status] as any}
+                  variant={MATCH_STATUS_COLORS[match.status] as any}
                   style={{ marginRight: theme.spacing.sm }}
                 />
                 {isFull && match.status === 'scheduled' && (

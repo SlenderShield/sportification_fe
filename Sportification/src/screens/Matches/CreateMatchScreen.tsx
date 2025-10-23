@@ -12,26 +12,16 @@ import { useCreateMatchMutation } from '../../store/api/matchApi';
 import { useGetVenuesQuery } from '../../store/api/venueApi';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import { Card, Chip } from '../../components/ui';
+import { Card, Chip, SportSelector, SectionHeader } from '../../components/ui';
 import { useTheme } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FadeInDown } from 'react-native-reanimated';
+import { SPORTS } from '../../constants/sports';
+import { validateName, validateDate, validateTime, validateNumber, validateSelection } from '../../utils/validation';
 
 interface CreateMatchScreenProps {
   navigation: any;
 }
-
-const SPORTS = [
-  { name: 'Football', icon: 'soccer' },
-  { name: 'Basketball', icon: 'basketball' },
-  { name: 'Tennis', icon: 'tennis' },
-  { name: 'Volleyball', icon: 'volleyball' },
-  { name: 'Cricket', icon: 'cricket' },
-  { name: 'Baseball', icon: 'baseball' },
-  { name: 'Badminton', icon: 'badminton' },
-  { name: 'Table Tennis', icon: 'table-tennis' },
-  { name: 'Other', icon: 'dots-horizontal' },
-];
 
 const CreateMatchScreen: React.FC<CreateMatchScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
@@ -59,60 +49,41 @@ const CreateMatchScreen: React.FC<CreateMatchScreenProps> = ({ navigation }) => 
   const styles = createStyles(theme);
 
   const validate = (): boolean => {
-    let valid = true;
     const newErrors = { title: '', sport: '', date: '', time: '', maxParticipants: '' };
 
-    if (!formData.title.trim()) {
-      newErrors.title = 'Match title is required';
-      valid = false;
-    } else if (formData.title.length < 3) {
-      newErrors.title = 'Title must be at least 3 characters';
-      valid = false;
+    // Use validation utilities
+    const titleValidation = validateName(formData.title, 'Match title', 3);
+    if (!titleValidation.isValid) {
+      newErrors.title = titleValidation.error || '';
     }
 
-    if (!formData.sport.trim()) {
-      newErrors.sport = 'Sport is required';
-      valid = false;
+    const sportValidation = validateSelection(formData.sport, 'Sport');
+    if (!sportValidation.isValid) {
+      newErrors.sport = sportValidation.error || '';
     }
 
-    if (!formData.date.trim()) {
-      newErrors.date = 'Date is required';
-      valid = false;
-    } else {
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateRegex.test(formData.date)) {
-        newErrors.date = 'Date must be in YYYY-MM-DD format';
-        valid = false;
-      }
+    const dateValidation = validateDate(formData.date, 'Date');
+    if (!dateValidation.isValid) {
+      newErrors.date = dateValidation.error || '';
     }
 
-    if (!formData.time.trim()) {
-      newErrors.time = 'Time is required';
-      valid = false;
-    } else {
-      const timeRegex = /^\d{2}:\d{2}$/;
-      if (!timeRegex.test(formData.time)) {
-        newErrors.time = 'Time must be in HH:MM format (24h)';
-        valid = false;
-      }
+    const timeValidation = validateTime(formData.time, 'Time');
+    if (!timeValidation.isValid) {
+      newErrors.time = timeValidation.error || '';
     }
 
-    if (!formData.maxParticipants.trim()) {
-      newErrors.maxParticipants = 'Maximum participants is required';
-      valid = false;
-    } else {
-      const max = parseInt(formData.maxParticipants, 10);
-      if (isNaN(max) || max < 2) {
-        newErrors.maxParticipants = 'Maximum participants must be at least 2';
-        valid = false;
-      } else if (max > 100) {
-        newErrors.maxParticipants = 'Maximum participants cannot exceed 100';
-        valid = false;
-      }
+    const maxParticipantsValidation = validateNumber(
+      formData.maxParticipants,
+      'Maximum participants',
+      2,
+      100
+    );
+    if (!maxParticipantsValidation.isValid) {
+      newErrors.maxParticipants = maxParticipantsValidation.error || '';
     }
 
     setErrors(newErrors);
-    return valid;
+    return Object.values(newErrors).every(error => !error);
   };
 
   const handleCreate = async () => {

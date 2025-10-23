@@ -12,32 +12,15 @@ import { useCreateTournamentMutation } from '../../store/api/tournamentApi';
 import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import { Card, Chip } from '../../components/ui';
+import { Card, Chip, SportSelector, SectionHeader } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { SPORTS, TOURNAMENT_FORMATS } from '../../constants/sports';
+import { validateName, validateDate, validateNumber, validateSelection } from '../../utils/validation';
 
 interface CreateTournamentScreenProps {
   navigation: any;
 }
-
-const SPORTS = [
-  { name: 'Football', icon: 'soccer' },
-  { name: 'Basketball', icon: 'basketball' },
-  { name: 'Tennis', icon: 'tennis' },
-  { name: 'Volleyball', icon: 'volleyball' },
-  { name: 'Cricket', icon: 'cricket' },
-  { name: 'Baseball', icon: 'baseball' },
-  { name: 'Badminton', icon: 'badminton' },
-  { name: 'Table Tennis', icon: 'table-tennis' },
-  { name: 'Other', icon: 'dots-horizontal' },
-];
-
-const FORMATS = [
-  { name: 'single-elimination', icon: 'tournament', label: 'Single Elimination' },
-  { name: 'double-elimination', icon: 'tournament', label: 'Double Elimination' },
-  { name: 'round-robin', icon: 'repeat', label: 'Round Robin' },
-  { name: 'swiss', icon: 'chess-rook', label: 'Swiss' },
-];
 
 const CreateTournamentScreen: React.FC<CreateTournamentScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
@@ -61,54 +44,41 @@ const CreateTournamentScreen: React.FC<CreateTournamentScreenProps> = ({ navigat
   const [createTournament, { isLoading }] = useCreateTournamentMutation();
 
   const validate = (): boolean => {
-    let valid = true;
     const newErrors = { name: '', sport: '', format: '', startDate: '', maxParticipants: '' };
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Tournament name is required';
-      valid = false;
-    } else if (formData.name.length < 3) {
-      newErrors.name = 'Name must be at least 3 characters';
-      valid = false;
+    // Use validation utilities
+    const nameValidation = validateName(formData.name, 'Tournament name', 3);
+    if (!nameValidation.isValid) {
+      newErrors.name = nameValidation.error || '';
     }
 
-    if (!formData.sport.trim()) {
-      newErrors.sport = 'Sport is required';
-      valid = false;
+    const sportValidation = validateSelection(formData.sport, 'Sport');
+    if (!sportValidation.isValid) {
+      newErrors.sport = sportValidation.error || '';
     }
 
-    if (!formData.format.trim()) {
-      newErrors.format = 'Format is required';
-      valid = false;
+    const formatValidation = validateSelection(formData.format, 'Format');
+    if (!formatValidation.isValid) {
+      newErrors.format = formatValidation.error || '';
     }
 
-    if (!formData.startDate.trim()) {
-      newErrors.startDate = 'Start date is required';
-      valid = false;
-    } else {
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateRegex.test(formData.startDate)) {
-        newErrors.startDate = 'Date must be in YYYY-MM-DD format';
-        valid = false;
-      }
+    const dateValidation = validateDate(formData.startDate, 'Start date');
+    if (!dateValidation.isValid) {
+      newErrors.startDate = dateValidation.error || '';
     }
 
-    if (!formData.maxParticipants.trim()) {
-      newErrors.maxParticipants = 'Maximum participants is required';
-      valid = false;
-    } else {
-      const max = parseInt(formData.maxParticipants, 10);
-      if (isNaN(max) || max < 4) {
-        newErrors.maxParticipants = 'Maximum participants must be at least 4';
-        valid = false;
-      } else if (max > 256) {
-        newErrors.maxParticipants = 'Maximum participants cannot exceed 256';
-        valid = false;
-      }
+    const maxParticipantsValidation = validateNumber(
+      formData.maxParticipants,
+      'Maximum participants',
+      4,
+      256
+    );
+    if (!maxParticipantsValidation.isValid) {
+      newErrors.maxParticipants = maxParticipantsValidation.error || '';
     }
 
     setErrors(newErrors);
-    return valid;
+    return Object.values(newErrors).every(error => !error);
   };
 
   const handleCreate = async () => {

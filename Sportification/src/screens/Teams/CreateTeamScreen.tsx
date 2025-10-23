@@ -12,25 +12,15 @@ import { useCreateTeamMutation } from '../../store/api/teamApi';
 import { useTheme } from '../../theme';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
-import { Card, Chip } from '../../components/ui';
+import { Card, SportSelector, SectionHeader } from '../../components/ui';
 import { Icon } from '@expo/vector-icons/MaterialCommunityIcons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { SPORTS } from '../../constants/sports';
+import { validateName, validateNumber, validateSelection } from '../../utils/validation';
 
 interface CreateTeamScreenProps {
   navigation: any;
 }
-
-const SPORTS = [
-  { name: 'Football', icon: 'soccer' },
-  { name: 'Basketball', icon: 'basketball' },
-  { name: 'Tennis', icon: 'tennis' },
-  { name: 'Volleyball', icon: 'volleyball' },
-  { name: 'Cricket', icon: 'cricket' },
-  { name: 'Baseball', icon: 'baseball' },
-  { name: 'Badminton', icon: 'badminton' },
-  { name: 'Table Tennis', icon: 'table-tennis' },
-  { name: 'Other', icon: 'dots-horizontal' },
-];
 
 const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
@@ -49,35 +39,33 @@ const CreateTeamScreen: React.FC<CreateTeamScreenProps> = ({ navigation }) => {
   const [createTeam, { isLoading }] = useCreateTeamMutation();
 
   const validate = (): boolean => {
-    let valid = true;
     const newErrors = { name: '', sport: '', maxMembers: '' };
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Team name is required';
-      valid = false;
-    } else if (formData.name.length < 3) {
-      newErrors.name = 'Team name must be at least 3 characters';
-      valid = false;
+    // Use validation utilities
+    const nameValidation = validateName(formData.name, 'Team name', 3);
+    if (!nameValidation.isValid) {
+      newErrors.name = nameValidation.error || '';
     }
 
-    if (!formData.sport.trim()) {
-      newErrors.sport = 'Sport is required';
-      valid = false;
+    const sportValidation = validateSelection(formData.sport, 'Sport');
+    if (!sportValidation.isValid) {
+      newErrors.sport = sportValidation.error || '';
     }
 
     if (formData.maxMembers) {
-      const max = parseInt(formData.maxMembers, 10);
-      if (isNaN(max) || max < 2) {
-        newErrors.maxMembers = 'Maximum members must be at least 2';
-        valid = false;
-      } else if (max > 100) {
-        newErrors.maxMembers = 'Maximum members cannot exceed 100';
-        valid = false;
+      const maxMembersValidation = validateNumber(
+        formData.maxMembers,
+        'Maximum members',
+        2,
+        100
+      );
+      if (!maxMembersValidation.isValid) {
+        newErrors.maxMembers = maxMembersValidation.error || '';
       }
     }
 
     setErrors(newErrors);
-    return valid;
+    return Object.values(newErrors).every(error => !error);
   };
 
   const handleCreate = async () => {
