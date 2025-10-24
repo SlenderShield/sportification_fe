@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { useCallback } from 'react';
 import { useGetTournamentByIdQuery } from '../store/tournamentApi';
 import { tournamentService } from '../services';
@@ -12,7 +13,7 @@ export function useTournamentDetailScreen(route: any, _navigation: any) {
       await tournamentService.joinTournament(tournamentId);
       await refetch();
     } catch (err) {
-      console.error('Failed to join tournament:', err);
+      logger.error('Failed to join tournament:', err instanceof Error ? err : undefined);
     }
   }, [tournamentId, refetch]);
 
@@ -21,7 +22,7 @@ export function useTournamentDetailScreen(route: any, _navigation: any) {
       await tournamentService.startTournament(tournamentId);
       await refetch();
     } catch (err) {
-      console.error('Failed to start tournament:', err);
+      logger.error('Failed to start tournament:', err instanceof Error ? err : undefined);
     }
   }, [tournamentId, refetch]);
 

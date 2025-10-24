@@ -8,6 +8,7 @@ import { socketService } from '@shared/services/socketService';
 import AuthNavigator from './AuthNavigator';
 import MainNavigator from './MainNavigator';
 import { LoadingSpinner } from '@shared/components/atoms';
+import { logger } from '@core';
 
 const Stack = createStackNavigator();
 
@@ -29,7 +30,7 @@ const RootNavigator = () => {
           }
         }
       } catch (error) {
-        console.error('Auth check failed:', error);
+        logger.error('Auth check failed', error instanceof Error ? error : undefined);
         await apiService.clearTokens();
       } finally {
         dispatch(setLoading(false));

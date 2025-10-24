@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@core';
 
 /**
  * Storage utility functions for AsyncStorage operations with type safety
@@ -12,7 +13,7 @@ export const saveData = async <T>(key: string, data: T): Promise<void> => {
     const jsonValue = JSON.stringify(data);
     await AsyncStorage.setItem(key, jsonValue);
   } catch (error) {
-    console.error(`Error saving data for key "${key}":`, error);
+    logger.error(`Error saving data for key "${key}":`, error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -25,7 +26,7 @@ export const loadData = async <T>(key: string): Promise<T | null> => {
     const jsonValue = await AsyncStorage.getItem(key);
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (error) {
-    console.error(`Error loading data for key "${key}":`, error);
+    logger.error(`Error loading data for key "${key}":`, error instanceof Error ? error : undefined);
     return null;
   }
 };
@@ -45,7 +46,7 @@ export const removeData = async (key: string): Promise<void> => {
   try {
     await AsyncStorage.removeItem(key);
   } catch (error) {
-    console.error(`Error removing data for key "${key}":`, error);
+    logger.error(`Error removing data for key "${key}":`, error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -57,7 +58,7 @@ export const clearAll = async (): Promise<void> => {
   try {
     await AsyncStorage.clear();
   } catch (error) {
-    console.error('Error clearing storage:', error);
+    logger.error('Error clearing storage:', error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -69,7 +70,7 @@ export const getAllKeys = async (): Promise<string[]> => {
   try {
     return await AsyncStorage.getAllKeys();
   } catch (error) {
-    console.error('Error getting all keys:', error);
+    logger.error('Error getting all keys:', error instanceof Error ? error : undefined);
     return [];
   }
 };
@@ -82,7 +83,7 @@ export const hasKey = async (key: string): Promise<boolean> => {
     const keys = await AsyncStorage.getAllKeys();
     return keys.includes(key);
   } catch (error) {
-    console.error(`Error checking if key "${key}" exists:`, error);
+    logger.error(`Error checking if key "${key}" exists:`, error instanceof Error ? error : undefined);
     return false;
   }
 };
@@ -105,7 +106,7 @@ export const getMultiple = async <T>(keys: string[]): Promise<Record<string, T |
     
     return result;
   } catch (error) {
-    console.error('Error getting multiple items:', error);
+    logger.error('Error getting multiple items:', error instanceof Error ? error : undefined);
     return {};
   }
 };
@@ -121,7 +122,7 @@ export const setMultiple = async (items: Record<string, any>): Promise<void> => 
     ]);
     await AsyncStorage.multiSet(pairs);
   } catch (error) {
-    console.error('Error setting multiple items:', error);
+    logger.error('Error setting multiple items:', error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -133,7 +134,7 @@ export const removeMultiple = async (keys: string[]): Promise<void> => {
   try {
     await AsyncStorage.multiRemove(keys);
   } catch (error) {
-    console.error('Error removing multiple items:', error);
+    logger.error('Error removing multiple items:', error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -147,7 +148,7 @@ export const mergeData = async <T extends object>(key: string, data: Partial<T>)
     const merged = { ...existing, ...data };
     await saveData(key, merged);
   } catch (error) {
-    console.error(`Error merging data for key "${key}":`, error);
+    logger.error(`Error merging data for key "${key}":`, error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -164,7 +165,7 @@ export const saveWithExpiry = async <T>(key: string, data: T, ttl: number): Prom
     };
     await saveData(key, item);
   } catch (error) {
-    console.error(`Error saving data with expiry for key "${key}":`, error);
+    logger.error(`Error saving data with expiry for key "${key}":`, error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -190,7 +191,7 @@ export const loadWithExpiry = async <T>(key: string): Promise<T | null> => {
     
     return item.value;
   } catch (error) {
-    console.error(`Error loading data with expiry for key "${key}":`, error);
+    logger.error(`Error loading data with expiry for key "${key}":`, error instanceof Error ? error : undefined);
     return null;
   }
 };
@@ -210,7 +211,7 @@ export const getStorageSize = async (): Promise<number> => {
     
     return size;
   } catch (error) {
-    console.error('Error calculating storage size:', error);
+    logger.error('Error calculating storage size:', error instanceof Error ? error : undefined);
     return 0;
   }
 };

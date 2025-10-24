@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { useCallback } from 'react';
 import { useGetMatchByIdQuery } from '../store/matchApi';
 import { matchService } from '../services';
@@ -12,7 +13,7 @@ export function useMatchDetailScreen(route: any, _navigation: any) {
       await matchService.joinMatch(matchId);
       await refetch();
     } catch (err) {
-      console.error('Failed to join match:', err);
+      logger.error('Failed to join match:', err instanceof Error ? err : undefined);
     }
   }, [matchId, refetch]);
 
@@ -21,7 +22,7 @@ export function useMatchDetailScreen(route: any, _navigation: any) {
       await matchService.leaveMatch(matchId);
       await refetch();
     } catch (err) {
-      console.error('Failed to leave match:', err);
+      logger.error('Failed to leave match:', err instanceof Error ? err : undefined);
     }
   }, [matchId, refetch]);
 

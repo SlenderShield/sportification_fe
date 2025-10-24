@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AccessibilityInfo, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@core';
 
 interface AccessibilitySettings {
   // Dynamic text sizing
@@ -93,7 +94,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
 
         setSettings(mergedSettings);
       } catch (error) {
-        console.error('Failed to load accessibility settings:', error);
+        logger.error('Failed to load accessibility settings', error instanceof Error ? error : undefined);
         setSettings(defaultSettings);
       }
     };
@@ -150,7 +151,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
       const { screenReaderEnabled, boldTextEnabled, reduceMotion, ...userSettings } = newSettings;
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(userSettings));
     } catch (error) {
-      console.error('Failed to save accessibility setting:', error);
+      logger.error('Failed to save accessibility setting', error instanceof Error ? error : undefined);
     }
   };
 
@@ -172,7 +173,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
         reduceMotion: isReduceMotionEnabled,
       });
     } catch (error) {
-      console.error('Failed to reset accessibility settings:', error);
+      logger.error('Failed to reset accessibility settings', error instanceof Error ? error : undefined);
     }
   };
 

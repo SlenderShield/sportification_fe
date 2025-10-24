@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { useCallback } from 'react';
 import { useGetVenueByIdQuery } from '../store/venueApi';
 
@@ -12,7 +13,7 @@ export function useVenueDetailScreen(route: any, navigation: any) {
 
   const handleViewOnMap = useCallback(() => {
     // Open map with venue location
-    console.log('View on map:', venue?.location);
+    logger.info('View on map', { location: venue?.location });
   }, [venue]);
 
   return {
