@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 import { View, StyleSheet, ViewStyle, Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -17,7 +17,7 @@ interface CardProps {
   animated?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({
+const Card: React.FC<CardProps> = React.memo(({
   children,
   variant = 'elevated',
   elevation = 'md',
@@ -36,21 +36,21 @@ const Card: React.FC<CardProps> = ({
     };
   });
 
-  const handlePressIn = () => {
+  const handlePressIn = useCallback(() => {
     if (onPress && animated) {
       scale.value = withSpring(0.98, theme.animations.spring.snappy);
       pressed.value = true;
     }
-  };
+  }, [onPress, animated, scale, pressed, theme]);
 
-  const handlePressOut = () => {
+  const handlePressOut = useCallback(() => {
     if (onPress && animated) {
       scale.value = withSpring(1, theme.animations.spring.snappy);
       pressed.value = false;
     }
-  };
+  }, [onPress, animated, scale, pressed, theme]);
 
-  const variantStyles = {
+  const variantStyles = useMemo(() => ({
     elevated: {
       backgroundColor: theme.colors.surface,
       ...theme.elevation[elevation],
@@ -63,9 +63,9 @@ const Card: React.FC<CardProps> = ({
     filled: {
       backgroundColor: theme.colors.surfaceVariant,
     },
-  };
+  }), [theme, elevation]);
 
-  const content = (
+  const content = useMemo(() => (
     <View
       style={[
         styles.card,
@@ -76,7 +76,7 @@ const Card: React.FC<CardProps> = ({
     >
       {children}
     </View>
-  );
+  ), [children, theme, variant, variantStyles, style]);
 
   if (onPress) {
     return (
@@ -89,7 +89,9 @@ const Card: React.FC<CardProps> = ({
   }
 
   return content;
-};
+});
+
+Card.displayName = 'Card';
 
 const styles = StyleSheet.create({
   card: {

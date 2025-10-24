@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   Text,
   StyleSheet,
@@ -35,7 +35,7 @@ interface ButtonProps {
   testID?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps> = React.memo(({
   title,
   onPress,
   variant = 'primary',
@@ -64,22 +64,22 @@ const Button: React.FC<ButtonProps> = ({
     };
   });
 
-  const handlePressIn = () => {
+  const handlePressIn = useCallback(() => {
     if (!isDisabled) {
       scale.value = withSpring(0.96, theme.animations.spring.snappy);
       opacity.value = withTiming(0.8, { duration: theme.animations.duration.fast });
       triggerLightImpact();
     }
-  };
+  }, [isDisabled, scale, opacity, theme]);
 
-  const handlePressOut = () => {
+  const handlePressOut = useCallback(() => {
     if (!isDisabled) {
       scale.value = withSpring(1, theme.animations.spring.bouncy);
       opacity.value = withTiming(1, { duration: theme.animations.duration.fast });
     }
-  };
+  }, [isDisabled, scale, opacity, theme]);
 
-  const sizeStyles = {
+  const sizeStyles = useMemo(() => ({
     small: {
       paddingVertical: theme.spacing.sm,
       paddingHorizontal: theme.spacing.base,
@@ -95,21 +95,21 @@ const Button: React.FC<ButtonProps> = ({
       paddingHorizontal: theme.spacing['2xl'],
       minHeight: 56,
     },
-  };
+  }), [theme]);
 
-  const textSizeStyles = {
+  const textSizeStyles = useMemo(() => ({
     small: theme.typography.labelMedium,
     medium: theme.typography.labelLarge,
     large: theme.typography.titleMedium,
-  };
+  }), [theme]);
 
-  const iconSizes = {
+  const iconSizes = useMemo(() => ({
     small: 16,
     medium: 20,
     large: 24,
-  };
+  }), []);
 
-  const variantStyles = {
+  const variantStyles = useMemo(() => ({
     primary: {
       backgroundColor: theme.colors.primary,
       color: theme.colors.onPrimary,
@@ -128,7 +128,7 @@ const Button: React.FC<ButtonProps> = ({
       backgroundColor: 'transparent',
       color: theme.colors.primary,
     },
-  };
+  }), [theme]);
 
   return (
     <Animated.View style={[animatedStyle, fullWidth && styles.fullWidth]}>
@@ -199,7 +199,9 @@ const Button: React.FC<ButtonProps> = ({
       </Pressable>
     </Animated.View>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 const styles = StyleSheet.create({
   button: {
