@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useGetTournamentByIdQuery } from '../store/tournamentApi';
 import { tournamentService } from '../services';
 
-export function useTournamentDetailScreen(route: any, navigation: any) {
+export function useTournamentDetailScreen(route: any, _navigation: any) {
   const { tournamentId } = route.params;
   const { data, isLoading, error, refetch } = useGetTournamentByIdQuery(tournamentId);
   const tournament = data?.data;

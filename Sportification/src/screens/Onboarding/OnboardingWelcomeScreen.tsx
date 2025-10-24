@@ -8,7 +8,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   Dimensions,
 } from 'react-native';
 import { useTheme } from '../../theme';

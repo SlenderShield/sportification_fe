@@ -3,7 +3,7 @@ import { useGetVenueByIdQuery } from '../store/venueApi';
 
 export function useVenueDetailScreen(route: any, navigation: any) {
   const { venueId } = route.params;
-  const { data, isLoading, error, refetch } = useGetVenueByIdQuery(venueId);
+  const { data, isLoading, error } = useGetVenueByIdQuery(venueId);
   const venue = data?.data;
 
   const handleBookVenue = useCallback(() => {

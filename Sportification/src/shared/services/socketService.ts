@@ -200,7 +200,7 @@ class SocketService {
     }
   }
 
-  // eslint-disable-next-line no-dupe-class-members
+   
   on<K extends keyof SocketEventHandlers>(
     event: K,
     callback: SocketEventHandlers[K]
@@ -218,7 +218,7 @@ class SocketService {
     }
   }
 
-  // eslint-disable-next-line no-dupe-class-members
+   
   off<K extends keyof SocketEventHandlers>(
     event: K,
     callback?: SocketEventHandlers[K]
