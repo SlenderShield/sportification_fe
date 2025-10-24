@@ -169,3 +169,20 @@ npm test           # Run tests
 ## License
 
 This project is private and proprietary.
+
+## 📚 Documentation
+
+### Architecture & Standards
+- **[Architecture Overview](./ARCHITECTURE.md)** - Complete system architecture and design patterns
+- **[Coding Standards](./CODING_STANDARDS.md)** - Code style guide and best practices
+- **[Component Guidelines](./COMPONENT_GUIDELINES.md)** - Component design and atomic design principles
+- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute to the project
+- **[Refactoring Plan](./REFACTORING_PLAN.md)** - Systematic refactoring roadmap
+- **[Refactoring Summary](./REFACTORING_SUMMARY.md)** - Progress and achievements
+
+### Quick Links
+- [Getting Started](#quick-start)
+- [Project Structure](#project-structure)
+- [Development Workflow](./CONTRIBUTING.md#development-workflow)
+- [Testing Guidelines](./CONTRIBUTING.md#testing-guidelines)
+
