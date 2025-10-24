@@ -65,7 +65,7 @@ export const email = (message: string = 'Invalid email address'): ValidationRule
 export const phone = (message: string = 'Invalid phone number'): ValidationRule => ({
   validate: (value) => {
     if (!value) return true;
-    const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+    const phoneRegex = /^[\d\s\-+()]+$/;
     return phoneRegex.test(String(value));
   },
   message,
@@ -78,8 +78,9 @@ export const url = (message: string = 'Invalid URL'): ValidationRule => ({
   validate: (value) => {
     if (!value) return true;
     try {
-      new URL(String(value));
-      return true;
+      // Validate URL by attempting to parse it
+      const urlObj = new URL(String(value));
+      return !!urlObj;
     } catch {
       return false;
     }

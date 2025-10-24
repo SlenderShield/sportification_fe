@@ -4,7 +4,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useMatchesScreen } from '../hooks';
 import { useTheme } from '../../../theme';
 import { ListScreenTemplate } from '@shared/components/templates';
-import { Card, Badge } from '@shared/components/organisms';
+import { Card } from '@shared/components/organisms';
+import { Badge } from '@shared/components/atoms';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
 
@@ -16,8 +17,8 @@ const MatchesScreen: React.FC<MatchesScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
   const props = useMatchesScreen(navigation);
 
-  const renderMatchItem = (item: any, index: number) => (
-    <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
+  const renderMatchItem = (item: any) => (
+    <Animated.View entering={FadeInDown.springify()}>
       <Card
         onPress={() => props.onMatchPress(item.id)}
         style={{ marginBottom: theme.spacing.md }}
@@ -120,7 +121,6 @@ const MatchesScreen: React.FC<MatchesScreenProps> = ({ navigation }) => {
       items={props.matches}
       renderItem={renderMatchItem}
       isLoading={props.isLoading}
-      error={props.error}
       onRefresh={props.onRefresh}
       onAddNew={props.onCreateMatch}
       emptyMessage="No matches found"

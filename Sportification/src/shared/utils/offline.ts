@@ -185,7 +185,7 @@ export const OfflineCache = {
   /**
    * Set cached data
    */
-  async set(key: string, data: any, duration: number = DEFAULT_CACHE_DURATION): Promise<void> {
+  async set(key: string, data: any, _duration: number = DEFAULT_CACHE_DURATION): Promise<void> {
     try {
       const cacheKey = `${CACHE_PREFIX}${key}`;
       const timestampKey = `${cacheKey}${CACHE_TIMESTAMP_SUFFIX}`;
@@ -349,6 +349,7 @@ export const useOfflineData = <T,>(
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, enabled]);
 
   return {

@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { useForm } from '@shared/hooks';
-import { authService } from '@features/auth/services';
 
 export function useChangePasswordScreen(navigation: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +49,7 @@ export function useChangePasswordScreen(navigation: any) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [values, validate, navigation]);
+  }, [validate, navigation]);
 
   return {
     values,

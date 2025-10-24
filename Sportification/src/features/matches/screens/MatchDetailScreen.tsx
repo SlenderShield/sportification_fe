@@ -1,10 +1,20 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { DetailScreenTemplate } from '@shared/components/templates';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTheme } from '../../../theme';
 import { useMatchDetailScreen } from '../hooks';
-import { ParticipantList } from '@shared/components/organisms';
-import { DetailRow } from '@shared/components/molecules';
+import { ParticipantList, Card, Badge } from '@shared/components/organisms';
+import { Chip, Divider } from '@shared/components/atoms';
+import { Button, LoadingSpinner } from '@shared/components/atoms';
 import { format } from 'date-fns';
+
+const MATCH_STATUS_COLORS: Record<string, string> = {
+  scheduled: 'info',
+  in_progress: 'warning',
+  completed: 'success',
+  cancelled: 'error',
+};
 
 interface MatchDetailScreenProps {
   navigation: any;

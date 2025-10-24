@@ -213,8 +213,8 @@ export const extractDomain = (url: string): string => {
  */
 export const isValidUrl = (url: string): boolean => {
   try {
-    new URL(url);
-    return true;
+    const urlObj = new URL(url);
+    return !!urlObj;
   } catch {
     return false;
   }

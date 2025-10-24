@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useGetMatchByIdQuery } from '../store/matchApi';
 import { matchService } from '../services';
 
-export function useMatchDetailScreen(route: any, navigation: any) {
+export function useMatchDetailScreen(route: any, _navigation: any) {
   const { matchId } = route.params;
   const { data, isLoading, error, refetch } = useGetMatchByIdQuery(matchId);
   const match = data?.data;

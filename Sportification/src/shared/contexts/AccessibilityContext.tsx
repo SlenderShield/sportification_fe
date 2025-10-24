@@ -146,7 +146,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
       setSettings(newSettings);
 
       // Save user preferences (excluding system-detected settings)
-      const { screenReaderEnabled, boldTextEnabled, reduceMotion, ...userSettings } = newSettings;
+      const { screenReaderEnabled: _screenReader, boldTextEnabled: _boldText, reduceMotion: _reduceMotion, ...userSettings } = newSettings;
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(userSettings));
     } catch (error) {
       console.error('Failed to save accessibility setting:', error);

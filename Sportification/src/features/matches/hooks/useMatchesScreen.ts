@@ -14,7 +14,7 @@ import { useGetMatchesQuery } from '../store/matchApi';
  * ```
  */
 export function useMatchesScreen(navigation: any) {
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
   const { data, isLoading, refetch } = useGetMatchesQuery({ page, limit: 10 });
 
   const matches = data?.data?.items || [];

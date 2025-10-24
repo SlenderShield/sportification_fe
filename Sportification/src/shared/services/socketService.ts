@@ -200,10 +200,12 @@ class SocketService {
     }
   }
 
+  // eslint-disable-next-line no-dupe-class-members
   on<K extends keyof SocketEventHandlers>(
     event: K,
     callback: SocketEventHandlers[K]
   ): void;
+  // eslint-disable-next-line no-dupe-class-members
   on(event: string, callback: SocketEventCallback): void;
   on(event: string, callback: SocketEventCallback): void {
     if (!this.eventHandlers.has(event)) {
@@ -216,10 +218,12 @@ class SocketService {
     }
   }
 
+  // eslint-disable-next-line no-dupe-class-members
   off<K extends keyof SocketEventHandlers>(
     event: K,
     callback?: SocketEventHandlers[K]
   ): void;
+  // eslint-disable-next-line no-dupe-class-members
   off(event: string, callback?: SocketEventCallback): void;
   off(event: string, callback?: SocketEventCallback): void {
     if (callback) {
