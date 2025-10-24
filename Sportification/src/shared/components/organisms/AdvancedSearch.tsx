@@ -1,3 +1,4 @@
+import { logger } from '@core';
 /**
  * Advanced Search Component
  * Enhanced search with history, suggestions, and filters
@@ -64,7 +65,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
         setSearchHistory(JSON.parse(historyData));
       }
     } catch (error) {
-      console.error('Failed to load search history:', error);
+      logger.error('Failed to load search history:', error);
     }
   };
 
@@ -81,7 +82,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
       await AsyncStorage.setItem(historyKey, JSON.stringify(newHistory));
       setSearchHistory(newHistory);
     } catch (error) {
-      console.error('Failed to save search history:', error);
+      logger.error('Failed to save search history:', error);
     }
   };
 
@@ -92,7 +93,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
       setSearchHistory([]);
       triggerSelection();
     } catch (error) {
-      console.error('Failed to clear search history:', error);
+      logger.error('Failed to clear search history:', error);
     }
   };
 
@@ -104,7 +105,7 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
       setSearchHistory(newHistory);
       triggerLightImpact();
     } catch (error) {
-      console.error('Failed to remove history item:', error);
+      logger.error('Failed to remove history item:', error);
     }
   };
 

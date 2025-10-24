@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { Platform, PermissionsAndroid } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -33,7 +34,7 @@ class MapService {
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
-      console.warn('Location permission error:', err);
+      logger.warn('Location permission error:', err);
       return false;
     }
   }
@@ -56,7 +57,7 @@ class MapService {
           });
         },
         (error) => {
-          console.warn('Get location error:', error);
+          logger.warn('Get location error:', error);
           resolve(null);
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }

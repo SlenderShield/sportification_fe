@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { Image } from 'react-native';
 
 /**
@@ -34,7 +35,7 @@ export const preloadImage = (uri: string): Promise<PreloadResult> => {
         });
       })
       .catch((error) => {
-        console.warn(`Failed to preload image: ${uri}`, error);
+        logger.warn(`Failed to preload image: ${uri}`, error);
         resolve({
           success: false,
           uri,
@@ -56,7 +57,7 @@ export const preloadImage = (uri: string): Promise<PreloadResult> => {
  *   'https://example.com/image1.jpg',
  *   'https://example.com/image2.jpg',
  * ]);
- * console.log(`Loaded ${results.filter(r => r.success).length} images`);
+ * logger.log(`Loaded ${results.filter(r => r.success).length} images`);
  * ```
  */
 export const preloadImages = async (uris: string[]): Promise<PreloadResult[]> => {
@@ -75,7 +76,7 @@ export const preloadImages = async (uris: string[]): Promise<PreloadResult[]> =>
  * await preloadImagesWithProgress(
  *   imageUrls,
  *   (loaded, total) => {
- *     console.log(`Loading: ${loaded}/${total}`);
+ *     logger.log(`Loading: ${loaded}/${total}`);
  *   }
  * );
  * ```
@@ -106,7 +107,7 @@ export const preloadImagesWithProgress = async (
 export const clearImageCache = (): void => {
   // React Native doesn't provide a built-in way to clear image cache
   // This is a placeholder for future implementation or third-party library integration
-  console.log('Image cache clearing is not directly supported in React Native');
+  logger.log('Image cache clearing is not directly supported in React Native');
 };
 
 /**

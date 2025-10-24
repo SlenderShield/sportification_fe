@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { LoginManager, AccessToken, Profile, GraphRequest, GraphRequestManager } from 'react-native-fbsdk-next';
 
 export interface FacebookUser {
@@ -23,7 +24,7 @@ class FacebookAuthService {
       const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
 
       if (result.isCancelled) {
-        console.log('User cancelled Facebook login');
+        logger.log('User cancelled Facebook login');
         return null;
       }
 
@@ -43,7 +44,7 @@ class FacebookAuthService {
         profile,
       };
     } catch (error) {
-      console.error('Facebook Sign-In error:', error);
+      logger.error('Facebook Sign-In error:', error);
       return null;
     }
   }
@@ -55,7 +56,7 @@ class FacebookAuthService {
     try {
       await LoginManager.logOut();
     } catch (error) {
-      console.error('Facebook Sign-Out error:', error);
+      logger.error('Facebook Sign-Out error:', error);
     }
   }
 
@@ -67,7 +68,7 @@ class FacebookAuthService {
       const accessTokenData = await AccessToken.getCurrentAccessToken();
       return accessTokenData?.accessToken || null;
     } catch (error) {
-      console.error('Get access token error:', error);
+      logger.error('Get access token error:', error);
       return null;
     }
   }
@@ -95,7 +96,7 @@ class FacebookAuthService {
         },
         (error, result) => {
           if (error) {
-            console.error('Error fetching Facebook profile:', error);
+            logger.error('Error fetching Facebook profile:', error);
             resolve(undefined);
           } else if (result) {
             const data = result as any;
@@ -125,7 +126,7 @@ class FacebookAuthService {
       const accessToken = await AccessToken.getCurrentAccessToken();
       return !!accessToken;
     } catch (error) {
-      console.error('Check logged in error:', error);
+      logger.error('Check logged in error:', error);
       return false;
     }
   }
@@ -137,7 +138,7 @@ class FacebookAuthService {
     try {
       return await Profile.getCurrentProfile();
     } catch (error) {
-      console.error('Get current profile error:', error);
+      logger.error('Get current profile error:', error);
       return null;
     }
   }
@@ -154,7 +155,7 @@ class FacebookAuthService {
       }
       return null;
     } catch (error) {
-      console.error('Refresh access token error:', error);
+      logger.error('Refresh access token error:', error);
       return null;
     }
   }

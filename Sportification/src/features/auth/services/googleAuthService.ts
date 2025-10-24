@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Platform } from 'react-native';
 
@@ -34,7 +35,7 @@ class GoogleAuthService {
       });
       this.initialized = true;
     } catch (error) {
-      console.error('Google Sign-In configuration error:', error);
+      logger.error('Google Sign-In configuration error:', error);
     }
   }
 
@@ -48,7 +49,7 @@ class GoogleAuthService {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       return true;
     } catch (error) {
-      console.error('Google Play Services not available:', error);
+      logger.error('Google Play Services not available:', error);
       return false;
     }
   }
@@ -83,13 +84,13 @@ class GoogleAuthService {
       };
     } catch (error: any) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log('User cancelled sign in');
+        logger.log('User cancelled sign in');
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log('Sign in already in progress');
+        logger.log('Sign in already in progress');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log('Play services not available');
+        logger.log('Play services not available');
       } else {
-        console.error('Google Sign-In error:', error);
+        logger.error('Google Sign-In error:', error);
       }
       return null;
     }
@@ -102,7 +103,7 @@ class GoogleAuthService {
     try {
       await GoogleSignin.signOut();
     } catch (error) {
-      console.error('Google Sign-Out error:', error);
+      logger.error('Google Sign-Out error:', error);
     }
   }
 
@@ -113,7 +114,7 @@ class GoogleAuthService {
     try {
       await GoogleSignin.revokeAccess();
     } catch (error) {
-      console.error('Google revoke access error:', error);
+      logger.error('Google revoke access error:', error);
     }
   }
 
@@ -124,7 +125,7 @@ class GoogleAuthService {
     try {
       return await GoogleSignin.isSignedIn();
     } catch (error) {
-      console.error('Check signed in error:', error);
+      logger.error('Check signed in error:', error);
       return false;
     }
   }
@@ -151,7 +152,7 @@ class GoogleAuthService {
         },
       };
     } catch (error) {
-      console.error('Get current user error:', error);
+      logger.error('Get current user error:', error);
       return null;
     }
   }
@@ -167,7 +168,7 @@ class GoogleAuthService {
         accessToken: tokens.accessToken,
       };
     } catch (error) {
-      console.error('Get tokens error:', error);
+      logger.error('Get tokens error:', error);
       return null;
     }
   }

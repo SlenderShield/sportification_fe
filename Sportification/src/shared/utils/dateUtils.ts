@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { format, formatDistance, formatRelative, parseISO, isValid, differenceInDays, differenceInHours, differenceInMinutes, addDays, addHours, addMinutes, startOfDay, endOfDay, isBefore, isAfter, isSameDay } from 'date-fns';
 
 /**
@@ -27,7 +28,7 @@ export const formatDate = (date: Date | string, formatStr: string = DATE_FORMATS
     }
     return format(dateObj, formatStr);
   } catch (error) {
-    console.error('Error formatting date:', error);
+    logger.error('Error formatting date:', error);
     return 'Invalid Date';
   }
 };
@@ -57,7 +58,7 @@ export const formatRelativeTime = (date: Date | string, baseDate: Date = new Dat
     }
     return formatDistance(dateObj, baseDate, { addSuffix: true });
   } catch (error) {
-    console.error('Error formatting relative time:', error);
+    logger.error('Error formatting relative time:', error);
     return 'Invalid Date';
   }
 };
@@ -73,7 +74,7 @@ export const formatRelativeDate = (date: Date | string, baseDate: Date = new Dat
     }
     return formatRelative(dateObj, baseDate);
   } catch (error) {
-    console.error('Error formatting relative date:', error);
+    logger.error('Error formatting relative date:', error);
     return 'Invalid Date';
   }
 };

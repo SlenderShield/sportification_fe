@@ -1,3 +1,4 @@
+import { logger } from '@core';
 /**
  * React performance optimization hooks
  * 
@@ -255,7 +256,7 @@ export const useRenderCount = (componentName: string): void => {
   useEffect(() => {
     renderCount.current += 1;
     if (__DEV__) {
-      console.log(`[Render Count] ${componentName}: ${renderCount.current}`);
+      logger.log(`[Render Count] ${componentName}: ${renderCount.current}`);
     }
   });
 };
@@ -285,7 +286,7 @@ export const useWhyDidYouUpdate = (
       });
 
       if (Object.keys(changedProps).length > 0) {
-        console.log(`[Why Updated] ${componentName}:`, changedProps);
+        logger.log(`[Why Updated] ${componentName}:`, changedProps);
       }
     }
 

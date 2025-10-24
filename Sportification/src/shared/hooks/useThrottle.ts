@@ -10,7 +10,7 @@ import { useCallback, useRef } from 'react';
  * @example
  * ```typescript
  * const handleScroll = useThrottle(() => {
- *   console.log('Scroll event');
+ *   logger.log('Scroll event');
  * }, 200);
  * 
  * <ScrollView onScroll={handleScroll} />

@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { API_CONFIG } from '@core/config';
 import { 
@@ -41,7 +42,7 @@ export const authApi = createApi({
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
-          console.error('Login error:', error);
+          logger.error('Login error:', error);
         }
       },
     }),
@@ -60,7 +61,7 @@ export const authApi = createApi({
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
-          console.error('Register error:', error);
+          logger.error('Register error:', error);
         }
       },
     }),
@@ -105,7 +106,7 @@ export const authApi = createApi({
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
-          console.error('Google login error:', error);
+          logger.error('Google login error:', error);
         }
       },
     }),
@@ -124,7 +125,7 @@ export const authApi = createApi({
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
-          console.error('Apple login error:', error);
+          logger.error('Apple login error:', error);
         }
       },
     }),
@@ -143,7 +144,7 @@ export const authApi = createApi({
             await apiService.saveTokens(accessToken, refreshToken);
           }
         } catch (error) {
-          console.error('Facebook login error:', error);
+          logger.error('Facebook login error:', error);
         }
       },
     }),

@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { useCallback } from 'react';
 import { useGetNotificationsQuery } from '../store/notificationApi';
 import { notificationService } from '../services';
@@ -18,7 +19,7 @@ export function useNotificationsScreen(navigation: any) {
         navigation.navigate('TeamDetail', { teamId: notification.teamId });
       }
     } catch (err) {
-      console.error('Failed to handle notification:', err);
+      logger.error('Failed to handle notification:', err);
     }
   }, [navigation, refetch]);
 
@@ -27,7 +28,7 @@ export function useNotificationsScreen(navigation: any) {
       await notificationService.markAllAsRead();
       await refetch();
     } catch (err) {
-      console.error('Failed to mark all as read:', err);
+      logger.error('Failed to mark all as read:', err);
     }
   }, [refetch]);
 

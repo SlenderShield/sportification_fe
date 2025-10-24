@@ -1,3 +1,4 @@
+import { logger } from '@core';
 /**
  * Form helper functions for validation and submission
  */
@@ -296,7 +297,7 @@ export const handleFormSubmit = async <T extends Record<string, any>>(
     await onSubmit(sanitized);
     return true;
   } catch (error) {
-    console.error('Form submission error:', error);
+    logger.error('Form submission error:', error);
     return false;
   }
 };
