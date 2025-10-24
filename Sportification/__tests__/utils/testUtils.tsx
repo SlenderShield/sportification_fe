@@ -133,7 +133,7 @@ export const flushPromises = () => new Promise(resolve => setImmediate(resolve))
 /**
  * Mock a successful API response
  */
-export const mockApiSuccess = <T>(data: T) => {
+export const mockApiSuccess = <T,>(data: T) => {
   return Promise.resolve({
     data: {
       success: true,

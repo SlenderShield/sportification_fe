@@ -3,7 +3,6 @@ import {
   isOnline,
   waitForConnection,
   retryWithBackoff,
-  downloadWithProgress,
   parseUrl,
   buildUrl,
   getQueryParams,

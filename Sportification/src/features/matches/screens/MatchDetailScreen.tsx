@@ -22,6 +22,7 @@ interface MatchDetailScreenProps {
 }
 
 const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route }) => {
+  const { theme } = useTheme();
   const props = useMatchDetailScreen(route, navigation);
   
   if (!props.match) {
@@ -30,29 +31,31 @@ const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route
 
   const match = props.match;
 
-  const isParticipant = match?.participants.some((p) => p.userId === user?.id);
-  const isOrganizer = match?.createdBy === user?.id;
+  // TODO: Get user from auth context
+  // const isParticipant = match?.participants.some((p) => p.userId === user?.id);
+  // const isOrganizer = match?.createdBy === user?.id;
 
-  const handleStatusChange = (newStatus: string) => {
-    showConfirmation(
-      {
-        title: 'Update Status',
-        message: `Change match status to ${newStatus}?`,
-        confirmText: 'Confirm',
-      },
-      async () => {
-        try {
-          await updateStatus({ id: matchId, status: newStatus }).unwrap();
-          Alert.alert('Success', 'Match status updated');
-          refetch();
-        } catch (error: any) {
-          Alert.alert('Error', error?.data?.message || 'Failed to update status');
-        }
-      }
-    );
-  };
+  // TODO: Implement status change handler with proper API integration
+  // const handleStatusChange = (newStatus: string) => {
+  //   showConfirmation(
+  //     {
+  //       title: 'Update Status',
+  //       message: `Change match status to ${newStatus}?`,
+  //       confirmText: 'Confirm',
+  //     },
+  //     async () => {
+  //       try {
+  //         await updateStatus({ id: matchId, status: newStatus }).unwrap();
+  //         Alert.alert('Success', 'Match status updated');
+  //         refetch();
+  //       } catch (error: any) {
+  //         Alert.alert('Error', error?.data?.message || 'Failed to update status');
+  //       }
+  //     }
+  //   );
+  // };
 
-  if (isLoading) {
+  if (props.isLoading) {
     return <LoadingSpinner />;
   }
 
@@ -187,74 +190,28 @@ const MatchDetailScreen: React.FC<MatchDetailScreenProps> = ({ navigation, route
         </Animated.View>
 
         {/* Action Buttons */}
+        {/* TODO: Implement action buttons with proper auth and API integration */}
         <Animated.View entering={FadeInDown.delay(500).springify()}>
           <View style={{ marginBottom: theme.spacing.xl }}>
-            {!isParticipant && match.status === 'scheduled' && (
+            {match.status === 'scheduled' && !isFull && (
               <Button
-                title={isFull ? "Match is Full" : "Join Match"}
+                title="Join Match"
                 icon="account-plus"
-                onPress={handleJoin}
-                loading={isJoining}
-                disabled={isFull}
+                onPress={props.onJoinMatch}
                 fullWidth
                 style={{ marginBottom: theme.spacing.sm }}
               />
             )}
-
-            {isParticipant && !isOrganizer && match.status === 'scheduled' && (
+            
+            {match.status === 'scheduled' && (
               <Button
                 title="Leave Match"
                 icon="account-minus"
-                onPress={handleLeave}
-                loading={isLeaving}
+                onPress={props.onLeaveMatch}
                 variant="outline"
                 fullWidth
                 style={{ marginBottom: theme.spacing.sm }}
               />
-            )}
-
-            {isOrganizer && (
-              <>
-                {match.status === 'scheduled' && (
-                  <>
-                    <Button
-                      title="Start Match"
-                      icon="play"
-                      onPress={() => handleStatusChange('in_progress')}
-                      loading={isUpdating}
-                      fullWidth
-                      style={{ marginBottom: theme.spacing.sm }}
-                    />
-                    <Button
-                      title="Cancel Match"
-                      icon="close"
-                      onPress={() => handleStatusChange('cancelled')}
-                      loading={isUpdating}
-                      variant="outline"
-                      fullWidth
-                      style={{ marginBottom: theme.spacing.sm }}
-                    />
-                  </>
-                )}
-                {match.status === 'in_progress' && (
-                  <Button
-                    title="Complete Match"
-                    icon="check"
-                    onPress={() => handleStatusChange('completed')}
-                    loading={isUpdating}
-                    fullWidth
-                    style={{ marginBottom: theme.spacing.sm }}
-                  />
-                )}
-                <Button
-                  title="Delete Match"
-                  icon="delete"
-                  onPress={handleDelete}
-                  loading={isDeleting}
-                  variant="outline"
-                  fullWidth
-                />
-              </>
             )}
           </View>
         </Animated.View>

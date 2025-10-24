@@ -16,7 +16,6 @@ import {
   navigateToScreen,
   navigateToTab,
   navigateBack,
-  navigateBackTo,
   getRouteParams,
   getCurrentRoute,
   getPreviousRoute,
