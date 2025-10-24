@@ -7,7 +7,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import Input from '../common/Input';
-import { useTheme } from '../../theme';
 
 interface TimePickerProps {
   value: string;
@@ -30,7 +29,6 @@ const TimePicker: React.FC<TimePickerProps> = ({
   disabled = false,
   required = false,
 }) => {
-  const { theme } = useTheme();
   const [localError, setLocalError] = useState<string>('');
 
   const formatTime = (timeString: string): string => {

@@ -7,7 +7,6 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { Chip } from './';
-import { useTheme } from '../../theme';
 
 export interface FilterOption {
   id: string;
@@ -27,10 +26,8 @@ const FilterChips: React.FC<FilterChipsProps> = ({
   options,
   selectedFilters,
   onFilterChange,
-  multiSelect = true,
   scrollable = true,
 }) => {
-  const { theme } = useTheme();
 
   const handlePress = (filterId: string) => {
     onFilterChange(filterId);

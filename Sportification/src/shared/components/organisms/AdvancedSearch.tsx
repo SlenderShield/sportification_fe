@@ -50,6 +50,8 @@ const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
   useEffect(() => {
     loadSearchHistory();
+    // loadSearchHistory is defined in component scope and uses storageKey
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey]);
 
   const loadSearchHistory = async () => {

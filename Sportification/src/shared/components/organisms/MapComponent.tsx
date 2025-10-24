@@ -35,6 +35,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     initializeMap();
+    // initializeMap only needs to run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

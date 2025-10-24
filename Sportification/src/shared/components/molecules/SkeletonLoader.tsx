@@ -31,6 +31,8 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       -1,
       false
     );
+    // animation is a stable shared value
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => {

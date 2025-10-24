@@ -15,7 +15,9 @@ export const useAfterInteractions = (callback: () => void, dependencies: Depende
   useEffect(() => {
     const handle = InteractionManager.runAfterInteractions(callback);
     return () => handle.cancel();
-  }, dependencies);
+    // Dependencies are passed as parameter and intentionally spread
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callback, ...dependencies]);
 };
 
 /**
@@ -58,6 +60,8 @@ export const useDebouncedCallback = <T extends (...args: any[]) => any>(
         callback(...args);
       }, delay);
     },
+    // Dependencies are intentionally spread for flexibility
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [callback, delay, ...dependencies]
   ) as T;
 
@@ -92,6 +96,8 @@ export const useThrottledCallback = <T extends (...args: any[]) => any>(
         }, limit);
       }
     },
+    // Dependencies are intentionally spread for flexibility
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [callback, limit, ...dependencies]
   ) as T;
 

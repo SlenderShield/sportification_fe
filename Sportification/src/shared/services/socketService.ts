@@ -201,12 +201,15 @@ class SocketService {
   }
 
    
+  // eslint-disable-next-line no-dupe-class-members
   on<K extends keyof SocketEventHandlers>(
     event: K,
     callback: SocketEventHandlers[K]
   ): void;
   // eslint-disable-next-line no-dupe-class-members
   on(event: string, callback: SocketEventCallback): void;
+  // TypeScript method overload pattern - implementation signature
+  // eslint-disable-next-line no-dupe-class-members
   on(event: string, callback: SocketEventCallback): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
@@ -219,12 +222,15 @@ class SocketService {
   }
 
    
+  // eslint-disable-next-line no-dupe-class-members
   off<K extends keyof SocketEventHandlers>(
     event: K,
     callback?: SocketEventHandlers[K]
   ): void;
   // eslint-disable-next-line no-dupe-class-members
   off(event: string, callback?: SocketEventCallback): void;
+  // TypeScript method overload pattern - implementation signature
+  // eslint-disable-next-line no-dupe-class-members
   off(event: string, callback?: SocketEventCallback): void {
     if (callback) {
       const handlers = this.eventHandlers.get(event);

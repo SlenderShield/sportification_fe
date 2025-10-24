@@ -7,7 +7,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import Input from '../common/Input';
-import { useTheme } from '../../theme';
 import { format, parse, isValid } from 'date-fns';
 
 interface DatePickerProps {
@@ -33,7 +32,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
   disabled = false,
   required = false,
 }) => {
-  const { theme } = useTheme();
   const [localError, setLocalError] = useState<string>('');
 
   const formatDate = (dateString: string): string => {

@@ -9,7 +9,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';

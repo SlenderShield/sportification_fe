@@ -4,7 +4,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 
@@ -36,6 +35,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     } else {
       progressValue.value = progress;
     }
+    // progressValue and theme.animations.spring.smooth are stable shared values
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [progress, animated]);
 
   const animatedStyle = useAnimatedStyle(() => {
