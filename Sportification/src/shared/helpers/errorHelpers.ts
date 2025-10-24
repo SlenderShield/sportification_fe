@@ -5,7 +5,18 @@
 export interface AppError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
+}
+
+export interface ApiErrorResponse {
+  response?: {
+    status: number;
+    data?: {
+      message?: string;
+    };
+  };
+  request?: unknown;
+  message?: string;
 }
 
 /**
@@ -36,27 +47,30 @@ export const getHttpErrorMessage = (statusCode: number, defaultMessage?: string)
 /**
  * Map API error to user-friendly message
  */
-export const mapApiError = (error: any): string => {
-  if (error.response) {
+export const mapApiError = (error: ApiErrorResponse | Error | unknown): string => {
+  const apiError = error as ApiErrorResponse;
+  if (apiError.response) {
     // Server responded with error
-    const statusCode = error.response.status;
-    const serverMessage = error.response.data?.message;
+    const statusCode = apiError.response.status;
+    const serverMessage = apiError.response.data?.message;
     
     return serverMessage || getHttpErrorMessage(statusCode);
-  } else if (error.request) {
+  } else if (apiError.request) {
     // Request was made but no response
     return 'Unable to reach the server. Please check your internet connection.';
   } else {
     // Something else happened
-    return error.message || 'An unexpected error occurred.';
+    const errorWithMessage = error as { message?: string };
+    return errorWithMessage.message || 'An unexpected error occurred.';
   }
 };
 
 /**
  * Map network error to user-friendly message
  */
-export const mapNetworkError = (error: any): string => {
-  if (error.message === 'Network request failed') {
+export const mapNetworkError = (error: Error | { message?: string } | unknown): string => {
+  const errorWithMessage = error as { message?: string };
+  if (errorWithMessage.message === 'Network request failed') {
     return 'Network error. Please check your internet connection.';
   }
   

@@ -9,14 +9,11 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { triggerLightImpact } from '@shared/utils/hapticFeedback';
-
-const { width } = Dimensions.get('window');
 
 interface Feature {
   icon: string;

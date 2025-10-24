@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
@@ -9,7 +10,7 @@ class NotificationService {
     if (this.initialized) return;
     
     if (Platform.OS === 'web') {
-      console.log('Notification service not supported on web platform');
+      logger.log('Notification service not supported on web platform');
       return;
     }
 
@@ -22,7 +23,7 @@ class NotificationService {
       await this.setupNotificationHandlers();
       this.initialized = true;
     } catch (error) {
-      console.error('Failed to initialize notification service:', error);
+      logger.error('Failed to initialize notification service:', error);
     }
   }
 
@@ -36,14 +37,14 @@ class NotificationService {
         authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
       if (enabled) {
-        console.log('Notification permission granted:', authStatus);
+        logger.log('Notification permission granted:', authStatus);
       } else {
-        console.log('Notification permission denied');
+        logger.log('Notification permission denied');
       }
 
       return enabled;
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
+      logger.error('Error requesting notification permission:', error);
       return false;
     }
   }
@@ -53,10 +54,10 @@ class NotificationService {
 
     try {
       const token = await messaging().getToken();
-      console.log('FCM Token:', token);
+      logger.log('FCM Token:', token);
       return token;
     } catch (error) {
-      console.error('Error getting FCM token:', error);
+      logger.error('Error getting FCM token:', error);
       return null;
     }
   }
@@ -65,21 +66,21 @@ class NotificationService {
     if (Platform.OS === 'web') return;
 
     messaging().onMessage(async (remoteMessage) => {
-      console.log('Foreground message received:', remoteMessage);
+      logger.log('Foreground message received:', remoteMessage);
       await this.displayNotification(remoteMessage);
     });
 
     notifee.onBackgroundEvent(async ({ type, detail }) => {
-      console.log('Background event:', type, detail);
+      logger.log('Background event:', type, detail);
       if (type === EventType.PRESS) {
-        console.log('User pressed notification:', detail.notification);
+        logger.log('User pressed notification:', detail.notification);
       }
     });
 
     notifee.onForegroundEvent(({ type, detail }) => {
-      console.log('Foreground event:', type, detail);
+      logger.log('Foreground event:', type, detail);
       if (type === EventType.PRESS) {
-        console.log('User pressed notification:', detail.notification);
+        logger.log('User pressed notification:', detail.notification);
       }
     });
   }
@@ -114,19 +115,19 @@ class NotificationService {
         },
       });
     } catch (error) {
-      console.error('Error displaying notification:', error);
+      logger.error('Error displaying notification:', error);
     }
   }
 
   async sendTokenToServer(token: string) {
-    console.log('TODO: Send FCM token to backend:', token);
+    logger.log('TODO: Send FCM token to backend:', token);
   }
 
   onTokenRefresh(callback: (token: string) => void) {
     if (Platform.OS === 'web') return () => {};
 
     return messaging().onTokenRefresh((token) => {
-      console.log('FCM Token refreshed:', token);
+      logger.log('FCM Token refreshed:', token);
       callback(token);
     });
   }

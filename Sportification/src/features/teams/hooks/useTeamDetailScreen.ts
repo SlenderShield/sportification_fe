@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { useCallback } from 'react';
 import { useGetTeamByIdQuery } from '../store/teamApi';
 import { teamService } from '../services';
@@ -12,7 +13,7 @@ export function useTeamDetailScreen(route: any, navigation: any) {
       await teamService.joinTeam(teamId);
       await refetch();
     } catch (err) {
-      console.error('Failed to join team:', err);
+      logger.error('Failed to join team:', err instanceof Error ? err : undefined);
     }
   }, [teamId, refetch]);
 
@@ -21,7 +22,7 @@ export function useTeamDetailScreen(route: any, navigation: any) {
       await teamService.leaveTeam(teamId);
       await refetch();
     } catch (err) {
-      console.error('Failed to leave team:', err);
+      logger.error('Failed to leave team:', err instanceof Error ? err : undefined);
     }
   }, [teamId, refetch]);
 

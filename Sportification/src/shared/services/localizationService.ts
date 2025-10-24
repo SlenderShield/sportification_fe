@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -318,7 +319,7 @@ class LocalizationService {
       await i18n.changeLanguage(language);
       await AsyncStorage.setItem(LANGUAGE_KEY, language);
     } catch (error) {
-      console.error('Error changing language:', error);
+      logger.error('Error changing language:', error);
     }
   }
 
@@ -339,7 +340,7 @@ class LocalizationService {
         await i18n.changeLanguage(savedLanguage);
       }
     } catch (error) {
-      console.error('Error loading language preference:', error);
+      logger.error('Error loading language preference:', error);
     }
   }
 

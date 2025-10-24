@@ -16,3 +16,6 @@ export * from './config';
 
 // Export constants
 export * from './constants';
+
+// Re-export logger instance for convenience
+export { logger } from './types/ILogger';

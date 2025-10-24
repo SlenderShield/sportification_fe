@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -48,6 +47,8 @@ const Toast: React.FC<ToastProps> = ({
     }, duration);
 
     return () => clearTimeout(timer);
+    // All dependencies are stable (shared values and theme constants)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const hideToast = () => {

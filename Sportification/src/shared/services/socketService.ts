@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { io, Socket } from 'socket.io-client';
 import { API_CONFIG } from '@core/config';
 import { apiService } from './api';
@@ -38,12 +39,12 @@ class SocketService {
   async connect(): Promise<void> {
     const token = await apiService.getAccessToken();
     if (!token) {
-      console.warn('No access token available for socket connection');
+      logger.warn('No access token available for socket connection');
       return;
     }
 
     if (this.socket?.connected) {
-      console.log('Socket already connected');
+      logger.log('Socket already connected');
       return;
     }
 
@@ -67,40 +68,40 @@ class SocketService {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket?.id);
+      logger.log('Socket connected:', this.socket?.id);
       this.reconnectAttempts = 0;
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+      logger.log('Socket disconnected:', reason);
       if (reason === 'io server disconnect') {
         this.connect();
       }
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+      logger.error('Socket connection error:', error);
       this.handleReconnect();
     });
 
     this.socket.on('error', (error) => {
-      console.error('Socket error:', error);
+      logger.error('Socket error:', error);
     });
 
     this.socket.on('reconnect', (attemptNumber) => {
-      console.log('Socket reconnected after', attemptNumber, 'attempts');
+      logger.log('Socket reconnected after', attemptNumber, 'attempts');
     });
 
     this.socket.on('reconnect_attempt', (attemptNumber) => {
-      console.log('Socket reconnection attempt:', attemptNumber);
+      logger.log('Socket reconnection attempt:', attemptNumber);
     });
 
     this.socket.on('reconnect_error', (error) => {
-      console.error('Socket reconnection error:', error);
+      logger.error('Socket reconnection error:', error);
     });
 
     this.socket.on('reconnect_failed', () => {
-      console.error('Socket reconnection failed');
+      logger.error('Socket reconnection failed');
     });
   }
 
@@ -119,11 +120,11 @@ class SocketService {
       this.reconnectAttempts++;
       const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
       setTimeout(() => {
-        console.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
+        logger.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
         this.connect();
       }, delay);
     } else {
-      console.error('Max reconnection attempts reached');
+      logger.error('Max reconnection attempts reached');
     }
   }
 
@@ -200,11 +201,16 @@ class SocketService {
     }
   }
 
+   
+  // eslint-disable-next-line no-dupe-class-members
   on<K extends keyof SocketEventHandlers>(
     event: K,
     callback: SocketEventHandlers[K]
   ): void;
+  // eslint-disable-next-line no-dupe-class-members
   on(event: string, callback: SocketEventCallback): void;
+  // TypeScript method overload pattern - implementation signature
+  // eslint-disable-next-line no-dupe-class-members
   on(event: string, callback: SocketEventCallback): void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
@@ -216,11 +222,16 @@ class SocketService {
     }
   }
 
+   
+  // eslint-disable-next-line no-dupe-class-members
   off<K extends keyof SocketEventHandlers>(
     event: K,
     callback?: SocketEventHandlers[K]
   ): void;
+  // eslint-disable-next-line no-dupe-class-members
   off(event: string, callback?: SocketEventCallback): void;
+  // TypeScript method overload pattern - implementation signature
+  // eslint-disable-next-line no-dupe-class-members
   off(event: string, callback?: SocketEventCallback): void {
     if (callback) {
       const handlers = this.eventHandlers.get(event);
@@ -246,7 +257,7 @@ class SocketService {
     if (this.socket) {
       this.socket.emit(event, data);
     } else {
-      console.warn(`Cannot emit event ${event}: Socket not connected`);
+      logger.warn(`Cannot emit event ${event}: Socket not connected`);
     }
   }
 

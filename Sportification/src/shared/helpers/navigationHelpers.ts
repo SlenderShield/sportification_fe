@@ -2,13 +2,26 @@
  * Navigation helper functions for type-safe navigation
  */
 
-export type NavigationParams = Record<string, any>;
+export type NavigationParams = Record<string, unknown>;
+
+// Navigation prop type from @react-navigation/native
+export interface NavigationProp {
+  navigate: (screen: string, params?: NavigationParams) => void;
+  replace: (screen: string, params?: NavigationParams) => void;
+  goBack: () => void;
+  canGoBack: () => boolean;
+  popToTop: () => void;
+  reset: (state: unknown) => void;
+  getState: () => unknown;
+  setParams: (params: NavigationParams) => void;
+  dispatch: (action: unknown) => void;
+}
 
 /**
  * Navigate to a screen with type-safe params
  */
 export const navigateTo = <T extends NavigationParams>(
-  navigation: any,
+  navigation: NavigationProp,
   screen: string,
   params?: T
 ): void => {
@@ -19,7 +32,7 @@ export const navigateTo = <T extends NavigationParams>(
  * Replace current screen with a new one
  */
 export const replaceWith = <T extends NavigationParams>(
-  navigation: any,
+  navigation: NavigationProp,
   screen: string,
   params?: T
 ): void => {
@@ -29,7 +42,7 @@ export const replaceWith = <T extends NavigationParams>(
 /**
  * Go back to previous screen
  */
-export const goBack = (navigation: any): void => {
+export const goBack = (navigation: NavigationProp): void => {
   if (navigation.canGoBack()) {
     navigation.goBack();
   }
@@ -38,7 +51,7 @@ export const goBack = (navigation: any): void => {
 /**
  * Pop to top of the stack
  */
-export const popToTop = (navigation: any): void => {
+export const popToTop = (navigation: NavigationProp): void => {
   navigation.popToTop();
 };
 
@@ -46,7 +59,7 @@ export const popToTop = (navigation: any): void => {
  * Reset navigation state
  */
 export const resetNavigation = (
-  navigation: any,
+  navigation: NavigationProp,
   screens: Array<{ name: string; params?: NavigationParams }>
 ): void => {
   navigation.reset({
@@ -59,7 +72,7 @@ export const resetNavigation = (
  * Navigate to tab
  */
 export const navigateToTab = (
-  navigation: any,
+  navigation: NavigationProp,
   tab: string,
   screen?: string,
   params?: NavigationParams
@@ -75,32 +88,40 @@ export const navigateToTab = (
  * Push a new screen on the stack
  */
 export const pushScreen = <T extends NavigationParams>(
-  navigation: any,
+  navigation: NavigationProp & { push?: (screen: string, params?: T) => void },
   screen: string,
   params?: T
 ): void => {
-  navigation.push(screen, params);
+  if (navigation.push) {
+    navigation.push(screen, params);
+  } else {
+    navigation.navigate(screen, params);
+  }
 };
 
 /**
  * Pop n screens from the stack
  */
-export const popScreens = (navigation: any, count: number = 1): void => {
-  navigation.pop(count);
+export const popScreens = (navigation: NavigationProp & { pop?: (count: number) => void }, count: number = 1): void => {
+  if (navigation.pop) {
+    navigation.pop(count);
+  } else {
+    navigation.goBack();
+  }
 };
 
 /**
  * Check if can go back
  */
-export const canGoBack = (navigation: any): boolean => {
+export const canGoBack = (navigation: NavigationProp): boolean => {
   return navigation.canGoBack();
 };
 
 /**
  * Get current route name
  */
-export const getCurrentRouteName = (navigation: any): string | undefined => {
-  return navigation.getCurrentRoute()?.name;
+export const getCurrentRouteName = (navigation: NavigationProp & { getCurrentRoute?: () => { name?: string } }): string | undefined => {
+  return navigation.getCurrentRoute?.()?.name;
 };
 
 /**

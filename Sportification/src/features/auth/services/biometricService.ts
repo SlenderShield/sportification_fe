@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
 
 export interface BiometricCapabilities {
@@ -25,7 +26,7 @@ class BiometricService {
         biometryType: biometryType || null,
       };
     } catch (error) {
-      console.error('Biometric availability check error:', error);
+      logger.error('Biometric availability check error:', error);
       return {
         available: false,
         biometryType: null,
@@ -44,7 +45,7 @@ class BiometricService {
       });
       return success;
     } catch (error) {
-      console.error('Biometric authentication error:', error);
+      logger.error('Biometric authentication error:', error);
       return false;
     }
   }
@@ -57,7 +58,7 @@ class BiometricService {
       const { publicKey } = await this.rnBiometrics.createKeys();
       return !!publicKey;
     } catch (error) {
-      console.error('Create biometric keys error:', error);
+      logger.error('Create biometric keys error:', error);
       return false;
     }
   }
@@ -70,7 +71,7 @@ class BiometricService {
       const { keysDeleted } = await this.rnBiometrics.deleteKeys();
       return keysDeleted;
     } catch (error) {
-      console.error('Delete biometric keys error:', error);
+      logger.error('Delete biometric keys error:', error);
       return false;
     }
   }
@@ -83,7 +84,7 @@ class BiometricService {
       const { keysExist } = await this.rnBiometrics.biometricKeysExist();
       return keysExist;
     } catch (error) {
-      console.error('Check biometric keys error:', error);
+      logger.error('Check biometric keys error:', error);
       return false;
     }
   }
@@ -99,7 +100,7 @@ class BiometricService {
       });
       return success ? signature : null;
     } catch (error) {
-      console.error('Create signature error:', error);
+      logger.error('Create signature error:', error);
       return null;
     }
   }

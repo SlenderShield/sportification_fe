@@ -19,27 +19,6 @@ const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
   const { theme } = useTheme();
   const props = useTeamsScreen(navigation);
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useTeamsScreen } from '../hooks';
-import { useTheme } from '../../../theme';
-import { ListScreenTemplate } from '@shared/components/templates';
-import { Card, Avatar } from '@shared/components/organisms';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-interface TeamsScreenProps {
-  navigation: any;
-}
-
-const TeamsScreen: React.FC<TeamsScreenProps> = ({ navigation }) => {
-  const { theme } = useTheme();
-  const props = useTeamsScreen(navigation);
-
   const renderTeamItem = (item: any, index: number) => {
     const captain = item.members.find((m: any) => m.role === 'captain');
     

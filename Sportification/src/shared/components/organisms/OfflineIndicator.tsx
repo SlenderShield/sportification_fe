@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -48,6 +48,8 @@ const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
         opacity.value = withTiming(0, { duration: theme.animations.duration.normal });
       }
     }
+    // All dependencies are stable shared values and theme constants
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFullyOnline]);
 
   const animatedStyle = useAnimatedStyle(() => {

@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
 
@@ -21,7 +22,7 @@ class AnalyticsService {
     try {
       await analytics().logEvent(eventName, params);
     } catch (error) {
-      console.error('Analytics log event error:', error);
+      logger.error('Analytics log event error:', error);
     }
   }
 
@@ -35,7 +36,7 @@ class AnalyticsService {
         screen_class: screenClass || screenName,
       });
     } catch (error) {
-      console.error('Analytics screen view error:', error);
+      logger.error('Analytics screen view error:', error);
     }
   }
 
@@ -59,7 +60,7 @@ class AnalyticsService {
         await analytics().setUserProperty('sport', properties.sport);
       }
     } catch (error) {
-      console.error('Set user properties error:', error);
+      logger.error('Set user properties error:', error);
     }
   }
 
@@ -158,7 +159,7 @@ class AnalyticsService {
       }
       crashlytics().recordError(error);
     } catch (err) {
-      console.error('Crashlytics record error failed:', err);
+      logger.error('Crashlytics record error failed:', err);
     }
   }
 
@@ -169,7 +170,7 @@ class AnalyticsService {
     try {
       crashlytics().log(message);
     } catch (error) {
-      console.error('Crashlytics log error:', error);
+      logger.error('Crashlytics log error:', error);
     }
   }
 
@@ -180,7 +181,7 @@ class AnalyticsService {
     try {
       crashlytics().setAttribute(key, value);
     } catch (error) {
-      console.error('Set attribute error:', error);
+      logger.error('Set attribute error:', error);
     }
   }
 
@@ -191,7 +192,7 @@ class AnalyticsService {
     try {
       await analytics().setAnalyticsCollectionEnabled(enabled);
     } catch (error) {
-      console.error('Set analytics enabled error:', error);
+      logger.error('Set analytics enabled error:', error);
     }
   }
 
@@ -202,7 +203,7 @@ class AnalyticsService {
     try {
       await crashlytics().setCrashlyticsCollectionEnabled(enabled);
     } catch (error) {
-      console.error('Set crashlytics enabled error:', error);
+      logger.error('Set crashlytics enabled error:', error);
     }
   }
 }

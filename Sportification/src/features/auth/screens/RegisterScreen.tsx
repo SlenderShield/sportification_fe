@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRegisterScreen } from '../hooks';
 import { FormScreenTemplate } from '@shared/components/templates';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Text, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '../../../theme';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 

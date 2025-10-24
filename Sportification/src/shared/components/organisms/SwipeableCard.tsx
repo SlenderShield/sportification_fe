@@ -30,7 +30,6 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
   onDelete,
   leftActions = [],
   rightActions = [],
-  deleteThreshold = 80,
 }) => {
   const { theme } = useTheme();
 

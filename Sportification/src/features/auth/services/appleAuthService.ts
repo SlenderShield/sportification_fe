@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import { Platform } from 'react-native';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 
@@ -28,7 +29,7 @@ class AppleAuthService {
    */
   async signIn(): Promise<AppleUser | null> {
     if (!this.isSupported()) {
-      console.warn('Apple Sign-In is not supported on this device');
+      logger.warn('Apple Sign-In is not supported on this device');
       return null;
     }
 
@@ -70,17 +71,17 @@ class AppleAuthService {
       }
     } catch (error: any) {
       if (error.code === appleAuth.Error.CANCELED) {
-        console.log('User cancelled Apple Sign-In');
+        logger.log('User cancelled Apple Sign-In');
       } else if (error.code === appleAuth.Error.FAILED) {
-        console.log('Apple Sign-In failed');
+        logger.log('Apple Sign-In failed');
       } else if (error.code === appleAuth.Error.INVALID_RESPONSE) {
-        console.log('Invalid response from Apple');
+        logger.log('Invalid response from Apple');
       } else if (error.code === appleAuth.Error.NOT_HANDLED) {
-        console.log('Apple Sign-In not handled');
+        logger.log('Apple Sign-In not handled');
       } else if (error.code === appleAuth.Error.UNKNOWN) {
-        console.log('Unknown Apple Sign-In error');
+        logger.log('Unknown Apple Sign-In error');
       } else {
-        console.error('Apple Sign-In error:', error);
+        logger.error('Apple Sign-In error:', error);
       }
       return null;
     }
@@ -97,7 +98,7 @@ class AppleAuthService {
     try {
       return await appleAuth.getCredentialStateForUser(user);
     } catch (error) {
-      console.error('Get credential state error:', error);
+      logger.error('Get credential state error:', error);
       return appleAuth.State.UNKNOWN;
     }
   }

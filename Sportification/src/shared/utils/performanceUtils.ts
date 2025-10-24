@@ -1,3 +1,4 @@
+import { logger } from '@core';
 /**
  * Performance optimization utilities
  * 
@@ -73,11 +74,11 @@ export const measurePerformance = async <T>(
     try {
       const result = await fn();
       const duration = Date.now() - start;
-      console.log(`[Performance] ${name}: ${duration}ms`);
+      logger.log(`[Performance] ${name}: ${duration}ms`);
       return result;
     } catch (error) {
       const duration = Date.now() - start;
-      console.log(`[Performance] ${name} failed after: ${duration}ms`);
+      logger.log(`[Performance] ${name} failed after: ${duration}ms`);
       throw error;
     }
   } else {
@@ -188,7 +189,7 @@ export class PerformanceMonitor {
     const duration = endTimes[endTimes.length - 1] - startTimes[startTimes.length - 1];
     
     if (__DEV__) {
-      console.log(`[Performance] ${name}: ${duration}ms`);
+      logger.log(`[Performance] ${name}: ${duration}ms`);
     }
 
     return duration;

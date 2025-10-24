@@ -2,7 +2,6 @@ import { Dimensions, Platform } from 'react-native';
 
 export const getDeviceType = () => {
   const { width, height } = Dimensions.get('window');
-  const aspectRatio = height / width;
 
   if (Platform.OS === 'ios' && Platform.isPad) {
     return 'tablet';

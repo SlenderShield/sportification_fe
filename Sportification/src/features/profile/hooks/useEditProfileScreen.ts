@@ -48,7 +48,7 @@ export function useEditProfileScreen(navigation: any) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [values, validate, navigation]);
+  }, [validate, navigation]);
 
   return {
     values,

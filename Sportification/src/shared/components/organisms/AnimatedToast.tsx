@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { Text, StyleSheet, Animated } from 'react-native';
 import { useTheme } from '../../theme';
 import LottieLoader from '../common/LottieLoader';
 import { triggerSuccessNotification, triggerErrorNotification, triggerWarningNotification } from '@shared/utils/hapticFeedback';
@@ -64,6 +64,8 @@ const AnimatedToast: React.FC<AnimatedToastProps> = ({
 
       return () => clearTimeout(timer);
     }
+    // All dependencies are stable (animated values and constants)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const hideToast = () => {

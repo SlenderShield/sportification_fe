@@ -8,8 +8,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Platform,
-  Alert,
 } from 'react-native';
 import { useTheme } from '../../theme';
 import { Button } from '@shared/components/atoms';

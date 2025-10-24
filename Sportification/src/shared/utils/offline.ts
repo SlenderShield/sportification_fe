@@ -1,3 +1,4 @@
+import { logger } from "@core";
 /**
  * Offline Support Utilities
  * Provides utilities for handling offline functionality
@@ -73,7 +74,7 @@ export class OfflineActionQueue {
         this.queue = JSON.parse(queueData);
       }
     } catch (error) {
-      console.error('Failed to load offline queue:', error);
+      logger.error('Failed to load offline queue:', error instanceof Error ? error : undefined);
     }
   }
 
@@ -84,7 +85,7 @@ export class OfflineActionQueue {
     try {
       await AsyncStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(this.queue));
     } catch (error) {
-      console.error('Failed to save offline queue:', error);
+      logger.error('Failed to save offline queue:', error instanceof Error ? error : undefined);
     }
   }
 
@@ -134,7 +135,7 @@ export class OfflineActionQueue {
           }
         }
       } catch (error) {
-        console.error(`Failed to process action ${action.id}:`, error);
+        logger.error(`Failed to process action ${action.id}:`, error instanceof Error ? error : undefined);
         action.retryCount++;
         if (action.retryCount < MAX_RETRY_COUNT) {
           failedActions.push(action);
@@ -185,7 +186,7 @@ export const OfflineCache = {
   /**
    * Set cached data
    */
-  async set(key: string, data: any, duration: number = DEFAULT_CACHE_DURATION): Promise<void> {
+  async set(key: string, data: any, _duration: number = DEFAULT_CACHE_DURATION): Promise<void> {
     try {
       const cacheKey = `${CACHE_PREFIX}${key}`;
       const timestampKey = `${cacheKey}${CACHE_TIMESTAMP_SUFFIX}`;
@@ -193,7 +194,7 @@ export const OfflineCache = {
       await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
       await AsyncStorage.setItem(timestampKey, Date.now().toString());
     } catch (error) {
-      console.error(`Failed to cache data for key ${key}:`, error);
+      logger.error(`Failed to cache data for key ${key}:`, error instanceof Error ? error : undefined);
     }
   },
 
@@ -225,7 +226,7 @@ export const OfflineCache = {
 
       return JSON.parse(dataStr) as T;
     } catch (error) {
-      console.error(`Failed to get cached data for key ${key}:`, error);
+      logger.error(`Failed to get cached data for key ${key}:`, error instanceof Error ? error : undefined);
       return null;
     }
   },
@@ -243,7 +244,7 @@ export const OfflineCache = {
         AsyncStorage.removeItem(timestampKey),
       ]);
     } catch (error) {
-      console.error(`Failed to remove cached data for key ${key}:`, error);
+      logger.error(`Failed to remove cached data for key ${key}:`, error instanceof Error ? error : undefined);
     }
   },
 
@@ -256,7 +257,7 @@ export const OfflineCache = {
       const cacheKeys = keys.filter(key => key.startsWith(CACHE_PREFIX));
       await AsyncStorage.multiRemove(cacheKeys);
     } catch (error) {
-      console.error('Failed to clear all cached data:', error);
+      logger.error('Failed to clear all cached data:', error instanceof Error ? error : undefined);
     }
   },
 
@@ -275,7 +276,7 @@ export const OfflineCache = {
       const timestamp = parseInt(timestampStr, 10);
       return Date.now() - timestamp;
     } catch (error) {
-      console.error(`Failed to get cache age for key ${key}:`, error);
+      logger.error(`Failed to get cache age for key ${key}:`, error instanceof Error ? error : undefined);
       return null;
     }
   },
@@ -349,6 +350,7 @@ export const useOfflineData = <T,>(
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, enabled]);
 
   return {

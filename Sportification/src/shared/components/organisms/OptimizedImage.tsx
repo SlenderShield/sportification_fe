@@ -45,7 +45,6 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   style,
   placeholder = true,
   placeholderColor,
-  fadeInDuration = 300,
   cacheEnabled = true,
   resizeMode = 'cover',
   onLoadStart,

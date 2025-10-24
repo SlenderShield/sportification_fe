@@ -20,7 +20,7 @@ interface ChatDetailScreenProps {
   route: any;
 }
 
-const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ navigation, route }) => {
+const ChatDetailScreen: React.FC<ChatDetailScreenProps> = ({ route }) => {
   const { theme } = useTheme();
   const { chatId } = route.params;
   const props = useChatDetailScreen(chatId);

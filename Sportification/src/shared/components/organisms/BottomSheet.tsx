@@ -5,7 +5,6 @@ import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
 import { useTheme } from '../../theme';
 
@@ -40,6 +39,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         duration: theme.animations.duration.normal,
       });
     }
+    // All dependencies are stable shared values and theme constants
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   const animatedSheetStyle = useAnimatedStyle(() => {

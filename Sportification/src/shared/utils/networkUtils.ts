@@ -1,3 +1,4 @@
+import { logger } from '@core';
 import NetInfo from '@react-native-community/netinfo';
 
 /**
@@ -12,7 +13,7 @@ export const isOnline = async (): Promise<boolean> => {
     const state = await NetInfo.fetch();
     return state.isConnected === true && state.isInternetReachable === true;
   } catch (error) {
-    console.error('Error checking online status:', error);
+    logger.error('Error checking online status:', error);
     return false;
   }
 };
@@ -32,7 +33,7 @@ export const getNetworkState = async () => {
   try {
     return await NetInfo.fetch();
   } catch (error) {
-    console.error('Error getting network state:', error);
+    logger.error('Error getting network state:', error);
     return null;
   }
 };
@@ -140,7 +141,7 @@ export const getNetworkSpeed = async (): Promise<'slow' | 'medium' | 'fast' | 'u
     
     return 'unknown';
   } catch (error) {
-    console.error('Error getting network speed:', error);
+    logger.error('Error getting network speed:', error);
     return 'unknown';
   }
 };
@@ -153,7 +154,7 @@ export const isMeteredConnection = async (): Promise<boolean> => {
     const state = await NetInfo.fetch();
     return state.type === 'cellular';
   } catch (error) {
-    console.error('Error checking if connection is metered:', error);
+    logger.error('Error checking if connection is metered:', error);
     return false;
   }
 };
@@ -175,7 +176,7 @@ export const parseQueryParams = (url: string): Record<string, string> => {
       }
     });
   } catch (error) {
-    console.error('Error parsing query params:', error);
+    logger.error('Error parsing query params:', error);
   }
   
   return params;
@@ -213,8 +214,8 @@ export const extractDomain = (url: string): string => {
  */
 export const isValidUrl = (url: string): boolean => {
   try {
-    new URL(url);
-    return true;
+    const urlObj = new URL(url);
+    return !!urlObj;
   } catch {
     return false;
   }
