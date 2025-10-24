@@ -15,3 +15,6 @@ export * from './objectUtils';
 export * from './formatUtils';
 export * from './storageUtils';
 export * from './networkUtils';
+
+// Phase 8 utilities
+export * from './performanceUtils';
