@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   TextInput,
   View,
@@ -27,7 +27,7 @@ interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
 }
 
-const Input: React.FC<InputProps> = ({
+const Input: React.FC<InputProps> = React.memo(({
   label,
   error,
   helperText,
@@ -72,23 +72,23 @@ const Input: React.FC<InputProps> = ({
     };
   });
 
-  const handleFocus = (e: any) => {
+  const handleFocus = useCallback((e: any) => {
     setIsFocused(true);
     labelPosition.value = 1;
     borderColor.value = error ? theme.colors.error : theme.colors.primary;
     props.onFocus?.(e);
-  };
+  }, [error, theme.colors.error, theme.colors.primary, props, labelPosition, borderColor]);
 
-  const handleBlur = (e: any) => {
+  const handleBlur = useCallback((e: any) => {
     setIsFocused(false);
     if (!value) {
       labelPosition.value = 0;
     }
     borderColor.value = error ? theme.colors.error : theme.colors.outline;
     props.onBlur?.(e);
-  };
+  }, [value, error, theme.colors.error, theme.colors.outline, props, labelPosition, borderColor]);
 
-  const variantStyles = {
+  const variantStyles = useMemo(() => ({
     outlined: {
       backgroundColor: theme.colors.surface,
       borderWidth: 1,
@@ -100,7 +100,7 @@ const Input: React.FC<InputProps> = ({
       borderBottomWidth: 2,
       borderBottomColor: error ? theme.colors.error : theme.colors.outline,
     },
-  };
+  }), [theme.colors, error]);
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -207,7 +207,9 @@ const Input: React.FC<InputProps> = ({
       )}
     </View>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 const styles = StyleSheet.create({
   container: {
