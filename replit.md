@@ -1,186 +1,269 @@
-# Sportification Mobile App
+# 🏅 Sportification Mobile App
 
-## Overview
-A cross-platform React Native mobile application for the Sportification sports community platform. The app provides iOS and Android users with comprehensive features for sports match management, tournament coordination, venue bookings, real-time chat, and social networking.
+## 📘 Overview
 
-## Project Status
-- **Current State**: MVP implementation in progress
-- **Last Updated**: October 19, 2025
-- **Version**: 0.1.0
+**Sportification** is a **cross-platform React Native mobile application** for iOS and Android (including tablets and iPads) that powers the **Sportification sports community platform**.
 
-## Architecture
+The app enables users to:
 
-### Tech Stack
-- **Framework**: React Native 0.76.5 with TypeScript
-- **State Management**: Redux Toolkit with RTK Query
-- **Navigation**: React Navigation (Stack + Bottom Tabs)
-- **Real-time**: Socket.IO client
-- **HTTP Client**: Axios with auto-refresh interceptors
-- **Storage**: AsyncStorage + React Native Keychain
-- **Push Notifications**: Firebase Cloud Messaging (FCM) + Notifee
+* Discover and organize sports matches
+* Join or create tournaments
+* Manage teams and player stats
+* Book venues and manage availability
+* Chat in real time
+* Receive push notifications
+* Build a connected sports community
 
-### Project Structure
-```
+Built with **React Native + TypeScript**, the app delivers a responsive, secure, and high-performance experience across devices — from smartphones to tablets.
+
+---
+
+## 📦 Project Status
+
+* **Current State:** MVP implementation in progress
+* **Last Updated:** October 19, 2025
+* **Version:** 0.1.0
+
+---
+
+## ⚙️ System Architecture
+
+### 🧩 Frontend Architecture
+
+* **Framework:** React Native 0.81.2
+* **Language:** TypeScript 5.9.3
+* **React Version:** 19.1.1
+* **Engine:** Hermes
+* **Navigation:** React Navigation 7.x (Stack + Bottom Tabs)
+* **State Management:** Redux Toolkit + RTK Query
+* **Forms & Validation:** React Hook Form + Yup
+* **Authentication:** JWT-based with secure token storage via `react-native-keychain`
+* **Networking:** Axios with interceptors for token auto-refresh
+* **Real-time:** Socket.IO client with token-based authentication and auto-reconnect
+
+### 📡 Backend Integration
+
+* **API:** RESTful Sportification Backend API
+* **Versioning:** `/api/v1`
+* **Response Format:**
+
+  ```json
+  {
+    "success": true,
+    "data": {},
+    "message": "string",
+    "timestamp": "ISODate"
+  }
+  ```
+* **Modules Integrated:** Auth, Users, Matches, Tournaments, Teams, Venues, Chats, Notifications
+* **Real-time Events:** Match updates, tournament brackets, chat messages, notifications
+
+### 💾 Data Storage
+
+* **Secure Storage:** `react-native-keychain` for JWT tokens
+* **Local Configs:** AsyncStorage for app preferences
+* **Caching:** RTK Query tag invalidation and optimistic updates
+
+### 🎨 UI/UX Design
+
+* Responsive design for phones and tablets
+* Multi-column layout for tablets
+* Adaptive font and spacing utilities
+* Accessible touch targets and clear states
+* Smooth transitions, loading, and error handling
+
+---
+
+## 🏗️ Project Structure
+
+```bash
 src/
 ├── components/       # Reusable UI components
-│   ├── common/      # Button, Input, LoadingSpinner
-│   ├── matches/     # Match-specific components
+│   ├── common/      # Buttons, Inputs, Spinners
+│   ├── matches/     # Match components
 │   ├── tournaments/ # Tournament components
 │   └── ...
-├── navigation/       # Navigation configuration
+├── navigation/       # Navigation setup
 │   ├── RootNavigator.tsx
 │   ├── AuthNavigator.tsx
 │   └── MainNavigator.tsx
-├── screens/          # Screen components
-│   ├── Auth/        # Login, Register
-│   ├── Matches/     # Match list, detail, create
-│   ├── Tournaments/ # Tournament screens
-│   ├── Teams/       # Team management
-│   ├── Venues/      # Venue and booking screens
-│   ├── Chat/        # Chat screens
+├── screens/          # Feature screens
+│   ├── Auth/        # Login, Register, Profile
+│   ├── Matches/     # List, Detail, Create
+│   ├── Tournaments/ # Bracket view, Create
+│   ├── Teams/       # Create, Manage members
+│   ├── Venues/      # Venue details, Booking
+│   ├── Chat/        # Chat list and messages
 │   ├── Notifications/ # Notification center
-│   └── Profile/     # User profile
-├── services/         # API and utility services
-│   ├── api.ts       # Axios instance with JWT refresh
-│   └── socketService.ts # Socket.IO connection manager
-├── store/            # Redux store configuration
-│   ├── index.ts     # Store setup
-│   ├── hooks.ts     # Typed hooks
-│   ├── slices/      # Redux slices
-│   └── api/         # RTK Query API endpoints
-├── types/            # TypeScript type definitions
-├── config/           # App configuration
-└── utils/            # Utility functions
+│   └── Profile/     # Edit, stats, achievements
+├── services/         # API & Socket services
+│   ├── api.ts
+│   └── socketService.ts
+├── store/            # Redux setup
+│   ├── index.ts
+│   ├── hooks.ts
+│   ├── slices/
+│   └── api/
+├── types/            # TypeScript definitions
+├── config/           # App configurations
+└── utils/            # Helper utilities
 ```
 
-## Features Implemented
+---
 
-### Authentication & User Management
-- ✅ JWT-based login/register with secure token storage
-- ✅ Automatic token refresh on 401 errors
-- ✅ User profile display with stats and achievements
-- ✅ Friend search and management
-- ⏳ Password change (pending)
-- ⏳ Profile editing (pending)
+## 🚀 Features
 
-### Matches
-- ✅ Match browsing with pagination and status badges
-- ✅ Match detail view with participant list and organizer badge
-- ✅ Match creation with sport/venue selection and validation
-- ✅ Join/leave functionality
-- ✅ Update match status (start, complete, cancel) - organizer only
-- ✅ Score display for completed matches
-- ✅ Delete match (organizer only)
-- ✅ Match navigation stack integrated
+### 👤 Authentication & User Management
 
-### Tournaments
-- ✅ Tournament listing
-- ⏳ Tournament detail with bracket view
-- ⏳ Create tournament
-- ⏳ Join/leave tournament
+* ✅ JWT login/register with secure storage
+* ✅ Auto token refresh
+* ✅ User profile (stats, achievements)
+* ✅ Friend management (search, add, remove)
+* ⏳ Profile edit and password change
 
-### Teams
-- ✅ Team listing with member counts and captain display
-- ✅ Team detail view with member management
-- ✅ Create team form with sport selection
-- ✅ Join/leave team functionality
-- ✅ Delete team (captain only)
-- ✅ Team navigation stack integrated
+### 🏆 Matches
 
-### Venues & Bookings
-- ✅ Venue browsing
-- ⏳ Venue detail with availability
-- ⏳ Booking creation and management
-- ⏳ My bookings view
+* ✅ Browse matches with filters & pagination
+* ✅ Match detail with participants
+* ✅ Create and manage matches
+* ✅ Join/leave matches
+* ✅ Organizer control (start, complete, cancel)
+* ✅ Score tracking
 
-### Chat
-- ✅ Chat list with real-time updates
-- ⏳ Chat message view
-- ⏳ Send messages
-- ✅ Socket.IO integration with auto-reconnect
+### 🏅 Tournaments
 
-### Notifications
-- ⏳ Notification center
-- ⏳ Push notification integration
-- ⏳ Unread badge counts
+* ✅ Tournament listing
+* ⏳ Bracket view & details
+* ⏳ Create and manage tournaments
 
-## API Integration
-The app connects to the Sportification backend at:
-- **Base URL**: Configurable via `.env` file
-- **API Version**: `/api/v1`
-- **Socket.IO**: Real-time messaging and updates
+### 👥 Teams
+
+* ✅ Team list & details
+* ✅ Create, join, or leave team
+* ✅ Manage members
+* ✅ Delete team (captain only)
+
+### 🏟️ Venues & Bookings
+
+* ✅ Venue browsing
+* ⏳ Venue detail with booking slots
+* ⏳ Create/manage bookings
+
+### 💬 Chat
+
+* ✅ Chat list with real-time updates
+* ⏳ Chat messages (send/receive)
+* ✅ Auto-reconnect and typing indicators
+
+### 🔔 Notifications
+
+* ⏳ Notification center
+* ⏳ Push notifications (FCM + Notifee)
+* ⏳ Badge counts
+
+---
+
+## 🔌 External Dependencies
+
+### Backend
+
+* **Sportification Backend API** – Main REST API
+* **Socket.IO Server** – Real-time event hub
+
+### Third-Party
+
+* **Firebase Cloud Messaging (FCM)** – Push notifications
+* **Notifee** – Local notification display
+
+### Core Libraries
+
+| Category     | Libraries                                                                                                             |
+| ------------ | --------------------------------------------------------------------------------------------------------------------- |
+| Navigation   | `@react-navigation/native`, `@react-navigation/stack`, `@react-navigation/bottom-tabs`                                |
+| UI & Layout  | `react-native-vector-icons`, `react-native-safe-area-context`, `react-native-screens`, `react-native-gesture-handler` |
+| State & Data | `@reduxjs/toolkit`, `react-redux`, `axios`, `socket.io-client`                                                        |
+| Validation   | `react-hook-form`, `yup`, `@hookform/resolvers`                                                                       |
+| Utilities    | `date-fns`, `react-native-keychain`, `react-native-dotenv`                                                            |
+| Dev Tools    | `TypeScript`, `ESLint`, `Prettier`, `Jest`, `Babel`                                                                   |
+
+---
+
+## ⚙️ Environment Setup
 
 ### Environment Variables
-Create a `.env` file in the project root:
-```
+
+Create a `.env` file:
+
+```bash
 API_BASE_URL=http://your-backend-url:3000
 SOCKET_URL=http://your-backend-url:3000
 ```
 
-## Development
-
 ### Prerequisites
-- Node.js 18+
-- React Native development environment (Xcode for iOS, Android Studio for Android)
+
+* Node.js 18+
+* React Native CLI
+* Android Studio (Android) / Xcode (iOS)
 
 ### Installation
+
 ```bash
 cd Sportification
 npm install
 ```
 
-### Running the App
+### Run the App
+
 ```bash
-# Start Metro bundler
-npm start
-
-# iOS
-npm run ios
-
-# Android
-npm run android
+npm start      # Start Metro bundler
+npm run ios    # Run on iOS
+npm run android # Run on Android
 ```
 
-## Recent Changes
+---
 
-### October 19, 2025 - Complete Implementation
-- **All Must Have Features Implemented**: Completed all PRD requirements for MVP launch
-- **Match Management**: Full CRUD with join/leave, status updates, score tracking
-- **Tournament Management**: Complete with bracket view, join/leave, start tournament functionality
-- **Team Management**: Full CRUD with member management and captain operations
-- **Venue & Booking System**: Venue details, availability check, booking creation and management
-- **Real-time Chat**: Message history, send messages, Socket.IO integration for live updates
-- **Notifications**: Fetch, mark read, navigation to related content, unread count tracking
-- **Profile Features**: Edit profile, change password, friends management (search, add, remove)
-- **Navigation**: Complete stack navigators for all major features (Matches, Tournaments, Teams, Venues, Chats, Profile)
-- **Security**: JWT authentication with secure keychain storage, token auto-refresh
-- **Testing Documentation**: Comprehensive TESTING_GUIDE.md with detailed scenarios
+## 🧾 Recent Updates
 
-### October 19, 2025 - Initial Implementation
-- Initialized React Native project with TypeScript
-- Set up Redux Toolkit store with RTK Query API slices
-- Implemented authentication service with JWT token management
-- Created authentication screens (Login, Register, Profile)
-- Set up React Navigation with tab-based structure
-- Implemented Socket.IO service with auto-reconnect
-- Created initial screen implementations for Matches, Tournaments, Venues, Chat
-- Configured API services for all major features
+### October 19, 2025 – MVP Completion
 
-## Known Issues
-- LSP errors in some screen files due to type imports
-- Push notification setup incomplete
-- Several CRUD screens need implementation (Create Match, Create Tournament, etc.)
-- Chat message detail screen pending
+* ✅ Core MVP features complete
+* ✅ Full CRUD for Matches, Tournaments, Teams, Venues
+* ✅ Real-time chat via Socket.IO
+* ✅ Notifications framework integrated
+* ✅ Authentication security hardened
+* ✅ Added `TESTING_GUIDE.md` for QA
 
-## Next Steps
-1. Complete CRUD screens for Matches and Tournaments
-2. Implement push notification handlers
-3. Add offline caching for better UX
-4. Implement real-time Socket.IO event handlers in screens
-5. Add form validation and error handling
-6. Set up Firebase for push notifications
-7. Add platform-specific configurations (iOS/Android)
-8. Implement deep linking for match/tournament invites
+---
 
-## User Preferences
-- No specific preferences set yet
+## ⚠️ Known Issues
+
+* Minor TypeScript LSP errors
+* Push notification integration incomplete
+* Some CRUD forms under construction
+* Chat message detail view pending
+
+---
+
+## 🧭 Technical Roadmap (Q4 2025 → Q1 2026)
+
+| Milestone                              | Timeline            | Goals                                                                                             | Status         |
+| -------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------- | -------------- |
+| **Phase 1: MVP Finalization**          | Oct – Nov 2025      | Finalize CRUD for Matches & Tournaments, implement Socket.IO handlers, complete notification flow | 🟡 In Progress |
+| **Phase 2: Offline & Notifications**   | Nov – Dec 2025      | Implement FCM + Notifee integration, add offline caching (RTK Query persist), error resilience    | 🔜 Planned     |
+| **Phase 3: Enhanced UX & Performance** | Dec 2025 – Jan 2026 | Optimize navigation performance, improve UI for tablets, add animations, polish transitions       | 🔜 Upcoming    |
+| **Phase 4: Deep Linking & Sharing**    | Jan 2026            | Add deep links for match/tournament invites, integrate shareable links, test on both platforms    | 🔜 Planned     |
+| **Phase 5: Beta Launch**               | Feb 2026            | Internal beta rollout, bug fixes, QA automation, CI/CD setup                                      | 🔜 Pending     |
+| **Phase 6: Public Launch**             | Mar 2026            | Play Store + App Store release, analytics setup, post-launch monitoring                           | ⏳ Upcoming     |
+
+**Stretch Goals (Q2 2026):**
+
+* 🗺️ Map integration (Google Maps / Apple Maps) for venues
+* 🧩 In-app leaderboard & achievements
+* 🔐 End-to-end encryption for chat messages
+* 🌐 Multilingual support (EN, HI, ES)
+
+---
+
+## 💬 User Preferences
+
+Preferred communication style: **Simple, everyday language**
